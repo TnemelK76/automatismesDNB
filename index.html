@@ -104,6 +104,24 @@
 		    overflow: hidden;
 		    margin-bottom: 25px;
 		}
+		/* Style pour les miniatures dans le tableau final */
+		.mini-svg-container svg {
+		    max-width: 60px !important; /* Force la petite taille */
+		    height: auto !important;
+		    margin-top: 5px;
+		}
+		
+		/* On cache les textes trop petits dans les miniatures si besoin */
+		.mini-svg-container br {
+		    display: block;
+		    content: "";
+		    margin-top: 4px;
+		}
+		
+		.history-q-cell {
+		    line-height: 1.2;
+		    font-size: 0.8rem;
+		}
 		
     </style>
 </head>
@@ -945,7 +963,7 @@
 		        textColor = 'var(--green-dark)';
 		        icon = '✓';
 		    } else if (q.status === 'partial') {
-		        bgColor = 'rgba(255, 244, 229, 0.8)'; // Orange clair
+		        bgColor = 'rgba(255, 244, 229, 0.8)';
 		        textColor = 'var(--orange-dark)';
 		        icon = '⚠';
 		    } else {
@@ -954,9 +972,13 @@
 		        icon = '✗';
 		    }
 		
+		    // Ici on garde TOUTE la question (q.q) pour inclure le SVG
+		    // On ajoute un conteneur 'mini-svg' pour forcer la petite taille
 		    html += `
 		    <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
-		        <td style="padding: 10px 12px;">${q.q.split('<br>')[0]}</td>
+		        <td style="padding: 10px 12px;" class="history-q-cell">
+		            <div class="mini-svg-container">${q.q}</div>
+		        </td>
 		        <td style="padding: 10px 12px; text-align: center; color: ${textColor}; font-weight: bold;">
 		            ${icon} ${q.userAns || '-'}
 		        </td>
