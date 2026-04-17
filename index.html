@@ -78,12 +78,20 @@
 		    display: flex;
 		    min-height: 50px;
 		}
-		.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
+		.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; border-bottom: 1px solid var(--border);}
 		.history-table th { color: var(--text2); font-weight: 500; padding: 8px; border-bottom: 2px solid var(--border); }
 		.history-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: center; }
 		.row-wrong { background-color: #fffafa; }
 		.text-wrong { color: var(--red-dark); font-weight: bold; }
 		.text-correct { color: var(--green-dark); font-weight: bold; }
+		/* Pour arrondir les coins du tableau */
+		#history-container {
+		    border-radius: 16px;
+		    border: 1px solid var(--border);
+		    overflow: hidden;
+		    margin-bottom: 25px;
+		}
+		
     </style>
 </head>
 <body>
@@ -642,47 +650,59 @@
 }
 
     function next() {
-	    currentIdx++;
-	    if(currentIdx < 10) {
-	        showQuestion();
-	    } else {
-	        document.getElementById('quiz-screen').classList.add('hidden');
-	        document.getElementById('result-screen').classList.remove('hidden');
-	        document.getElementById('final-score-val').textContent = score;
-	
-	        // --- GÉNÉRATION DU TABLEAU D'HISTORIQUE ---
-	        let html = `
-	        <table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.9rem;">
-	            <thead>
-	                <tr style="border-bottom: 2px solid var(--border); color: var(--text2);">
-	                    <th style="text-align:left; padding:8px;">Question</th>
-	                    <th style="padding:8px;">Ta réponse</th>
-	                    <th style="padding:8px;">Correction</th>
-	                </tr>
-	            </thead>
-	            <tbody>`;
-	
-	        session.forEach(q => {
-	            const color = q.isCorrect ? '#27500A' : '#501313';
-	            const bgColor = q.isCorrect ? 'transparent' : '#FCEBEB';
-	            const cleanQ = q.q.split('<br>')[0]; // On enlève le SVG pour le tableau
-	
-	            html += `
-	            <tr style="border-bottom: 1px solid var(--border); background-color: ${bgColor};">
-	                <td style="text-align:left; padding:12px 8px;">${cleanQ}</td>
-	                <td style="text-align:center; color: ${color}; font-weight:bold;">${q.userAns || "—"}</td>
-	                <td style="text-align:center; padding:8px;">$${q.a}$</td>
-	            </tr>`;
-	        });
-	
-	        html += `</tbody></table>`;
-	        
-	        const container = document.getElementById('history-container');
-	        container.innerHTML = html;
-	        // Rendu des maths dans le tableau
-	        renderMathInElement(container, { delimiters: [{left: "$", right: "$", display: false}] });
-	    }
-	}
+        currentIdx++;
+        if(currentIdx < 10) showQuestion();
+        else showFinalResults();
+    }
+
+    function showFinalResults() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    const resScreen = document.getElementById('result-screen');
+    resScreen.classList.remove('hidden');
+    document.getElementById('final-score-val').textContent = score;
+
+    let html = `
+    <table class="history-table" style="width:100%; border-collapse: collapse; margin-top:20px; border-radius: 12px; overflow: hidden;">
+        <thead>
+            <tr style="background-color: var(--purple-light); color: var(--purple-dark);">
+                <th style="padding: 12px; text-align: left;">Question</th>
+                <th style="padding: 12px; text-align: center;">Ta réponse</th>
+                <th style="padding: 12px; text-align: center;">Correction</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    session.forEach(q => {
+        // Définition des couleurs de fond selon la réussite
+        const bgColor = q.isCorrect ? 'rgba(234, 243, 222, 0.6)' : 'rgba(252, 235, 235, 0.8)';
+        const textColor = q.isCorrect ? 'var(--green-dark)' : 'var(--red-dark)';
+        const icon = q.isCorrect ? '✓' : '✗';
+        
+        // On nettoie l'énoncé pour ne pas afficher les SVG ou les balises HTML dans le tableau
+        const cleanQ = q.q.split('<br>')[0];
+
+        html += `
+        <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
+            <td style="padding: 12px; font-size: 0.9rem;">${cleanQ}</td>
+            <td style="padding: 12px; text-align: center; font-weight: bold; color: ${textColor};">
+                ${icon} ${q.userAns || '-'}
+            </td>
+            <td style="padding: 12px; text-align: center; font-family: 'DM Mono', monospace;">
+                $${q.a}$
+            </td>
+        </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    
+    const container = document.getElementById('history-container');
+    container.innerHTML = html;
+    
+    // Rendu KaTeX pour les formules dans le tableau
+    renderMathInElement(container, { 
+        delimiters: [{left: "$", right: "$", display: false}] 
+    });
+}
     document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleValidation(); });
 </script>
 </body>
