@@ -617,9 +617,20 @@
 	}
 	//Fraction uniquement irréductible dans simplifier
 	else if (q.q.includes("Simplifier au maximum")) {
-		if (userRaw.replace(/\s+/g, '') === correctRaw.replace(/\s+/g, '')) {
-			isCorrect = true;
-		}
+	    const uClean = userRaw.replace(/\s+/g, '');
+	    const cClean = correctRaw.replace(/\s+/g, '');
+	    
+	    // Cas 1 : Correspondance exacte (ex: 3/4)
+	    if (uClean === cClean) {
+	        isCorrect = true;
+	    } 
+	    // Cas 2 : Le résultat est un entier (ex: attendu "5/1", reçu "5")
+	    else if (cClean.endsWith('/1')) {
+	        const integerPart = cClean.split('/')[0];
+	        if (uClean === integerPart) {
+	            isCorrect = true;
+	        }
+	    }
 	}
 	//ecriture scientifique
 	else if (q.q.includes("scientifique")) {
