@@ -178,6 +178,34 @@
         { v: "0,0035", a: "3,5 \\times 10^{-3}" }
     ];
 
+	function generateTriangleSVG(angleA, angleB, type = "normal") {
+	    // Coordonnées de base
+	    const x1 = 20, y1 = 130; // Point A (Bas-gauche)
+	    const x2 = 180, y2 = 130; // Point B (Bas-droite)
+	    
+	    // Calcul du point C selon les angles
+	    const angleA_rad = (angleA * Math.PI) / 180;
+	    const angleB_rad = (angleB * Math.PI) / 180;
+	    const sideAB = 160;
+	    const sideAC = (sideAB * Math.sin(angleB_rad)) / Math.sin(Math.PI - angleA_rad - angleB_rad);
+	    
+	    const x3 = x1 + sideAC * Math.cos(angleA_rad);
+	    const y3 = y1 - sideAC * Math.sin(angleA_rad);
+	
+	    const isRight = type === "rectangle";
+	
+	    return `
+	    <svg viewBox="0 0 220 150" class="triangle-svg" style="max-width:250px; margin: 10px auto; display:block;">
+	        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="var(--purple-dark)" stroke-width="2" />
+	        
+	        ${isRight ? `<rect x="${x1}" y="${y1-15}" width="15" height="15" fill="none" stroke="var(--purple-mid)" stroke-width="1.5" transform="rotate(${-angleA}, ${x1}, ${y1})"/>` : ''}
+	
+	        <text x="${x1+20}" y="${y1-5}" font-size="12" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>
+	        <text x="${x2-40}" y="${y2-5}" font-size="12" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
+	        <text x="${x3-10}" y="${y3+20}" font-size="14" fill="var(--red-dark)" font-weight="bold">?</text>
+	    </svg>`;
+	}
+	
     const GENERATORS = {
         calc: [
             () => {
@@ -416,7 +444,29 @@
                      : ratio === "cos" ? "cosinus = adjacent / hypoténuse"
                      :                  "tangente = opposé / adjacent"
                 };
-            }
+            },
+
+			() => {
+		        const isRight = Math.random() > 0.5;
+		        let a1, a2, qText;
+		
+		        if (isRight) {
+		            a1 = 90;
+		            a2 = Math.floor(Math.random() * 70) + 10;
+		            qText = "Dans ce triangle rectangle, calculer l'angle manquant :";
+		        } else {
+		            a1 = Math.floor(Math.random() * 60) + 30;
+		            a2 = Math.floor(Math.random() * (180 - a1 - 40)) + 20;
+		            qText = "Calculer la mesure de l'angle manquant :";
+		        }
+		
+		        const ans = 180 - a1 - a2;
+		        return {
+		            q: `${qText}<br>${generateTriangleSVG(a1, a2, isRight ? "rectangle" : "normal")}`,
+		            a: ans.toString() + "°",
+		            h: "La somme des angles d'un triangle est toujours égale à $180°$."
+		        };
+		    }
 
         ],
         proba: [
@@ -613,6 +663,21 @@
 	            isCorrect = (uL_norm === cL_norm && uR_norm === cR_norm) || 
 	                        (uL_norm === cR_norm && uR_norm === cL_norm);
 	        }
+	    }
+	}
+	// Validation Somme des angles avec gestion du score partiel
+	else if (q.q.includes("angle manquant")) {
+	    const userClean = userRaw.replace(/\s/g, '');
+	    const correctClean = q.a.replace(/\s/g, ''); // Contient le "°"
+	    
+	    const userValue = userClean.replace('°', '');
+	    const correctValue = correctClean.replace('°', '');
+	
+	    if (userClean === correctClean) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        // L'élève a mis la bonne valeur numérique mais a oublié le "°"
+	        partial = true; 
 	    }
 	}
 	//Fraction uniquement irréductible dans simplifier
