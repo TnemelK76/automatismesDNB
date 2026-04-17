@@ -121,9 +121,10 @@
         <div id="question-text" class="question-text"></div>
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
 		<div class="math-shortcuts">
-		    <button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('*')">$\times$</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">$\frac{a}{b}$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^n$</button>
 		</div>
         <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
         <div id="feedback" class="feedback hidden"></div>
@@ -136,7 +137,7 @@
 	    </div>
 	    <div id="history-container" style="margin-bottom: 20px;"></div> 
 	    
-	    <button class="validate-btn" onclick="location.reload()">Recommencer</button>
+	    <button class="validate-btn" onclick="location.reload()">Retour au menu</button>
 	</div>
 </div>
 
