@@ -682,7 +682,6 @@
                     return { q: `Roue de loterie de ${secteurs} secteurs. ${gagnants} secteurs gagnants. Probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "favorable / total" };
                 }
             },
-			stat: [
 		    () => {
 		        const effectifs = [
 		            Math.floor(Math.random() * 8) + 1,
@@ -744,7 +743,6 @@
 		            a: reponse.toString()
 		        };
 		    }
-]
         ]
     };
 
