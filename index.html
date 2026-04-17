@@ -46,20 +46,36 @@
 			stroke-linecap: round;
 			stroke-linejoin: round;
 		}
+		.math-shortcuts .katex-display, 
 		.math-shortcuts .katex {
+		    margin: 0 !important;
+		    padding: 0 !important;
 		    font-size: 1.2rem;
 		}
 		
-		/* Supprime les marges automatiques de KaTeX qui créent l'espace */
-		.math-shortcuts .katex-display, .math-shortcuts .katex {
-		    margin: 0 !important;
-		    padding: 0 !important;
+		.math-shortcuts {
+		    display: flex;       /* Aligne les boutons horizontalement */
+		    gap: 10px;          /* Espace entre les boutons */
+		    margin-top: 20px;
+		    margin-bottom: 10px;
+		    width: 100%;        /* Prend toute la largeur de l'app */
 		}
-		
+		.short-btn:active {
+		    background: var(--purple-mid);
+		    transform: translateY(2px);
+		}
 		.short-btn {
-		    display: flex;
+			flex: 1;            /* Donne la même largeur à chaque bouton */
+		    height: 55px;       /* Hauteur fixe pour éviter les déformations */
+		    background: var(--purple-light);
+		    border: 1px solid var(--border);
+		    border-radius: 12px;
+		    cursor: pointer;
+		    display: flex;      /* Centre le contenu KaTeX à l'intérieur */
 		    align-items: center;
 		    justify-content: center;
+		    transition: all 0.2s;
+		    display: flex;
 		    min-height: 50px;
 		}
     </style>
