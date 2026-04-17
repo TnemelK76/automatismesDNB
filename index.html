@@ -897,11 +897,21 @@
 	        }
 	    }
 	}
-	//ecriture scientifique
+	// ecriture scientifique
 	else if (q.q.includes("scientifique")) {
-		let u = userRaw.replace(/\s/g, '').replace('*', '×');
-		let c = q.a.replace(/\\times/g, '×').replace(/[\{\}]/g, '').replace(/\s/g, '');
-		if (u === c || u === c.replace('×10^', '*10^')) isCorrect = true;
+	    // 1. On nettoie la réponse utilisateur (espaces, virgules, croix et x -> étoile)
+	    let u = userRaw.replace(/\s/g, '').replace(',', '.').replace('×', '*').replace('x', '*');
+	    
+	    // 2. On nettoie la réponse attendue (LaTeX, accolades, espaces, virgules -> étoile)
+	    let c = q.a.replace(/\\times/g, '*')
+	               .replace(/[\{\}]/g, '')
+	               .replace(/\s/g, '')
+	               .replace(',', '.');
+	    
+	    // 3. Comparaison (on accepte avec ou sans le symbole ^ selon la saisie)
+	    if (u === c || u === c.replace('^', '')) {
+	        isCorrect = true;
+	    }
 	}
 	//Accepter x= dans équation
 	else if (q.q.includes("Résoudre")) {
