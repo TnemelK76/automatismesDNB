@@ -689,19 +689,21 @@
 	    score += 1;
 	    fb.textContent = "✓ Parfait !";
 	    fb.className = "feedback correct";
+		renderMathInElement(fb, { delimiters: [{left: "$", right: "$", display: false}] });
 		setTimeout(next, 1000)
 	} else if (partial) {
 	    score += 0.5;
 	    fb.innerHTML = `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
 	    fb.className = "feedback partial"; // On va créer ce style CSS
+		renderMathInElement(fb, { delimiters: [{left: "$", right: "$", display: false}] });
 		setTimeout(next, 3000)
 	} else {
 	    fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
 	    fb.className = "feedback wrong";
+		renderMathInElement(fb, { delimiters: [{left: "$", right: "$", display: false}] });
 		setTimeout(next, 3000)
 	}
 }
-setTimeout(next, 3000)
     function next() {
         currentIdx++;
         if(currentIdx < 10) {
