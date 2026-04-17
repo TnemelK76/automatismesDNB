@@ -669,16 +669,16 @@
             () => {
                 const type = Math.floor(Math.random() * 4);
                 if (type === 0) {
-                    const r = Math.floor(Math.random() * 6) + 2, b = Math.floor(Math.random() * 6) + 2;
+                    const r = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 8) + 2;
                     return { q: `Une urne contient ${r} boules rouges et ${b} bleues. Probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "favorable / total" };
                 } else if (type === 1) {
                     const seuil = Math.floor(Math.random() * 3) + 2;
-                    return { q: `Dé à 6 faces. Probabilité d'obtenir un nombre > ${seuil} ?`, a: `${6-seuil}/6`, h: "favorable / total" };
+                    return { q: `Dé à 6 faces. Probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "favorable / total" };
                 } else if (type === 2) {
                     const p = Math.floor(Math.random() * 8) + 1;
-                    return { q: `La probabilité qu'il pleuve est de $${p}/10$. Probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
+                    return { q: `La probabilité qu'il pleuve demain est de $${p}/10$. Probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
                 } else {
-                    const secteurs = [8, 10, 12][Math.floor(Math.random()*3)]; const gagnants = Math.floor(Math.random()*3) + 1;
+                    const secteurs = [8, 10, 12, 15, 20][Math.floor(Math.random()*3)]; const gagnants = Math.floor(Math.random()*secteurs/2) + 2 ;
                     return { q: `Roue de loterie de ${secteurs} secteurs. ${gagnants} secteurs gagnants. Probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "favorable / total" };
                 }
             },
@@ -825,7 +825,7 @@
 		        </div>`;
 		
 		        return {
-		            q: `Le graphique représente la température d'une journée. <br> <b>De combien de degrés la température a-t-elle augmenté entre ${labels[idxA]} et ${labels[idxB]} ?</b> ${svg}`,
+		            q: `Le graphique représente l'évolution de la température sur une journée. <br> <b>De combien de degrés la température a-t-elle augmenté entre ${labels[idxA]} et ${labels[idxB]} ?</b> ${svg}`,
 		            a: reponse.toString()
 		        };
 		    }
