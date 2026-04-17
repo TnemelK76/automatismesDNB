@@ -67,7 +67,10 @@
 		    transition: all 0.1s;
 		    touch-action: manipulation; /* Optimise le clic sur mobile */
 		}
-		
+		.short-btn i {
+		    font-size: 1.3rem; /* Le x légèrement plus grand */
+		    margin-right: 1px;
+		}
 		.short-btn:active {
 		    background: var(--purple-mid);
 		    color: white;
@@ -102,7 +105,9 @@
         <div id="question-text" class="question-text"></div>
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
 		<div class="math-shortcuts">
-		    <button type="button" class="short-btn" onclick="insertSymbol('²')">x²</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('²')">
+			    <i style="font-family: 'serif'; font-style: italic;">x</i>²
+			</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('*')">×</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">/</button>
 		</div>
