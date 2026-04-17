@@ -179,33 +179,47 @@
     ];
 
 	function generateTriangleSVG(angleA, angleB, type = "normal") {
-	    // Coordonnées de base
-	    const x1 = 20, y1 = 130; // Point A (Bas-gauche)
-	    const x2 = 180, y2 = 130; // Point B (Bas-droite)
-	    
-	    // Calcul du point C selon les angles
-	    const angleA_rad = (angleA * Math.PI) / 180;
-	    const angleB_rad = (angleB * Math.PI) / 180;
-	    const sideAB = 160;
-	    const sideAC = (sideAB * Math.sin(angleB_rad)) / Math.sin(Math.PI - angleA_rad - angleB_rad);
-	    
-	    const x3 = x1 + sideAC * Math.cos(angleA_rad);
-	    const y3 = y1 - sideAC * Math.sin(angleA_rad);
+	    // 1. Dimensions plus petites (Echelle réduite)
+	    const x1 = 30, y1 = 100; 
+	    const x2 = 140, y2 = 100; 
+	    const sideAB = 110;
+	
+	    const aRad = (angleA * Math.PI) / 180;
+	    const bRad = (angleB * Math.PI) / 180;
+	    const cRad = Math.PI - aRad - bRad;
+	
+	    const sideAC = (sideAB * Math.sin(bRad)) / Math.sin(cRad);
+	    const x3 = x1 + sideAC * Math.cos(aRad);
+	    const y3 = y1 - sideAC * Math.sin(aRad);
 	
 	    const isRight = type === "rectangle";
 	
+	    // Fonction utilitaire pour dessiner un arc d'angle
+	    const drawArc = (px, py, startAngle, sweepAngle, radius = 15) => {
+	        const startRad = -startAngle * Math.PI / 180;
+	        const endRad = -(startAngle + sweepAngle) * Math.PI / 180;
+	        const xStart = px + radius * Math.cos(startRad);
+	        const yStart = py + radius * Math.sin(startRad);
+	        const xEnd = px + radius * Math.cos(endRad);
+	        const yEnd = py + radius * Math.sin(endRad);
+	        return `<path d="M ${xStart} ${yStart} A ${radius} ${radius} 0 0 0 ${xEnd} ${yEnd}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+	    };
+	
 	    return `
-	    <svg viewBox="0 0 220 150" class="triangle-svg" style="max-width:250px; margin: 10px auto; display:block;">
+	    <svg viewBox="0 0 180 120" style="max-width:200px; margin: 5px auto; display:block; overflow:visible;">
 	        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="var(--purple-dark)" stroke-width="2" />
 	        
-	        ${isRight ? `<rect x="${x1}" y="${y1-15}" width="15" height="15" fill="none" stroke="var(--purple-mid)" stroke-width="1.5" transform="rotate(${-angleA}, ${x1}, ${y1})"/>` : ''}
+	        ${isRight ? `<path d="M ${x1} ${y1-12} L ${x1+12} ${y1-12} L ${x1+12} ${y1}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>` : drawArc(x1, y1, 0, angleA)}
 	
-	        <text x="${x1+20}" y="${y1-5}" font-size="12" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>
-	        <text x="${x2-40}" y="${y2-5}" font-size="12" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
-	        <text x="${x3-10}" y="${y3+20}" font-size="14" fill="var(--red-dark)" font-weight="bold">?</text>
+	        ${drawArc(x2, y2, 180 - angleB, -angleB)}
+	
+	        ${!isRight ? `<text x="${x1+18}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>` : ''}
+	        <text x="${x2-35}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
+	        
+	        <text x="${x3-5}" y="${y3+18}" font-size="15" fill="var(--red-dark)" font-weight="bold">?</text>
 	    </svg>`;
 	}
-	
+		
     const GENERATORS = {
         calc: [
             () => {
