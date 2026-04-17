@@ -583,42 +583,35 @@
     }
     // 2. PYTHAGORE
     else if (q.q.includes("égalité de Pythagore")) {
-		// 1. On vérifie la présence du signe égal
-		if (!userRaw.includes('=')) { isCorrect = false; } 
-		else {
-			const [uL, uR] = userRaw.split('=').map(clean);
-			const [cL, cR] = correctRaw.split('=').map(clean);
-
-			// Fonction interne pour vérifier si un membre contient bien des carrés
-			// Elle transforme "ab2+bc2" ou "ab^2+bc^2" en "ab2+bc2" normalisé
-			const checkAndNorm = (membre) => {
-				// On sépare par le signe +
-				const segments = membre.split('+');
-				return segments.map(seg => {
-					// regex : cherche 2 lettres suivies obligatoirement d'un indicateur de carré
-					const match = seg.match(/^([a-z]{2})(²|\^2|2)$/);
-					if (!match) return "INVALID"; 
-					// Retourne les 2 lettres triées + "2" pour la comparaison
-					return match[1].split('').sort().join('') + "2";
-				}).sort().join('+');
-			};
-
-			const uL_norm = checkAndNorm(uL);
-			const uR_norm = checkAndNorm(uR);
-			const cL_norm = checkAndNorm(cL);
-			const cR_norm = checkAndNorm(cR);
-
-			// Si un membre contient un segment sans carré, la validation échoue
-			if (uL_norm.includes("INVALID") || uR_norm.includes("INVALID")) {
-				isCorrect = false;
-			} else {
-				// Comparaison des deux côtés (permet l'inversion de l'égalité)
-				if ((uL_norm === cL_norm && uR_norm === cR_norm) || 
-					(uL_norm === cR_norm && uR_norm === cL_norm)) {
-					isCorrect = true;
-				}
-			}
-		}
+	    const cleanUser = userRaw.replace(/\s+/g, '');
+	    if (!cleanUser.includes('=')) { 
+	        isCorrect = false; 
+	    } else {
+	        const [uL, uR] = cleanUser.split('=');
+	        const [cL, cR] = correctRaw.replace(/\s+/g, '').split('=');
+	
+	        const normMembre = (membre) => {
+	            return membre.split('+').map(seg => {
+	                // Regex : cherche exactement 2 lettres + un carré (², ^2 ou 2)
+	                const match = seg.match(/^([a-z]{2})(²|\^2|2)$/);
+	                if (!match) return "INVALID"; 
+	                return match[1].split('').sort().join('') + "2";
+	            }).sort().join('+');
+	        };
+	
+	        const uL_norm = normMembre(uL);
+	        const uR_norm = normMembre(uR);
+	        
+	        // Si l'utilisateur a tapé "1", uL_norm sera "INVALID"
+	        if (uL_norm.includes("INVALID") || uR_norm.includes("INVALID")) {
+	            isCorrect = false;
+	        } else {
+	            const cL_norm = normMembre(cL);
+	            const cR_norm = normMembre(cR);
+	            isCorrect = (uL_norm === cL_norm && uR_norm === cR_norm) || 
+	                        (uL_norm === cR_norm && uR_norm === cL_norm);
+	        }
+	    }
 	}
 	//Fraction uniquement irréductible dans simplifier
 	else if (q.q.includes("Simplifier au maximum")) {
