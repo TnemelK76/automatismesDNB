@@ -180,26 +180,21 @@
 
 	function generateTriangleSVG(angleA, angleB, type = "normal") {
 	    const isRight = type === "rectangle";
-	    
-	    // Définition des points selon le type
-	    // [x1,y1] Bas Gauche | [x2,y2] Bas Droite | [x3,y3] Sommet Haut
 	    let x1, y1, x2, y2, x3, y3;
 	    
 	    if (isRight) {
-	        // Silhouette Triangle Rectangle
-	        x1 = 40;  y1 = 100;
-	        x2 = 150; y2 = 100;
-	        x3 = 40;  y3 = 30;
+	        x1 = 40;  y1 = 100; x2 = 150; y2 = 100; x3 = 40;  y3 = 30;
 	    } else {
-	        // Silhouette Triangle Quelconque
-	        x1 = 30;  y1 = 100;
-	        x2 = 150; y2 = 100;
-	        x3 = 70;  y3 = 30;
+	        x1 = 30;  y1 = 100; x2 = 150; y2 = 100; x3 = 75;  y3 = 30;
 	    }
 	
-	    // Fonction pour les arcs de codage
-	    const drawArc = (x, y, start, end) => {
-	        return `<path d="M ${x + Math.cos(start)*18} ${y + Math.sin(start)*18} A 18 18 0 0 1 ${x + Math.cos(end)*18} ${y + Math.sin(end)*18}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+	    const drawArc = (x, y, startAngleRad, endAngleRad) => {
+	        const r = 18;
+	        const xS = x + r * Math.cos(startAngleRad);
+	        const yS = y + r * Math.sin(startAngleRad);
+	        const xE = x + r * Math.cos(endAngleRad);
+	        const yE = y + r * Math.sin(endAngleRad);
+	        return `<path d="M ${xS} ${yS} A ${r} ${r} 0 0 1 ${xE} ${yE}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
 	    };
 	
 	    return `
@@ -208,17 +203,20 @@
 	        
 	        ${isRight ? 
 	            `<path d="M ${x1} ${y1-15} L ${x1+15} ${y1-15} L ${x1+15} ${y1}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>` : 
-	            drawArc(x1, y1, -1.1, 0) + `<text x="${x1+20}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>`
+	            drawArc(x1, y1, -1, 0) + `<text x="${x1+22}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>`
 	        }
 	
-	        ${isRight ? drawArc(x2, y2, 3.14, 3.65) : drawArc(x2, y2, 3.14, 3.9)}
-	        <text x="${x2-42}" y="${y2-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
+	        ${isRight ? drawArc(x2, y2, 3.14, 3.7) : drawArc(x2, y2, 3.14, 3.9)}
+	        <text x="${x2-45}" y="${y2-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
 	        
-	        ${isRight ? drawArc(x3, y3, 0.5, 1.57) : drawArc(x3, y3, 0.4, 1.8)}
-	        <text x="${x3+5}" y="${y3+25}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
+	        ${isRight ? 
+	            drawArc(x3, y3, 0.5, 1.57) : 
+	            drawArc(x3, y3, 0.6, 2.2)
+	        }
+	        <text x="${x3-2}" y="${y3+32}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
 	    </svg>`;
 	}
-		
+			
     const GENERATORS = {
         calc: [
             () => {
