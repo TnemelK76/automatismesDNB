@@ -797,10 +797,18 @@
 		
 		        // Lignes de température horizontales (tous les 5 degrés)
 		        let yGrid = "";
+				for (let deg = 0; deg <= 25; deg += 1) {
+		            const y = height - padding - (deg * yUnit);
+		            yGrid += `
+		                <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(0,0,0,0.1)" />
+		                <text x="${padding - 5}" y="${y + 3}" font-size="8" text-anchor="end">${deg}°</text>
+		            `;
+		        }
+				let yGrid = "";
 		        for (let deg = 0; deg <= 25; deg += 5) {
 		            const y = height - padding - (deg * yUnit);
 		            yGrid += `
-		                <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(0,0,0,0.05)" />
+		                <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(0,0,0,0.3)" />
 		                <text x="${padding - 5}" y="${y + 3}" font-size="8" text-anchor="end">${deg}°</text>
 		            `;
 		        }
