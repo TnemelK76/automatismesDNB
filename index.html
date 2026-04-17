@@ -344,8 +344,8 @@
                 // Arcs centrés sur chaque sommet :
                 // p1=(40,20) : côté vertical vers le bas → point à (40,32) ; hypo vers p3 → point à (50,27)
                 // p3=(120,80) : côté horizontal vers la gauche → point à (108,80) ; hypo vers p1 → point à (111,73)
-                const arcP1 = `<path d="M 40,32 A 12,12 0 0 1 50,27" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
-                const arcP3 = `<path d="M 108,80 A 12,12 0 0 0 111,73" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arcP1 = `<path d="M 40,32 A 12,12 0 0 0 50,27" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arcP3 = `<path d="M 108,80 A 12,12 0 0 1 111,73" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
                 const arc = angleEn === p1 ? arcP1 : arcP3;
                 const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
                     <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -489,7 +489,7 @@
     const clean = (s) => s.replace(/\s+/g, '');
 
 	// 0. TRIGONOMÉTRIE (rapport de deux segments)
-    if (q.q.includes("Écris le rapport")) {
+    if (q.q.includes("Quel rapport faut-il")) {
         // Accepte AB/CD, BA/CD, AB/DC, BA/DC — on trie les lettres de chaque segment
         const normSeg = (s) => clean(s).split('/').map(p => p.split('').sort().join('')).join('/');
         if (normSeg(userRaw) === normSeg(correctRaw)) isCorrect = true;
