@@ -46,39 +46,21 @@
 			stroke-linecap: round;
 			stroke-linejoin: round;
 		}
-		.math-shortcuts {
-		    display: flex;
-		    gap: 10px;
-		    margin-bottom: 12px;
-		    justify-content: center;
+		.math-shortcuts .katex {
+		    font-size: 1.2rem;
+		}
+		
+		/* Supprime les marges automatiques de KaTeX qui créent l'espace */
+		.math-shortcuts .katex-display, .math-shortcuts .katex {
+		    margin: 0 !important;
+		    padding: 0 !important;
 		}
 		
 		.short-btn {
-		    flex: 1;
-			display: flex;
+		    display: flex;
 		    align-items: center;
 		    justify-content: center;
-		    white-space: nowrap;
-		    padding: 12px 5px;
-		    background: var(--purple-light);
-		    border: 1px solid var(--purple-mid);
-		    border-radius: 8px;
-		    color: var(--purple-dark);
-		    font-family: 'DM Mono', monospace;
-		    font-weight: 600;
-		    font-size: 1.1rem;
-		    cursor: pointer;
-		    transition: all 0.1s;
-		    touch-action: manipulation; /* Optimise le clic sur mobile */
-		}
-		.short-btn .katex {
-		    font-size: 1.4rem; /* Taille globale du symbole dans le bouton */
-		    line-height: 1;
-		}
-		.short-btn:active {
-		    background: var(--purple-mid);
-		    color: white;
-		    transform: translateY(2px);
+		    min-height: 50px;
 		}
     </style>
 </head>
@@ -109,31 +91,9 @@
         <div id="question-text" class="question-text"></div>
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
 		<div class="math-shortcuts">
-		    <button type="button" class="short-btn" onclick="insertSymbol('²')">
-			    <span class="katex">
-			        <span class="katex-html" aria-hidden="true">
-			            <span class="base">
-			                <span class="mord mathnormal">x</span>
-			                <span class="msupsub">
-			                    <span class="vlist-t">
-			                        <span class="vlist-r">
-			                            <span class="vlist" style="height:0.8141em;">
-			                                <span style="top:-3.063em;margin-right:0.05em;">
-			                                    <span class="pstrut" style="height:2.7em;"></span>
-			                                    <span class="sizing reset-size6 size3 mtight">
-			                                        <span class="mord mtight">2</span>
-			                                    </span>
-			                                </span>
-			                            </span>
-			                        </span>
-			                    </span>
-			                </span>
-			            </span>
-			        </span>
-			    </span>
-			</button>
-		    <button type="button" class="short-btn" onclick="insertSymbol('*')">×</button>
-		    <button type="button" class="short-btn" onclick="insertSymbol('/')">/</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('*')">$\times$</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('/')">$\frac{a}{b}$</button>
 		</div>
         <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
         <div id="feedback" class="feedback hidden"></div>
@@ -435,7 +395,11 @@
     let session = [], currentIdx = 0, score = 0, isLocked = false;
 
     function startQuiz(theme) {
-        session = [];
+        // Force le rendu mathématique des nouveaux boutons
+	    renderMathInElement(document.querySelector('.math-shortcuts'), { 
+	        delimiters: [{left: "$", right: "$", display: false}] 
+	    });
+		session = [];
         const cats = theme === 'tout' ? Object.keys(GENERATORS) : [theme];
         for(let i=0; i<10; i++) {
             const cat = cats[Math.floor(Math.random()*cats.length)];
