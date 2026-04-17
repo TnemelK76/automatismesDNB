@@ -572,25 +572,26 @@
 	}
 	//Accepter x= dans équation
 	else if (q.q.includes("Résoudre")) {
-		// On nettoie la saisie de l'élève s'il a écrit "x = ..."
-        let userClean = clean(userRaw);
-        if (userClean.startsWith('x=')) {
-            userClean = userClean.split('=')[1];
-        }
+        let userClean = clean(userRaw).replace('x=', '');
+        let correctClean = clean(correctRaw).replace('x=', '');
 
-        // On nettoie aussi la réponse attendue au cas où
-        let correctClean = clean(correctRaw);
-        if (correctClean.startsWith('x=')) {
-            correctClean = correctClean.split('=')[1];
-        }
+        // Fonction pour convertir "7", "-7/-1" ou "1/2" en nombre décimal
+        const toNum = (s) => {
+            if (s.includes('/')) {
+                const p = s.split('/');
+                return parseFloat(p[0]) / parseFloat(p[1]);
+            }
+            return parseFloat(s);
+        };
 
-        // Comparaison finale
-        const c2 = (s) => s.replace(/\\times/g, '*').replace(/x/g, '*').replace(/\{/g, '').replace(/\}/g, '').replace(/([\+\-])1([a-z])/g, '$1$2').replace(/^1([a-z])/g, '$2');
-        
-        if (c2(userClean) === c2(correctClean)) {
+        const uVal = toNum(userClean);
+        const cVal = toNum(correctClean);
+
+        // Comparaison avec une petite marge d'erreur pour les arrondis
+        if (!isNaN(uVal) && Math.abs(uVal - cVal) < 0.0001) {
             isCorrect = true;
         }
-	}
+    }
     // 3. FRACTIONS & NOMBRES
     else if (correctRaw.includes('/')) {
         let uN, uD;
