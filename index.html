@@ -221,7 +221,47 @@
 	        <text x="${qMarkX}" y="${qMarkY}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
 	    </svg>`;
 	}
-			
+
+	function generatePerimeterSVG(type, data) {
+	    const color = "var(--purple-dark)";
+	    const accent = "var(--purple-mid)";
+	    const textColor = "var(--purple-deep)";
+	    
+	    let figure = "";
+	    if (type === "losange") {
+	        figure = `
+	            <path d="M 90 20 L 150 60 L 90 100 L 30 60 Z" fill="none" stroke="${color}" stroke-width="2" />
+	            <line x1="55" y1="35" x2="65" y2="45" stroke="${accent}" stroke-width="1.5" />
+	            <line x1="115" y1="35" x2="125" y2="45" stroke="${accent}" stroke-width="1.5" />
+	            <line x1="55" y1="85" x2="65" y2="75" stroke="${accent}" stroke-width="1.5" />
+	            <line x1="115" y1="85" x2="125" y2="75" stroke="${accent}" stroke-width="1.5" />
+	            <text x="130" y="45" font-size="12" fill="${textColor}" font-weight="bold">${data.cote} ${data.unit}</text>
+	        `;
+	    } else if (type === "rectangle") {
+	        figure = `
+	            <rect x="30" y="30" width="120" height="60" fill="none" stroke="${color}" stroke-width="2" />
+	            <path d="M 30 45 L 45 45 L 45 30" fill="none" stroke="${accent}" stroke-width="1" />
+	            <text x="90" y="22" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${data.L} ${data.unit}</text>
+	            <text x="155" y="65" font-size="12" fill="${textColor}" font-weight="bold">${data.l} ${data.unit}</text>
+	        `;
+	    } else if (type === "disque") {
+	        const isRayon = data.mode === "rayon";
+	        figure = `
+	            <circle cx="90" cy="60" r="40" fill="none" stroke="${color}" stroke-width="2" />
+	            <circle cx="90" cy="60" r="2" fill="${color}" />
+	            ${isRayon ? 
+	                `<line x1="90" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
+	                 <text x="100" y="55" font-size="11" fill="${textColor}" font-weight="bold">r = ${data.val} ${data.unit}</text>` :
+	                `<line x1="50" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
+	                 <text x="90" y="55" text-anchor="middle" font-size="11" fill="${textColor}" font-weight="bold">d = ${data.val} ${data.unit}</text>`
+	            }
+	        `;
+	    }
+	
+	    return `<svg viewBox="0 0 180 120" style="max-width:200px; margin: 5px auto; display:block; overflow:visible;">${figure}</svg>`;
+	}
+
+	
     const GENERATORS = {
         calc: [
             () => {
@@ -482,6 +522,45 @@
 		            a: ans.toString() + "°",
 		            h: "La somme des angles d'un triangle est toujours égale à $180°$."
 		        };
+		    },
+
+			() => {
+		        const types = ["losange", "rectangle", "disque"];
+		        const type = types[Math.floor(Math.random() * types.length)];
+		        const unit = "cm";
+		        let qText, ans, svg;
+		
+		        if (type === "losange") {
+		            const cote = Math.floor(Math.random() * 8) + 3;
+		            qText = "Calculer le périmètre de ce losange :";
+		            ans = (cote * 4).toString().replace('.', ',') + " \\text{ " + unit + "}";
+		            svg = generatePerimeterSVG("losange", {cote, unit});
+		        } else if (type === "rectangle") {
+		            const L = Math.floor(Math.random() * 6) + 6;
+		            const l = Math.floor(Math.random() * 4) + 2;
+		            qText = "Calculer le périmètre de ce rectangle :";
+		            ans = ((L + l) * 2).toString().replace('.', ',') + " \\text{ " + unit + "}";
+		            svg = generatePerimeterSVG("rectangle", {L, l, unit});
+		        } else {
+				    const val = Math.floor(Math.random() * 9) + 2;
+				    const isRayon = Math.random() > 0.5;
+				    const r = isRayon ? val : val / 2;
+				    
+				    qText = `Calculer le périmètre de ce disque au dixième près :`;
+				    
+				    // Calcul de la réponse attendue au dixième
+				    const calcul = 2 * Math.PI * r;
+				    // On garde la valeur numérique pour la validation et l'affichage propre
+				    ans = (Math.round(calcul * 10) / 10).toString().replace('.', ',') + " \\text{ " + unit + "}";
+				    
+				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
+				}
+		
+		        return {
+		            q: `${qText}<br>${svg}`,
+		            a: ans,
+		            h: type === "disque" ? "Périmètre d'un cercle : $P = 2 \\times \\pi \\times r$ ou $P = \\pi \\times d$." : "Le périmètre est la somme des longueurs des bords."
+		        };
 		    }
 
         ],
@@ -678,6 +757,27 @@
 	            const cR_norm = normMembre(cR);
 	            isCorrect = (uL_norm === cL_norm && uR_norm === cR_norm) || 
 	                        (uL_norm === cR_norm && uR_norm === cL_norm);
+	        }
+	    }
+	}
+		// Validation Périmètres
+	else if (q.q.includes("périmètre")) {
+	    const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
+	    const correctRaw = q.a.toLowerCase().replace(/\\text\{/g, '').replace(/\}/g, '').replace(/\s/g, '').replace(',', '.');
+	    
+	    const userNum = parseFloat(userClean);
+	    const correctNum = parseFloat(correctRaw);
+	    const hasUnit = userClean.includes('cm') || userClean.includes('m');
+	
+	    if (!isNaN(userNum)) {
+	        // SI c'est un disque -> marge de 0.11 | SINON -> égalité stricte (marge 0.01)
+	        const margin = q.q.includes("disque") ? 0.11 : 0.01;
+	        const isValueCorrect = Math.abs(userNum - correctNum) < margin;
+	
+	        if (isValueCorrect && hasUnit) {
+	            isCorrect = true;
+	        } else if (isValueCorrect && !hasUnit) {
+	            partial = true;
 	        }
 	    }
 	}
