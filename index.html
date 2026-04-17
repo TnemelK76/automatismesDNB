@@ -55,6 +55,10 @@
 		
 		.short-btn {
 		    flex: 1;
+			display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 2px;
 		    padding: 12px 5px;
 		    background: var(--purple-light);
 		    border: 1px solid var(--purple-mid);
@@ -67,9 +71,9 @@
 		    transition: all 0.1s;
 		    touch-action: manipulation; /* Optimise le clic sur mobile */
 		}
-		.short-btn i {
-		    font-size: 1.3rem; /* Le x légèrement plus grand */
-		    margin-right: 1px;
+		.short-btn .katex {
+		    font-size: 1.2rem; /* Ajuste la taille du x */
+		    pointer-events: none; /* Évite les problèmes de clic sur le span */
 		}
 		.short-btn:active {
 		    background: var(--purple-mid);
@@ -106,7 +110,7 @@
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
 		<div class="math-shortcuts">
 		    <button type="button" class="short-btn" onclick="insertSymbol('²')">
-			    <i style="font-family: 'serif'; font-style: italic;">x</i>²
+			    <span class="katex"><span class="katex-mathml">x</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>²
 			</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('*')">×</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">/</button>
