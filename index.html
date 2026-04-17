@@ -55,7 +55,7 @@
 		
 		.math-shortcuts {
 		    display: flex;       /* Aligne les boutons horizontalement */
-		    gap: 10px;          /* Espace entre les boutons */
+		    gap: 8px;          /* Espace entre les boutons */
 		    margin-top: 20px;
 		    margin-bottom: 10px;
 		    width: 100%;        /* Prend toute la largeur de l'app */
@@ -75,8 +75,8 @@
 		    align-items: center;
 		    justify-content: center;
 		    transition: all 0.2s;
-		    display: flex;
 		    min-height: 50px;
+			min-width: 0;
 		}
 		.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; border-bottom: 1px solid var(--border);}
 		.history-table th { color: var(--text2); font-weight: 500; padding: 8px; border-bottom: 2px solid var(--border); }
@@ -124,7 +124,7 @@
 		    <button type="button" class="short-btn" onclick="insertSymbol('*')">$\times$</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">$\frac{a}{b}$</button>
 			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
-			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^n$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('^')">$x^n$</button>
 		</div>
         <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
         <div id="feedback" class="feedback hidden"></div>
