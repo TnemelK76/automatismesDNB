@@ -104,31 +104,38 @@
 		    overflow: hidden;
 		    margin-bottom: 25px;
 		}
-		/* Conteneur pour gérer le dépassement lors du zoom */
-		.mini-svg-container {
-		    position: relative;
-		    display: inline-block;
-		}
-		
-		/* L'effet de survol sur le SVG */
-		.mini-svg-container svg {
+		/* On cible uniquement les SVG de figures, pas les symboles KaTeX */
+		.mini-svg-container > br + svg, 
+		.mini-svg-container > svg {
 		    max-width: 110px !important;
 		    height: auto !important;
-		    transition: all 0.3s ease; /* Transition fluide */
+		    transition: all 0.3s ease;
 		    cursor: zoom-in;
 		    display: block;
-		    margin: 8px 0;
+		    margin: 8px auto;
 		}
 		
-		/* État lors du survol */
-		.mini-svg-container svg:hover {
-		    transform: scale(2.2); /* Grossissement (x 2.2) */
+		/* L'effet de survol UNIQUEMENT sur la figure */
+		.mini-svg-container > br + svg:hover,
+		.mini-svg-container > svg:hover {
+		    transform: scale(2.2);
 		    position: relative;
-		    z-index: 100; /* Passe au-dessus des autres lignes */
-		    background: white; /* Fond blanc pour la lisibilité */
+		    z-index: 100;
+		    background: white;
 		    border-radius: 4px;
-		    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Ombre portée pour l'effet relief */
+		    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 		    padding: 5px;
+		}
+		
+		/* On s'assure que les SVG de KaTeX (chapeaux d'angles, racines...) restent intacts */
+		.katex svg {
+		    display: inline !important;
+		    max-width: none !important;
+		    transform: none !important;
+		    box-shadow: none !important;
+		    transition: none !important;
+		    margin: 0 !important;
+		    cursor: default !important;
 		}
 		
 		/* Empêche les lignes du tableau de bouger pendant le zoom */
