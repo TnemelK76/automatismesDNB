@@ -104,23 +104,36 @@
 		    overflow: hidden;
 		    margin-bottom: 25px;
 		}
-		/* Style pour les miniatures dans le tableau final */
+		/* Conteneur pour gérer le dépassement lors du zoom */
+		.mini-svg-container {
+		    position: relative;
+		    display: inline-block;
+		}
+		
+		/* L'effet de survol sur le SVG */
 		.mini-svg-container svg {
-		    max-width: 110px !important; /* Force la petite taille */
+		    max-width: 110px !important;
 		    height: auto !important;
-		    margin-top: 8px 0;
-		}
-		
-		/* On cache les textes trop petits dans les miniatures si besoin */
-		.mini-svg-container br {
+		    transition: all 0.3s ease; /* Transition fluide */
+		    cursor: zoom-in;
 		    display: block;
-		    content: "";
-		    margin-top: 14px;
+		    margin: 8px 0;
 		}
 		
+		/* État lors du survol */
+		.mini-svg-container svg:hover {
+		    transform: scale(2.2); /* Grossissement (x 2.2) */
+		    position: relative;
+		    z-index: 100; /* Passe au-dessus des autres lignes */
+		    background: white; /* Fond blanc pour la lisibilité */
+		    border-radius: 4px;
+		    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Ombre portée pour l'effet relief */
+		    padding: 5px;
+		}
+		
+		/* Empêche les lignes du tableau de bouger pendant le zoom */
 		.history-q-cell {
-		    padding: 15px 12px !important;
-		    vertical-align: middle;
+		    overflow: visible !important; /* Important pour que le zoom ne soit pas coupé */
 		}
 		
     </style>
