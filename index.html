@@ -652,17 +652,40 @@
 
     let session = [], currentIdx = 0, score = 0, isLocked = false;
 
-    function startQuiz(theme) {
-        // Force le rendu mathématique des nouveaux boutons
-	    renderMathInElement(document.querySelector('.math-shortcuts'), { 
-	        delimiters: [{left: "$", right: "$", display: false}] 
-	    });
-		session = [];
+	 // ── Génération sans répétition ──────────────────────────────────────────
+    function buildSession(theme) {
         const cats = theme === 'tout' ? Object.keys(GENERATORS) : [theme];
-        for(let i=0; i<10; i++) {
-            const cat = cats[Math.floor(Math.random()*cats.length)];
-            session.push(GENERATORS[cat][Math.floor(Math.random()*GENERATORS[cat].length)]());
+        const pool = [];
+        // Crée un pool large (jusqu'à 40 tentatives) puis déduplique par texte
+        const seen = new Set();
+        let tries = 0;
+        while (pool.length < 10 && tries < 80) {
+            tries++;
+            const cat = cats[Math.floor(Math.random() * cats.length)];
+            const gen = GENERATORS[cat][Math.floor(Math.random() * GENERATORS[cat].length)];
+            const q = gen();
+            // Clé de déduplication : les 60 premiers caractères de l'énoncé
+            const key = q.q.replace(/<[^>]+>/g, '').trim().slice(0, 60);
+            if (!seen.has(key)) {
+                seen.add(key);
+                pool.push(q);
+            }
         }
+        // Complète si le pool est insuffisant (thème très petit)
+        while (pool.length < 10) {
+            const cat = cats[Math.floor(Math.random() * cats.length)];
+            const gen = GENERATORS[cat][Math.floor(Math.random() * GENERATORS[cat].length)];
+            pool.push(gen());
+        }
+        return pool;
+    }
+
+	
+    function startQuiz(theme) {
+        renderMathInElement(document.querySelector('.math-shortcuts'), {
+            delimiters: [{left: "$", right: "$", display: false}]
+        });
+        session = buildSession(theme);
         currentIdx = 0; score = 0;
         document.getElementById('menu-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
@@ -824,10 +847,10 @@
 		// Validation Périmètres
 	else if (q.q.includes("périmètre")) {
 	    const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
-	    const correctRaw = q.a.toLowerCase().replace(/\\text\{/g, '').replace(/\}/g, '').replace(/\s/g, '').replace(',', '.');
+	    const perimCorrect = q.a.toLowerCase().replace(/\\text\{/g, '').replace(/\}/g, '').replace(/\s/g, '').replace(',', '.');
 	    
 	    const userNum = parseFloat(userClean);
-	    const correctNum = parseFloat(correctRaw);
+	    const correctNum = parseFloat(perimCorrect);
 	    const hasUnit = userClean.includes('cm') || userClean.includes('m');
 	
 	    if (!isNaN(userNum)) {
