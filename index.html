@@ -747,7 +747,85 @@
 					q: `À l'aide du diagramme ci-dessous, déterminer combien d'enfants ont <b>${ageConsigne} ans ou plus</b> dans cet échantillon. ${svg}`,
 					a: reponse.toString()
 				};
-			}
+			},
+		
+		    () => {
+		        const heures = [8, 11, 14, 17, 20];
+		        const labels = ["8h", "11h", "14h", "17h", "20h"];
+		        
+		        // 1. Génération de températures logiques (aléatoires mais cohérentes)
+		        const t8 = Math.floor(Math.random() * 5) + 4;      // Entre 4 et 9°
+		        const t11 = t8 + Math.floor(Math.random() * 4) + 2; // +2 à 5°
+		        const t14 = t11 + Math.floor(Math.random() * 5) + 3; // +3 à 7°
+		        const t17 = t14 + Math.floor(Math.random() * 3) + 1; // +1 à 3° (pic)
+		        const t20 = t17 - (Math.floor(Math.random() * 3) + 1); // Redescend de 1 à 3°
+		        
+		        const temps = [t8, t11, t14, t17, t20];
+		
+		        // 2. Tirage au sort de deux indices A et B pour la question (B > A pour une augmentation)
+		        // On limite à l'augmentation (entre 8h et 17h) pour coller à ta consigne
+		        const idxA = Math.floor(Math.random() * 3); // 8h, 11h ou 14h
+		        const idxB = idxA + 1 + Math.floor(Math.random() * (4 - idxA - 1)); // Une heure après A mais avant ou à 17h
+		        
+		        // Si on veut vraiment n'importe quelle paire, même la descente, on ferait :
+		        // const idxA = 0; const idxB = 3; // Exemple fixe ou tirage complet
+		        
+		        const reponse = temps[idxB] - temps[idxA];
+		
+		        // 3. Construction du SVG
+		        const padding = 30;
+		        const width = 220;
+		        const height = 120;
+		        const xStep = (width - 2 * padding) / 4;
+		        const yUnit = 4; // 1 degré = 4 pixels
+		
+		        let pointsStr = "";
+		        let circles = "";
+		        let grid = "";
+		
+		        // Quadrillage et points
+		        temps.forEach((t, i) => {
+		            const x = padding + i * xStep;
+		            const y = height - padding - (t * yUnit);
+		            pointsStr += `${x},${y} `;
+		            circles += `<circle cx="${x}" cy="${y}" r="3" fill="var(--red-dark)" />`;
+		            grid += `
+		                <line x1="${x}" y1="${height - padding}" x2="${x}" y2="${height - padding + 5}" stroke="black" />
+		                <text x="${x}" y="${height - 10}" font-size="9" text-anchor="middle">${labels[i]}</text>
+		            `;
+		        });
+		
+		        // Lignes de température horizontales (tous les 5 degrés)
+		        let yGrid = "";
+		        for (let deg = 0; deg <= 25; deg += 5) {
+		            const y = height - padding - (deg * yUnit);
+		            yGrid += `
+		                <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(0,0,0,0.05)" />
+		                <text x="${padding - 5}" y="${y + 3}" font-size="8" text-anchor="end">${deg}°</text>
+		            `;
+		        }
+		
+		        const svg = `
+		        <div style="text-align:center; margin: 15px 0;">
+		            <svg viewBox="0 0 ${width} ${height}" class="svg-math" style="max-width:300px; background:white; border-radius:8px;">
+		                ${yGrid}
+		                <line x1="${padding}" y1="${height - padding}" x2="${width - padding + 10}" y2="${height - padding}" stroke="black" stroke-width="1.2" />
+		                <line x1="${padding}" y1="${height - padding}" x2="${padding}" y2="10" stroke="black" stroke-width="1.2" />
+		                
+		                <polyline points="${pointsStr}" fill="none" stroke="var(--red-mid)" stroke-width="2" />
+		                ${circles}
+		                ${grid}
+		                
+		                <text x="${width/2}" y="${height - 2}" font-size="8" font-weight="bold" text-anchor="middle">Heure de la journée</text>
+		            </svg>
+		        </div>`;
+		
+		        return {
+		            q: `Le graphique suivant représente l'évolution de la température durant une journée. <br> <b>De combien de degrés la température a-t-elle augmenté entre ${labels[idxA]} et ${labels[idxB]} ?</b> ${svg}`,
+		            a: reponse.toString()
+		        };
+		    }
+
         ]
     };
 
