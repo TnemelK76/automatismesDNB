@@ -651,58 +651,63 @@
 
     function next() {
         currentIdx++;
-        if(currentIdx < 10) showQuestion();
-        else showFinalResults();
+        if(currentIdx < 10) {
+            showQuestion();
+        } else {
+            showFinalResults();
+        }
     }
 
     function showFinalResults() {
-    document.getElementById('quiz-screen').classList.add('hidden');
-    const resScreen = document.getElementById('result-screen');
-    resScreen.classList.remove('hidden');
-    document.getElementById('final-score-val').textContent = score;
+        document.getElementById('quiz-screen').classList.add('hidden');
+        const resScreen = document.getElementById('result-screen');
+        resScreen.classList.remove('hidden');
+        document.getElementById('final-score-val').textContent = score;
 
-    let html = `
-    <table class="history-table" style="width:100%; border-collapse: collapse; margin-top:20px; border-radius: 12px; overflow: hidden;">
-        <thead>
-            <tr style="background-color: var(--purple-light); color: var(--purple-dark);">
-                <th style="padding: 12px; text-align: left;">Question</th>
-                <th style="padding: 12px; text-align: center;">Ta réponse</th>
-                <th style="padding: 12px; text-align: center;">Correction</th>
-            </tr>
-        </thead>
-        <tbody>`;
+        let html = `
+        <div id="history-container" style="margin-top:20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px;">
+            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                    <tr style="background-color: var(--purple-light); color: var(--purple-dark);">
+                        <th style="padding: 12px; text-align: left;">Question</th>
+                        <th style="padding: 12px; text-align: center;">Ta réponse</th>
+                        <th style="padding: 12px; text-align: center;">Correction</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
-    session.forEach(q => {
-        // Définition des couleurs de fond selon la réussite
-        const bgColor = q.isCorrect ? 'rgba(234, 243, 222, 0.6)' : 'rgba(252, 235, 235, 0.8)';
-        const textColor = q.isCorrect ? 'var(--green-dark)' : 'var(--red-dark)';
-        const icon = q.isCorrect ? '✓' : '✗';
+        session.forEach(q => {
+            // Couleurs de fond : vert très clair ou rouge très clair
+            const bgColor = q.isCorrect ? 'rgba(234, 243, 222, 0.7)' : 'rgba(252, 235, 235, 0.8)';
+            const textColor = q.isCorrect ? 'var(--green-dark)' : 'var(--red-dark)';
+            const icon = q.isCorrect ? '✓' : '✗';
+            
+            // On enlève le SVG de l'énoncé pour le tableau
+            const cleanQ = q.q.split('<br>')[0];
+
+            html += `
+            <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <td style="padding: 10px 12px;">${cleanQ}</td>
+                <td style="padding: 10px 12px; text-align: center; font-weight: bold; color: ${textColor};">
+                    ${icon} ${q.userAns || '-'}
+                </td>
+                <td style="padding: 10px 12px; text-align: center;">$${q.a}$</td>
+            </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
         
-        // On nettoie l'énoncé pour ne pas afficher les SVG ou les balises HTML dans le tableau
-        const cleanQ = q.q.split('<br>')[0];
-
-        html += `
-        <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
-            <td style="padding: 12px; font-size: 0.9rem;">${cleanQ}</td>
-            <td style="padding: 12px; text-align: center; font-weight: bold; color: ${textColor};">
-                ${icon} ${q.userAns || '-'}
-            </td>
-            <td style="padding: 12px; text-align: center; font-family: 'DM Mono', monospace;">
-                $${q.a}$
-            </td>
-        </tr>`;
-    });
-
-    html += `</tbody></table>`;
-    
-    const container = document.getElementById('history-container');
-    container.innerHTML = html;
-    
-    // Rendu KaTeX pour les formules dans le tableau
-    renderMathInElement(container, { 
-        delimiters: [{left: "$", right: "$", display: false}] 
-    });
-}
+        // On insère le tableau juste avant le bouton "Retour au menu"
+        const resultDiv = document.getElementById('result-screen');
+        const existingTable = document.getElementById('history-container');
+        if(existingTable) existingTable.remove(); // Évite les doublons si on revient
+        
+        // On l'insère avant le bouton
+        resultDiv.querySelector('button').insertAdjacentHTML('beforebegin', html);
+        
+        // Rendu des maths
+        renderMathInElement(resultDiv, { delimiters: [{left: "$", right: "$", display: false}] });
+    }
     document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleValidation(); });
 </script>
 </body>
