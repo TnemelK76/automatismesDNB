@@ -232,21 +232,30 @@
 		    figure = `
 		        <path d="M 90 20 L 150 60 L 90 100 L 30 60 Z" fill="none" stroke="${color}" stroke-width="2" />
 		        
-		        <line x1="55" y1="45" x2="65" y2="35" stroke="${accent}" stroke-width="1.5" />
+		        <line x1="55" y1="35" x2="65" y2="45" stroke="${accent}" stroke-width="1.5" />
+		        
 		        <line x1="115" y1="45" x2="125" y2="35" stroke="${accent}" stroke-width="1.5" />
-		        <line x1="55" y1="75" x2="65" y2="85" stroke="${accent}" stroke-width="1.5" />
+		        
+		        <line x1="55" y1="85" x2="65" y2="75" stroke="${accent}" stroke-width="1.5" />
+		        
 		        <line x1="115" y1="75" x2="125" y2="85" stroke="${accent}" stroke-width="1.5" />
 		        
 		        <text x="135" y="40" font-size="12" fill="${textColor}" font-weight="bold">${data.cote} ${data.unit}</text>
 		    `;
 		} else if (type === "rectangle") {
-	        figure = `
-	            <rect x="30" y="30" width="120" height="60" fill="none" stroke="${color}" stroke-width="2" />
-	            <path d="M 30 45 L 45 45 L 45 30" fill="none" stroke="${accent}" stroke-width="1" />
-	            <text x="90" y="22" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${data.L} ${data.unit}</text>
-	            <text x="155" y="65" font-size="12" fill="${textColor}" font-weight="bold">${data.l} ${data.unit}</text>
-	        `;
-	    }  else if (type === "disque") {
+		    const w = 120; // Largeur visuelle
+		    const h = 60;  // Hauteur visuelle
+		    const x = 30;  // Position X
+		    const y = 30;  // Position Y
+		    const s = 12;  // Taille du carré d'angle droit
+		
+		    figure = `
+		        <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="2" />
+		        
+		        <path d="M ${x} ${y+s} L ${x+s} ${y+s} L ${x+s} ${y}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x} ${y+h-s} L ${x+s} ${y+h-s} L ${x+s} ${y+h}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x+w-s} ${y+h} L ${x+w-s} ${y+h-s} L ${x+w} ${y+h-s}" fill="none" stroke="${accent}" stroke-width="1" /> <text x="${x + w/2}" y="${y - 8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${data.L} ${data.unit}</text>
+		        <text x="${x + w + 5}" y="${y + h/2 + 5}" font-size="12" fill="${textColor}" font-weight="bold">${data.l} ${data.unit}</text>
+		    `;
+		}  else if (type === "disque") {
 			const isRayon = data.mode === "rayon";
 			figure = `
 				<circle cx="90" cy="60" r="40" fill="none" stroke="${color}" stroke-width="2" />
