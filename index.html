@@ -46,6 +46,33 @@
 			stroke-linecap: round;
 			stroke-linejoin: round;
 		}
+		.math-shortcuts {
+		    display: flex;
+		    gap: 10px;
+		    margin-bottom: 12px;
+		    justify-content: center;
+		}
+		
+		.short-btn {
+		    flex: 1;
+		    padding: 12px 5px;
+		    background: var(--purple-light);
+		    border: 1px solid var(--purple-mid);
+		    border-radius: 8px;
+		    color: var(--purple-dark);
+		    font-family: 'DM Mono', monospace;
+		    font-weight: 600;
+		    font-size: 1.1rem;
+		    cursor: pointer;
+		    transition: all 0.1s;
+		    touch-action: manipulation; /* Optimise le clic sur mobile */
+		}
+		
+		.short-btn:active {
+		    background: var(--purple-mid);
+		    color: white;
+		    transform: translateY(2px);
+		}
     </style>
 </head>
 <body>
@@ -74,6 +101,11 @@
         <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
         <div id="question-text" class="question-text"></div>
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
+		<div class="math-shortcuts">
+		    <button type="button" class="short-btn" onclick="insertSymbol('²')">x²</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('*')">×</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('/')">/</button>
+		</div>
         <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
         <div id="feedback" class="feedback hidden"></div>
     </div>
@@ -399,7 +431,53 @@
         document.getElementById('progress-bar').style.width = (currentIdx * 10) + '%';
         document.getElementById('live-score').textContent = score;
     }
+	
+	function normalizeAlgebra(str) {
+	    if (!str) return "";
+	    
+	    // 1. Nettoyage de base
+	    let s = str.toLowerCase().replace(/\s+/g, '').replace(/-/g, '+-');
+	    
+	    // 2. Découpage par les '+' (en gardant les '-' attachés aux nombres)
+	    let terms = s.split('+').filter(t => t !== "");
+	    
+	    // 3. Transformation des termes pour la comparaison
+	    // Ex: "x" devient "1x", "-x" devient "-1x"
+	    terms = terms.map(t => {
+	        if (t === "x") return "1x";
+	        if (t === "-x") return "-1x";
+	        return t;
+	    });
+	
+	    // 4. Tri alphabétique/numérique : les x^2 d'abord, puis x, puis les nombres
+	    terms.sort((a, b) => {
+	        const getPower = (term) => {
+	            if (term.includes('^2')) return 2;
+	            if (term.includes('x')) return 1;
+	            return 0;
+	        };
+	        return getPower(b) - getPower(a) || a.localeCompare(b);
+	    });
+	
+	    return terms.join('+').replace(/\+\-/g, '-');
+	}
 
+	function insertSymbol(symbol) {
+	    const input = document.getElementById('answer-input');
+	    const start = input.selectionStart;
+	    const end = input.selectionEnd;
+	    const text = input.value;
+	
+	    // Insère le symbole à la position du curseur
+	    input.value = text.slice(0, start) + symbol + text.slice(end);
+	
+	    // Repositionne le curseur juste après le symbole inséré
+	    input.selectionStart = input.selectionEnd = start + symbol.length;
+	
+	    // Redonne le focus à l'input pour que l'élève continue de taper
+	    input.focus();
+	}
+		
     function handleValidation() {
     if(isLocked) return;
     const inputEl = document.getElementById('answer-input');
@@ -484,22 +562,13 @@
 	}
     // 4. RESTE (Algèbre, développement, réduction, etc.)
     else {
-        // Normalise une expression algébrique pour comparaison souple :
-        // - supprime les espaces
-        // - accepte ² ou ^2
-        // - normalise le coefficient 1 implicite devant une lettre (x, y, a, b, t)
-        // - normalise le signe + en début ou après un signe
-        const normAlg = (s) => s
-            .replace(/\s+/g, '')
-            .replace(/²/g, '^2')
-            .replace(/\*\*/g, '^')
-            // Coefficient +1 ou -1 devant une lettre : "+-1x" → "-x", "+1x" → "+x"
-            .replace(/([\+\-])1([a-zA-Z])/g, '$1$2')
-            .replace(/^1([a-zA-Z])/g, '$1')
-            // Signe + en début inutile
-            .replace(/^\+/, '');
-        if (normAlg(userRaw) === normAlg(correctRaw)) isCorrect = true;
-    }
+	    const userNorm = normalizeAlgebra(userRaw);
+	    const correctNorm = normalizeAlgebra(correctRaw);
+	    
+	    if (userNorm === correctNorm) {
+	        isCorrect = true;
+	    }
+	}
 
     // Affichage résultat
     isLocked = true;
