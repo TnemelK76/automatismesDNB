@@ -570,6 +570,12 @@
 			isCorrect = true;
 		}
 	}
+	//ecriture scientifique
+	else if (q.q.includes("scientifique")) {
+		let u = userRaw.replace(/\s/g, '').replace('*', '×');
+		let c = q.a.replace(/\\times/g, '×').replace(/[\{\}]/g, '').replace(/\s/g, '');
+		if (u === c || u === c.replace('×10^', '*10^')) isCorrect = true;
+	}
 	//Accepter x= dans équation
 	else if (q.q.includes("Résoudre")) {
         let userClean = clean(userRaw).replace('x=', '');
