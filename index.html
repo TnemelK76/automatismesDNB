@@ -955,7 +955,7 @@
 	
 	    // 1. CAS PARFAIT : l'élève a mis les bonnes unités (ex: 1h30min, 45min, 1h)
 	    // On accepte aussi "0h45min" si la réponse attendue est "45min"
-	    if (u === c || u === "0" + c || (hFull === 0 && u === "0h" + c)) {
+	    if (u === c || u === "0" + c) {
 	        isCorrect = true;
 	    } 
 	    // 2. CAS PARTIEL (0,5 pt) : il manque "min" mais les nombres sont bons (ex: 1h30)
