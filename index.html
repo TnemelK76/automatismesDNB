@@ -126,7 +126,9 @@
 	    <div style="font-size: 3.5rem; font-weight: 600; color: var(--purple-mid); margin: 20px 0; text-align: center;">
 	        <span id="final-score-val">0</span>/10
 	    </div>
-	    <div id="history-container"></div> <button class="validate-btn" onclick="location.reload()">Recommencer</button>
+	    <div id="history-container" style="margin-bottom: 20px;"></div> 
+	    
+	    <button class="validate-btn" onclick="location.reload()">Recommencer</button>
 	</div>
 </div>
 
@@ -494,46 +496,6 @@
 	    // Redonne le focus à l'input pour que l'élève continue de taper
 	    input.focus();
 	}
-
-	function next() {
-	    currentIdx++;
-	    if(currentIdx < 10) {
-	        showQuestion();
-	    } else {
-	        document.getElementById('quiz-screen').classList.add('hidden');
-	        document.getElementById('result-screen').classList.remove('hidden');
-	        document.getElementById('final-score-val').textContent = score;
-	
-	        // Génération de l'historique
-	        let html = `<table class="history-table">
-	            <thead>
-	                <tr>
-	                    <th style="text-align:left">Question</th>
-	                    <th>Ta réponse</th>
-	                    <th>Correction</th>
-	                </tr>
-	            </thead>
-	            <tbody>`;
-	
-	        session.forEach(q => {
-	            const statusClass = q.isCorrect ? 'text-correct' : 'row-wrong';
-	            const userDisp = q.userAns === "" ? "—" : q.userAns;
-	            
-	            html += `<tr class="${statusClass}">
-	                <td style="text-align:left">${q.q.split('<br>')[0]}</td>
-	                <td class="${q.isCorrect ? '' : 'text-wrong'}">${userDisp}</td>
-	                <td>$${q.a}$</td>
-	            </tr>`;
-	        });
-	
-	        html += `</tbody></table>`;
-	        const container = document.getElementById('history-container');
-	        container.innerHTML = html;
-	        
-	        // Rendu mathématique du tableau
-	        renderMathInElement(container, { delimiters: [{left: "$", right: "$", display: false}] });
-	    }
-	}
 	
     function handleValidation() {
     if(isLocked) return;
@@ -663,24 +625,57 @@
     if(isCorrect) {
         score++; fb.textContent = "✓ Bravo !"; fb.classList.add('correct');
         document.getElementById('live-score').textContent = score;
-        setTimeout(next, 1200);
+        setTimeout(next, 1000);
     } else {
         fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
         renderMathInElement(fb, { delimiters: [{left: "$", right: "$", display: false}] });
         fb.classList.add('wrong');
-        setTimeout(next, 3500);
+        setTimeout(next, 3000);
     }
 }
 
     function next() {
-        currentIdx++;
-        if(currentIdx < 10) showQuestion();
-        else {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-score-val').textContent = score;
-        }
-    }
+	    currentIdx++;
+	    if(currentIdx < 10) {
+	        showQuestion();
+	    } else {
+	        document.getElementById('quiz-screen').classList.add('hidden');
+	        document.getElementById('result-screen').classList.remove('hidden');
+	        document.getElementById('final-score-val').textContent = score;
+	
+	        // --- GÉNÉRATION DU TABLEAU D'HISTORIQUE ---
+	        let html = `
+	        <table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.9rem;">
+	            <thead>
+	                <tr style="border-bottom: 2px solid var(--border); color: var(--text2);">
+	                    <th style="text-align:left; padding:8px;">Question</th>
+	                    <th style="padding:8px;">Ta réponse</th>
+	                    <th style="padding:8px;">Correction</th>
+	                </tr>
+	            </thead>
+	            <tbody>`;
+	
+	        session.forEach(q => {
+	            const color = q.isCorrect ? '#27500A' : '#501313';
+	            const bgColor = q.isCorrect ? 'transparent' : '#FCEBEB';
+	            const cleanQ = q.q.split('<br>')[0]; // On enlève le SVG pour le tableau
+	
+	            html += `
+	            <tr style="border-bottom: 1px solid var(--border); background-color: ${bgColor};">
+	                <td style="text-align:left; padding:12px 8px;">${cleanQ}</td>
+	                <td style="text-align:center; color: ${color}; font-weight:bold;">${q.userAns || "—"}</td>
+	                <td style="text-align:center; padding:8px;">$${q.a}$</td>
+	            </tr>`;
+	        });
+	
+	        html += `</tbody></table>`;
+	        
+	        const container = document.getElementById('history-container');
+	        container.innerHTML = html;
+	        // Rendu des maths dans le tableau
+	        renderMathInElement(container, { delimiters: [{left: "$", right: "$", display: false}] });
+	    }
+	}
     document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleValidation(); });
 </script>
 </body>
