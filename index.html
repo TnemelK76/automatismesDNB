@@ -370,9 +370,9 @@
 				    
 				    // On définit la réponse "parfaite" pour la base de données
 				    let reponseParfaite = "";
-				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull}h${m}min`;
-				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull}h`;
-				    else reponseParfaite = `${m}min`;
+				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull} \\text{h} ${m} \\text{min}`;
+				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull} \\text{h}`;
+				    else reponseParfaite = `${m} \\text{min}`;
 				
 				    return {
 				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
@@ -950,8 +950,11 @@
 	}
 	// Validation des durées
 	else if (q.q.includes("minutes")) {
-	    let u = userRaw.toLowerCase().replace(/\s/g, ''); // Réponse élève nettoyée
-	    let c = q.a.toLowerCase().replace(/\s/g, '');    // Réponse attendue nettoyée
+	    let u = userRaw.toLowerCase().replace(/\s/g, '').replace('heures', 'h').replace('heure', 'h'); // Réponse élève nettoyée
+	    let c = q.a.toLowerCase()
+               .replace(/\\text\{/g, '')
+               .replace(/\}/g, '')
+               .replace(/\s/g, '');  // Réponse attendue nettoyée
 	
 	    // 1. CAS PARFAIT : l'élève a mis les bonnes unités (ex: 1h30min, 45min, 1h)
 	    // On accepte aussi "0h45min" si la réponse attendue est "45min"
@@ -961,8 +964,8 @@
 	    // 2. CAS PARTIEL (0,5 pt) : il manque "min" mais les nombres sont bons (ex: 1h30)
 	    else {
 	        // On crée une version de la réponse attendue sans le "min" pour comparer
-	        let cSansMin = c.replace('min', '');
-	        if (u === cSansMin && c.includes('min')) {
+	        let cSansMin = c.replace('min', '').replace('h', '');
+	        if (u === cSansMin && (c.includes('min') || c.includes('h'))) {
 	            partial = true;
 	        }
 	    }
