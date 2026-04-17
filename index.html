@@ -686,30 +686,42 @@
 	function normalizeAlgebra(str) {
 	    if (!str) return "";
 	    
-	    // 1. Nettoyage de base
-	    let s = str.toLowerCase().replace(/\s+/g, '').replace(/-/g, '+-');
+	    // 1. Nettoyage de base et harmonisation des carrés
+	    let s = str.toLowerCase()
+	               .replace(/\s+/g, '')       // Supprime les espaces
+	               .replace(/²/g, '^2')       // RECTIFICATION : transforme ² en ^2 systématiquement
+	               .replace(/-/g, '+-');      // Prépare le découpage des termes
 	    
-	    // 2. Découpage par les '+' (en gardant les '-' attachés aux nombres)
+	    // 2. Découpage par les '+'
 	    let terms = s.split('+').filter(t => t !== "");
 	    
-	    // 3. Transformation des termes pour la comparaison
-	    // Ex: "x" devient "1x", "-x" devient "-1x"
+	    // 3. Transformation des termes (ex: "t" -> "1t", "-x" -> "-1x")
 	    terms = terms.map(t => {
-	        if (t === "x") return "1x";
-	        if (t === "-x") return "-1x";
+	        // On cherche une lettre (x, t, a, b...) qui n'est pas précédée d'un chiffre
+	        // Cette regex gère n'importe quelle variable alphabétique
+	        if (/^[-+]?[a-z]/.test(t) && !/^[-+]?\d/.test(t)) {
+	            return t.replace(/([a-z])/, '1$1');
+	        }
 	        return t;
 	    });
 	
-	    // 4. Tri alphabétique/numérique : les x^2 d'abord, puis x, puis les nombres
+	    // 4. Tri intelligent : Puissances décroissantes (t^2, puis t, puis constante)
 	    terms.sort((a, b) => {
 	        const getPower = (term) => {
-	            if (term.includes('^2') || term.includes('²')) return 2;
-	            if (term.includes('x')) return 1;
+	            if (term.includes('^2')) return 2;
+	            // Si le terme contient une lettre mais pas de ^2, c'est puissance 1
+	            if (/[a-z]/.test(term)) return 1;
 	            return 0;
 	        };
-	        return getPower(b) - getPower(a) || a.localeCompare(b);
+	        
+	        const pA = getPower(a);
+	        const pB = getPower(b);
+	        
+	        if (pA !== pB) return pB - pA;
+	        return a.localeCompare(b); // Tri alphabétique si même puissance
 	    });
 	
+	    // 5. Nettoyage final pour l'affichage/comparaison
 	    return terms.join('+').replace(/\+\-/g, '-');
 	}
 
