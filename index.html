@@ -554,10 +554,32 @@
 			}
 		}
 	}
+	//Fraction uniquement irréductible dans simplifier
 	else if (q.q.includes("Simplifier au maximum")) {
 		if (userRaw.replace(/\s+/g, '') === correctRaw.replace(/\s+/g, '')) {
 			isCorrect = true;
 		}
+	}
+	//Accepter x= dans équation
+	else if (q.q.includes("Résoudre")) {
+		// On nettoie la saisie de l'élève s'il a écrit "x = ..."
+        let userClean = clean(userRaw);
+        if (userClean.startsWith('x=')) {
+            userClean = userClean.split('=')[1];
+        }
+
+        // On nettoie aussi la réponse attendue au cas où
+        let correctClean = clean(correctRaw);
+        if (correctClean.startsWith('x=')) {
+            correctClean = correctClean.split('=')[1];
+        }
+
+        // Comparaison finale
+        const c2 = (s) => s.replace(/\\times/g, '*').replace(/x/g, '*').replace(/\{/g, '').replace(/\}/g, '').replace(/([\+\-])1([a-z])/g, '$1$2').replace(/^1([a-z])/g, '$2');
+        
+        if (c2(userClean) === c2(correctClean)) {
+            isCorrect = true;
+        }
 	}
     // 3. FRACTIONS & NOMBRES
     else if (correctRaw.includes('/')) {
