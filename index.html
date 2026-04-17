@@ -283,7 +283,53 @@
 						h: `Agrandissement de rapport $${k}$.` 
 					};
 				}
-			}
+			},
+
+            () => {
+                // Triangle rectangle : angle droit en p2 (bas-gauche), p1 (haut), p3 (bas-droite)
+                // Côtés nommés depuis l'angle choisi :
+                //   angle en p1 → opposé=p2p3 (bas), adjacent=p1p2 (gauche), hypo=p1p3 (hypo)
+                //   angle en p3 → opposé=p1p2 (gauche), adjacent=p2p3 (bas), hypo=p1p3 (hypo)
+                const noms = [["A","B","C"], ["R","S","T"], ["I","J","K"], ["U","V","W"], ["D","E","F"]][Math.floor(Math.random()*5)];
+                const [p1, p2, p3] = noms;
+                const angleEn = Math.random() > 0.5 ? p1 : p3; // angle choisi
+                const ratio  = ["sin","cos","tan"][Math.floor(Math.random()*3)];
+
+                // Segments nommés (paire de lettres dans l'ordre alphabétique du nom de côté)
+                const seg = (a, b) => a < b ? a+b : b+a; // ordre alphabétique non requis — on garde l'ordre naturel des points
+                const hypo = p1+p3, vert = p1+p2, horiz = p2+p3;
+
+                let opp, adj;
+                if (angleEn === p1) { opp = horiz; adj = vert; }
+                else                { opp = vert;  adj = horiz; }
+
+                // Réponse correcte : fraction de deux segments
+                let ansNum, ansDen;
+                if      (ratio === "sin") { ansNum = opp;  ansDen = hypo; }
+                else if (ratio === "cos") { ansNum = adj;  ansDen = hypo; }
+                else                     { ansNum = opp;  ansDen = adj;  }
+
+                // SVG identique au triangle Pythagore + arc sur l'angle choisi
+                const arcP1 = `<path d="M 40,28 A 13,13 0 0 1 48,20" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arcP3 = `<path d="M 112,80 A 13,13 0 0 0 120,72" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arc = angleEn === p1 ? arcP1 : arcP3;
+                const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
+                    <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor"/>
+                    ${arc}
+                    <text x="35" y="15" font-size="14" fill="currentColor">${p1}</text>
+                    <text x="30" y="95" font-size="14" fill="currentColor">${p2}</text>
+                    <text x="125" y="95" font-size="14" fill="currentColor">${p3}</text>
+                </svg>`;
+
+                return {
+                    q: `Quel rapport donne $\\${ratio}(\\widehat{${angleEn}})$ ?${svg}<small>(Écris le rapport sous la forme AB/CD)</small>`,
+                    a: `${ansNum}/${ansDen}`,
+                    h: ratio === "sin" ? "sinus = opposé / hypoténuse"
+                     : ratio === "cos" ? "cosinus = adjacent / hypoténuse"
+                     :                  "tangente = opposé / adjacent"
+                };
+            }
 
         ],
         proba: [
@@ -362,8 +408,14 @@
 
     const clean = (s) => s.replace(/\s+/g, '');
 
+	// 0. TRIGONOMÉTRIE (rapport de deux segments)
+    if (q.q.includes("Écris le rapport")) {
+        // Accepte AB/CD, BA/CD, AB/DC, BA/DC — on trie les lettres de chaque segment
+        const normSeg = (s) => clean(s).split('/').map(p => p.split('').sort().join('')).join('/');
+        if (normSeg(userRaw) === normSeg(correctRaw)) isCorrect = true;
+    }
     // 1. THALÈS (Rapports)
-    if (q.q.includes("rapports de Thalès")) {
+    else if (q.q.includes("rapports de Thalès")) {
         const uR = clean(userRaw).split('=');
         const cR = clean(correctRaw).split('=');
         if (uR.length === 3) {
