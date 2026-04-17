@@ -58,7 +58,7 @@
 			display: flex;
 		    align-items: center;
 		    justify-content: center;
-		    gap: 2px;
+		    white-space: nowrap;
 		    padding: 12px 5px;
 		    background: var(--purple-light);
 		    border: 1px solid var(--purple-mid);
@@ -72,8 +72,8 @@
 		    touch-action: manipulation; /* Optimise le clic sur mobile */
 		}
 		.short-btn .katex {
-		    font-size: 1.2rem; /* Ajuste la taille du x */
-		    pointer-events: none; /* Évite les problèmes de clic sur le span */
+		    font-size: 1.4rem; /* Taille globale du symbole dans le bouton */
+		    line-height: 1;
 		}
 		.short-btn:active {
 		    background: var(--purple-mid);
@@ -110,7 +110,27 @@
         <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off">
 		<div class="math-shortcuts">
 		    <button type="button" class="short-btn" onclick="insertSymbol('²')">
-			    <span class="katex"><span class="katex-mathml">x</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>²
+			    <span class="katex">
+			        <span class="katex-html" aria-hidden="true">
+			            <span class="base">
+			                <span class="mord mathnormal">x</span>
+			                <span class="msupsub">
+			                    <span class="vlist-t">
+			                        <span class="vlist-r">
+			                            <span class="vlist" style="height:0.8141em;">
+			                                <span style="top:-3.063em;margin-right:0.05em;">
+			                                    <span class="pstrut" style="height:2.7em;"></span>
+			                                    <span class="sizing reset-size6 size3 mtight">
+			                                        <span class="mord mtight">2</span>
+			                                    </span>
+			                                </span>
+			                            </span>
+			                        </span>
+			                    </span>
+			                </span>
+			            </span>
+			        </span>
+			    </span>
 			</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('*')">×</button>
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">/</button>
