@@ -1026,6 +1026,19 @@
 	        }
 	    }
 	}
+		// Validation températures
+	else if (q.q.includes("température")) {
+		const userCleaned = userRaw.toLowerCase()
+		    .replace(/\s/g, '')
+		    .replace('°c', '')
+		    .replace('°', '')
+		    .replace('c', '')
+		    .replace('degres', '')
+		    .replace('degre', '');
+		if (userCleaned === q.a.toLowerCase().replace(/\s/g, '')) {
+   			 isCorrect = true;
+		}
+	}
 		// Validation Périmètres
 	else if (q.q.includes("périmètre")) {
 	    const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
