@@ -78,6 +78,12 @@
 		    display: flex;
 		    min-height: 50px;
 		}
+		.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
+		.history-table th { color: var(--text2); font-weight: 500; padding: 8px; border-bottom: 2px solid var(--border); }
+		.history-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: center; }
+		.row-wrong { background-color: #fffafa; }
+		.text-wrong { color: var(--red-dark); font-weight: bold; }
+		.text-correct { color: var(--green-dark); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -116,10 +122,12 @@
     </div>
 
     <div id="result-screen" class="hidden">
-        <h1>Résultats</h1>
-        <div style="font-size: 3.5rem; font-weight: 600; color: var(--purple-mid); margin: 20px 0; text-align: center;"><span id="final-score-val">0</span>/10</div>
-        <button class="validate-btn" onclick="location.reload()">Retour au menu</button>
-    </div>
+	    <h1>Résultats</h1>
+	    <div style="font-size: 3.5rem; font-weight: 600; color: var(--purple-mid); margin: 20px 0; text-align: center;">
+	        <span id="final-score-val">0</span>/10
+	    </div>
+	    <div id="history-container"></div> <button class="validate-btn" onclick="location.reload()">Recommencer</button>
+	</div>
 </div>
 
 <script>
@@ -486,7 +494,47 @@
 	    // Redonne le focus à l'input pour que l'élève continue de taper
 	    input.focus();
 	}
-		
+
+	function next() {
+	    currentIdx++;
+	    if(currentIdx < 10) {
+	        showQuestion();
+	    } else {
+	        document.getElementById('quiz-screen').classList.add('hidden');
+	        document.getElementById('result-screen').classList.remove('hidden');
+	        document.getElementById('final-score-val').textContent = score;
+	
+	        // Génération de l'historique
+	        let html = `<table class="history-table">
+	            <thead>
+	                <tr>
+	                    <th style="text-align:left">Question</th>
+	                    <th>Ta réponse</th>
+	                    <th>Correction</th>
+	                </tr>
+	            </thead>
+	            <tbody>`;
+	
+	        session.forEach(q => {
+	            const statusClass = q.isCorrect ? 'text-correct' : 'row-wrong';
+	            const userDisp = q.userAns === "" ? "—" : q.userAns;
+	            
+	            html += `<tr class="${statusClass}">
+	                <td style="text-align:left">${q.q.split('<br>')[0]}</td>
+	                <td class="${q.isCorrect ? '' : 'text-wrong'}">${userDisp}</td>
+	                <td>$${q.a}$</td>
+	            </tr>`;
+	        });
+	
+	        html += `</tbody></table>`;
+	        const container = document.getElementById('history-container');
+	        container.innerHTML = html;
+	        
+	        // Rendu mathématique du tableau
+	        renderMathInElement(container, { delimiters: [{left: "$", right: "$", display: false}] });
+	    }
+	}
+	
     function handleValidation() {
     if(isLocked) return;
     const inputEl = document.getElementById('answer-input');
@@ -608,6 +656,10 @@
     const fb = document.getElementById('feedback');
     fb.classList.remove('hidden', 'correct', 'wrong');
 
+	// On enregistre les données pour l'historique
+    session[currentIdx].userAns = userRaw;
+    session[currentIdx].isCorrect = isCorrect;
+		
     if(isCorrect) {
         score++; fb.textContent = "✓ Bravo !"; fb.classList.add('correct');
         document.getElementById('live-score').textContent = score;
