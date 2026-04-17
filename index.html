@@ -356,7 +356,42 @@
             () => {
                 const n = Math.floor(Math.random() * 12) + 1;
                 return { q: `Calculer : $${n}^2$`, a: (n * n).toString(), h: `$${n} \\times ${n}$.` };
-            }
+            },
+			() {
+			    const type = Math.random() > 0.5 ? 'DEC_TO_HM' : 'MIN_TO_HM';
+			    
+			    if (type === 'DEC_TO_HM') {
+			        // Liste des valeurs décimales demandées
+			        const decs = [0.25, 0.5, 0.75, 1.25, 1.5, 1.75, 2.25, 2.5, 3.5, 3.75];
+				    const hDec = decs[Math.floor(Math.random() * decs.length)];
+				    
+				    const hFull = Math.floor(hDec);
+				    const m = Math.round((hDec - hFull) * 60);
+				    
+				    // On définit la réponse "parfaite" pour la base de données
+				    let reponseParfaite = "";
+				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull}h${m}min`;
+				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull}h`;
+				    else reponseParfaite = `${m}min`;
+				
+				    return {
+				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
+				        a: reponseParfaite,
+				        t: "duree"
+				    };
+			    } else {
+			        // Minutes vers Heures et Minutes (ex: 90 min -> 1h30)
+			        const totalMin = [75, 90, 105, 120, 135, 150, 180, 210][Math.floor(Math.random() * 8)];
+			        const h = Math.floor(totalMin / 60);
+			        const m = totalMin % 60;
+			        
+			        return {
+			            q: `Convertir en heures et minutes : $${totalMin}\\text{ min}$`,
+			            a: m === 0 ? `${h} \\text{ h}` : `${h} \\text{ h } ${m} \\text{ min}`,
+			            t: "duree"
+			        };
+			    }
+			}
         ],
         alg: [
             () => {
@@ -913,6 +948,27 @@
 	        isCorrect = true;
 	    }
 	}
+	// Validation des durées
+	else if (q.q.includes("minutes")) {
+	    let u = userRaw.toLowerCase().replace(/\s/g, ''); // Réponse élève nettoyée
+	    let c = q.a.toLowerCase().replace(/\s/g, '');    // Réponse attendue nettoyée
+	
+	    // 1. CAS PARFAIT : l'élève a mis les bonnes unités (ex: 1h30min, 45min, 1h)
+	    // On accepte aussi "0h45min" si la réponse attendue est "45min"
+	    if (u === c || u === "0" + c || (hFull === 0 && u === "0h" + c)) {
+	        isCorrect = true;
+	    } 
+	    // 2. CAS PARTIEL (0,5 pt) : il manque "min" mais les nombres sont bons (ex: 1h30)
+	    else {
+	        // On crée une version de la réponse attendue sans le "min" pour comparer
+	        let cSansMin = c.replace('min', '');
+	        if (u === cSansMin && c.includes('min')) {
+	            partial = true;
+	        }
+	    }
+	}
+
+		
 	//Accepter x= dans équation
 	else if (q.q.includes("Résoudre")) {
         let userClean = clean(userRaw).replace('x=', '');
