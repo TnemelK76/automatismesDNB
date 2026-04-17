@@ -197,6 +197,11 @@
 	        return `<path d="M ${xS} ${yS} A ${r} ${r} 0 0 1 ${xE} ${yE}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
 	    };
 	
+	    // Calcul de la position du ?
+	    // Rectangle : un peu plus à droite | Quelconque : centré sous le sommet
+	    const qMarkX = isRight ? x3 + 12 : x3 - 2;
+	    const qMarkY = isRight ? y3 + 30 : y3 + 32;
+	
 	    return `
 	    <svg viewBox="0 0 180 120" style="max-width:220px; margin: 5px auto; display:block; overflow:visible;">
 	        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="var(--purple-dark)" stroke-width="2" />
@@ -210,10 +215,10 @@
 	        <text x="${x2-45}" y="${y2-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
 	        
 	        ${isRight ? 
-	            drawArc(x3, y3, 0.5, 1.57) : 
-	            drawArc(x3, y3, 0.6, 2.2)
+	            drawArc(x3, y3, 0.55, 1.57) : 
+	            drawArc(x3, y3, 0.65, 2.05) // Arc réduit pour ne plus dépasser à droite
 	        }
-	        <text x="${x3-2}" y="${y3+32}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
+	        <text x="${qMarkX}" y="${qMarkY}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
 	    </svg>`;
 	}
 			
