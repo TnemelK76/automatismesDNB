@@ -309,9 +309,11 @@
                 else if (ratio === "cos") { ansNum = adj;  ansDen = hypo; }
                 else                     { ansNum = opp;  ansDen = adj;  }
 
-                // SVG identique au triangle Pythagore + arc sur l'angle choisi
-                const arcP1 = `<path d="M 40,28 A 13,13 0 0 1 48,20" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
-                const arcP3 = `<path d="M 112,80 A 13,13 0 0 0 120,72" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                // Arcs centrés sur chaque sommet :
+                // p1=(40,20) : côté vertical vers le bas → point à (40,32) ; hypo vers p3 → point à (50,27)
+                // p3=(120,80) : côté horizontal vers la gauche → point à (108,80) ; hypo vers p1 → point à (111,73)
+                const arcP1 = `<path d="M 40,32 A 12,12 0 0 1 50,27" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arcP3 = `<path d="M 108,80 A 12,12 0 0 0 111,73" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
                 const arc = angleEn === p1 ? arcP1 : arcP3;
                 const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
                     <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -323,7 +325,7 @@
                 </svg>`;
 
                 return {
-                    q: `Quel rapport donne $\\${ratio}(\\widehat{${angleEn}})$ ?${svg}<small>(Écris le rapport sous la forme AB/CD)</small>`,
+                    q: `Quel rapport faut-il calculer pour obtenir $\\${ratio}(\\widehat{${angleEn}})$ ?${svg}`,
                     a: `${ansNum}/${ansDen}`,
                     h: ratio === "sin" ? "sinus = opposé / hypoténuse"
                      : ratio === "cos" ? "cosinus = adjacent / hypoténuse"
