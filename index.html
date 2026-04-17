@@ -179,44 +179,31 @@
     ];
 
 	function generateTriangleSVG(angleA, angleB, type = "normal") {
-	    // 1. Dimensions plus petites (Echelle réduite)
-	    const x1 = 30, y1 = 100; 
-	    const x2 = 140, y2 = 100; 
-	    const sideAB = 110;
-	
-	    const aRad = (angleA * Math.PI) / 180;
-	    const bRad = (angleB * Math.PI) / 180;
-	    const cRad = Math.PI - aRad - bRad;
-	
-	    const sideAC = (sideAB * Math.sin(bRad)) / Math.sin(cRad);
-	    const x3 = x1 + sideAC * Math.cos(aRad);
-	    const y3 = y1 - sideAC * Math.sin(aRad);
+	    // Coordonnées fixes pour un triangle qui rentre parfaitement (180x100)
+	    const x1 = 30,  y1 = 90;  // Bas Gauche
+	    const x2 = 150, y2 = 90;  // Bas Droite
+	    const x3 = 60,  y3 = 25;  // Sommet haut (décalé pour ne pas être isocèle)
 	
 	    const isRight = type === "rectangle";
-	
-	    // Fonction utilitaire pour dessiner un arc d'angle
-	    const drawArc = (px, py, startAngle, sweepAngle, radius = 15) => {
-	        const startRad = -startAngle * Math.PI / 180;
-	        const endRad = -(startAngle + sweepAngle) * Math.PI / 180;
-	        const xStart = px + radius * Math.cos(startRad);
-	        const yStart = py + radius * Math.sin(startRad);
-	        const xEnd = px + radius * Math.cos(endRad);
-	        const yEnd = py + radius * Math.sin(endRad);
-	        return `<path d="M ${xStart} ${yStart} A ${radius} ${radius} 0 0 0 ${xEnd} ${yEnd}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+	    
+	    // Fonction pour dessiner les arcs (angles fixes pour le visuel)
+	    const drawStaticArc = (x, y, start, end) => {
+	        return `<path d="M ${x + Math.cos(start)*15} ${y + Math.sin(start)*15} A 15 15 0 0 1 ${x + Math.cos(end)*15} ${y + Math.sin(end)*15}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
 	    };
 	
 	    return `
-	    <svg viewBox="0 0 180 120" style="max-width:200px; margin: 5px auto; display:block; overflow:visible;">
+	    <svg viewBox="0 0 180 110" style="max-width:220px; margin: 5px auto; display:block; overflow:visible;">
 	        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="var(--purple-dark)" stroke-width="2" />
 	        
-	        ${isRight ? `<path d="M ${x1} ${y1-12} L ${x1+12} ${y1-12} L ${x1+12} ${y1}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>` : drawArc(x1, y1, 0, angleA)}
+	        ${isRight ? 
+	            `<path d="M ${x1} ${y1-12} L ${x1+12} ${y1-12} L ${x1+12} ${y1}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>` : 
+	            drawStaticArc(x1, y1, -1.1, 0) + `<text x="${x1+18}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>`
+	        }
 	
-	        ${drawArc(x2, y2, 180 - angleB, -angleB)}
-	
-	        ${!isRight ? `<text x="${x1+18}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>` : ''}
-	        <text x="${x2-35}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
+	        ${drawStaticArc(x2, y2, 3.14, 3.8)}
+	        <text x="${x2-38}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
 	        
-	        <text x="${x3-5}" y="${y3+18}" font-size="15" fill="var(--red-dark)" font-weight="bold">?</text>
+	        <text x="${x3-5}" y="${y3+25}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
 	    </svg>`;
 	}
 		
