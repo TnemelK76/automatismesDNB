@@ -489,7 +489,7 @@
 			        
 			        // On ajoute l'unité aux valeurs numériques de l'énoncé
 			        return { 
-			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL}=${petit} ${unit}, ${grandSide}=${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR}=${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
+			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL} = ${petit} ${unit}, ${grandSide} = ${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR} = ${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
 			            a: (baseP*k).toString().replace('.', ',') + ` \\text{ ${unit}}`, 
 			            h: `Agrandissement de rapport $${k}$. Réponse attendue en ${unit}.` 
 			        };
