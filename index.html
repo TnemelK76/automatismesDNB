@@ -686,17 +686,17 @@
     session[currentIdx].status = isCorrect ? 'correct' : (partial ? 'partial' : 'wrong');
 		
     if (isCorrect) {
-        score += 1;
-        fb.innerHTML = "✓ Parfait !";
-        fb.className = "feedback correct";
-    } else if (isPartial) {
-        score += 0.5;
-        fb.innerHTML = `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
-        fb.className = "feedback partial";
-    } else {
-        fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
-        fb.className = "feedback wrong";
-    }
+	    score += 1;
+	    fb.innerHTML = "✓ Parfait !";
+	    fb.className = "feedback correct";
+	} else if (partial) { // <--- Changé en 'partial' pour correspondre à votre variable
+	    score += 0.5;
+	    fb.innerHTML = `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
+	    fb.className = "feedback partial";
+	} else {
+	    fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
+	    fb.className = "feedback wrong";
+	}
 
     // CRUCIAL : Déclencher le rendu KaTeX sur le bloc feedback
     renderMathInElement(fb, {
