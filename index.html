@@ -279,66 +279,82 @@
                 } 
                 else {
                     const triplets = [[3,4,5], [6,8,10], [5,12,13]];
-                    const [a, b, c] = triplets[Math.floor(Math.random()*triplets.length)];
-                    const chercherHypo = (typePyth === 1);
-                    const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100"><path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" /><text x="20" y="55" font-size="12" fill="currentColor">${a}</text><text x="75" y="95" font-size="12" fill="currentColor">${chercherHypo ? b : "?"}</text><text x="85" y="45" font-size="12" fill="currentColor">${chercherHypo ? "?" : c}</text></svg>`;
-                    return { q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} :${svg}`, a: (chercherHypo ? c : b).toString(), h: chercherHypo ? `$${a}^2 + ${b}^2 = ${c}^2$` : `$${c}^2 - ${a}^2 = ${b}^2$` };
+				    const [a, b, c] = triplets[Math.floor(Math.random()*triplets.length)];
+				    const unit = Math.random() > 0.5 ? "cm" : "m"; // Choix de l'unité
+				    const chercherHypo = Math.random() > 0.5;
+				    
+				    const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
+				        <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+				        <rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" />
+				        <text x="15" y="55" font-size="12" fill="currentColor">${a}${unit}</text>
+				        <text x="75" y="95" font-size="12" fill="currentColor">${chercherHypo ? b + unit : "?"}</text>
+				        <text x="85" y="45" font-size="12" fill="currentColor">${chercherHypo ? "?" : c + unit}</text>
+				    </svg>`;
+				    
+				    return { 
+				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
+				        a: (chercherHypo ? c : b) + unit, // La réponse attendue inclut l'unité
+				        h: `Réponse attendue en ${unit}.` 
+				    };
                 }
             },
             
 			() => {
-				const isPapillon = Math.random() > 0.5;
-				const isCalcul = Math.random() > 0.5;
-				const noms = [["K","A","B","C","D"], ["S","M","N","P","G"], ["O","I","J","R","T"]][Math.floor(Math.random()*3)];
-				const [S, AL, AR, BL, BR] = noms; 
-
-				let svg = "";
-				if (isPapillon) {
-					// CONFIG PAPILLON ASYMÉTRIQUE
-					// Sommet S placé à y=55 (plus haut que le milieu) pour réduire le triangle du haut
-					// Triangle Haut (Petit) : y=20 | Triangle Bas (Grand) : y=130
-					svg = `<br><svg width="200" height="160" viewBox="0 0 200 160">
-						<line x1="65" y1="20" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
-						<line x1="135" y1="20" x2="45" y2="135" stroke="currentColor" stroke-width="2"/>
-						<line x1="65" y1="20" x2="135" y2="20" stroke="currentColor" stroke-width="2"/>
-						<line x1="45" y1="135" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
-						
-						<text x="112" y="65" class="svg-text">${S}</text>
-						<text x="45" y="25" class="svg-text">${BL}</text><text x="140" y="25" class="svg-text">${BR}</text>
-						<text x="25" y="145" class="svg-text">${AL}</text><text x="160" y="145" class="svg-text">${AR}</text>
-					</svg>`;
-				} else {
-					// CONFIG EMBOÎTÉE (Classique)
-					svg = `<br><svg width="200" height="150" viewBox="0 0 200 150">
-						<path d="M 100,20 L 30,130 L 170,130 Z" fill="none" stroke="currentColor" stroke-width="2"/>
-						<line x1="58" y1="85" x2="142" y2="85" stroke="currentColor" stroke-width="2"/>
-						<text x="95" y="15" class="svg-text">${S}</text>
-						<text x="15" y="140" class="svg-text">${AL}</text><text x="175" y="140" class="svg-text">${AR}</text>
-						<text x="40" y="90" class="svg-text">${BL}</text><text x="150" y="90" class="svg-text">${BR}</text>
-					</svg>`;
-				}
-
-				if (!isCalcul) {
-					// Rapports alignés : S-Haut / S-Bas (homologues sur la même droite)
-					const d1 = isPapillon ? `${S}${BL}/${S}${AR}` : `${S}${BL}/${S}${AL}`;
-					const d2 = isPapillon ? `${S}${BR}/${S}${AL}` : `${S}${BR}/${S}${AR}`;
-					const b = `${BL}${BR}/${AL}${AR}`;
-					return { 
-						q: `Écrire l'égalité des rapports de Thalès ((${BL}${BR}) // (${AL}${AR})) :${svg}`, 
-						a: `${d1}=${d2}=${b}`, 
-						h: "Associe les segments sur la même droite passant par le sommet." 
-					};
-				} else {
-					const k = [2, 2.5, 3, 1.5][Math.floor(Math.random()*4)];
-					const petit = Math.floor(Math.random()*3)+2; 
-					const baseP = Math.floor(Math.random()*3)+3;
-					const grandSide = isPapillon ? S+AR : S+AL;
-					return { 
-						q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL}=${petit}, ${grandSide}=${petit*k} et ${BL}${BR}=${baseP}. <br>Calculer ${AL}${AR} :${svg}`, 
-						a: (baseP*k).toString().replace('.', ','), 
-						h: `Agrandissement de rapport $${k}$.` 
-					};
-				}
+			    const isPapillon = Math.random() > 0.5;
+			    const isCalcul = Math.random() > 0.5;
+			    const noms = [["K","A","B","C","D"], ["S","M","N","P","G"], ["O","I","J","R","T"]][Math.floor(Math.random()*3)];
+			    const [S, AL, AR, BL, BR] = noms; 
+			
+			    // --- Ajout des variables pour les unités ---
+			    const units = ["cm", "m", "mm"];
+			    const unit = units[Math.floor(Math.random() * units.length)];
+			
+			    let svg = "";
+			    if (isPapillon) {
+			        // CONFIG PAPILLON ASYMÉTRIQUE
+			        svg = `<br><svg width="200" height="160" viewBox="0 0 200 160">
+			            <line x1="65" y1="20" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <line x1="135" y1="20" x2="45" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <line x1="65" y1="20" x2="135" y2="20" stroke="currentColor" stroke-width="2"/>
+			            <line x1="45" y1="135" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <text x="112" y="65" class="svg-text">${S}</text>
+			            <text x="45" y="25" class="svg-text">${BL}</text><text x="140" y="25" class="svg-text">${BR}</text>
+			            <text x="25" y="145" class="svg-text">${AL}</text><text x="160" y="145" class="svg-text">${AR}</text>
+			        </svg>`;
+			    } else {
+			        // CONFIG EMBOÎTÉE (Classique)
+			        svg = `<br><svg width="200" height="150" viewBox="0 0 200 150">
+			            <path d="M 100,20 L 30,130 L 170,130 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+			            <line x1="58" y1="85" x2="142" y2="85" stroke="currentColor" stroke-width="2"/>
+			            <text x="95" y="15" class="svg-text">${S}</text>
+			            <text x="15" y="140" class="svg-text">${AL}</text><text x="175" y="140" class="svg-text">${AR}</text>
+			            <text x="40" y="90" class="svg-text">${BL}</text><text x="150" y="90" class="svg-text">${BR}</text>
+			        </svg>`;
+			    }
+			
+			    if (!isCalcul) {
+			        // Rapports alignés : S-Haut / S-Bas
+			        const d1 = isPapillon ? `${S}${BL}/${S}${AR}` : `${S}${BL}/${S}${AL}`;
+			        const d2 = isPapillon ? `${S}${BR}/${S}${AL}` : `${S}${BR}/${S}${AR}`;
+			        const b = `${BL}${BR}/${AL}${AR}`;
+			        return { 
+			            q: `Écrire l'égalité des rapports de Thalès ((${BL}${BR}) // (${AL}${AR})) :${svg}`, 
+			            a: `${d1}=${d2}=${b}`, 
+			            h: "Associe les segments sur la même droite passant par le sommet." 
+			        };
+			    } else {
+			        const k = [2, 2.5, 3, 1.5][Math.floor(Math.random()*4)];
+			        const petit = Math.floor(Math.random()*3)+2; 
+			        const baseP = Math.floor(Math.random()*3)+3;
+			        const grandSide = isPapillon ? S+AR : S+AL;
+			        
+			        // On ajoute l'unité aux valeurs numériques de l'énoncé
+			        return { 
+			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL}=${petit} ${unit}, ${grandSide}=${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR}=${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
+			            a: (baseP*k).toString().replace('.', ',') + unit, 
+			            h: `Agrandissement de rapport $${k}$. Réponse attendue en ${unit}.` 
+			        };
+			    }
 			},
 
             () => {
@@ -522,6 +538,13 @@
         const normSeg = (s) => clean(s).split('/').map(p => p.split('').sort().join('')).join('/');
         if (normSeg(userRaw) === normSeg(correctRaw)) isCorrect = true;
     }
+	// Gestion unités
+	else if (q.q.includes("Calcule") && (q.a.includes("cm") || q.a.includes("m") || q.a.includes("mm"))) {
+		// On retire tous les espaces pour comparer "5cm" avec "5 cm"
+		if (userRaw.replace(/\s+/g, '') === q.a.replace(/\s+/g, '')) {
+			isCorrect = true;
+		}
+	}
     // 1. THALÈS (Rapports)
     else if (q.q.includes("rapports de Thalès")) {
         const uR = clean(userRaw).split('=');
