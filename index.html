@@ -428,10 +428,23 @@
             if (uN * cD === cN * uD) isCorrect = true;
         }
 	}
-    // 4. RESTE (Algèbre, etc.)
+    // 4. RESTE (Algèbre, développement, réduction, etc.)
     else {
-        const c2 = (s) => s.replace(/\\times/g, '*').replace(/x/g, '*').replace(/\{/g, '').replace(/\}/g, '').replace(/([\+\-])1([a-z])/g, '$1$2').replace(/^1([a-z])/g, '$2');
-        if (c2(clean(userRaw)) === c2(clean(correctRaw))) isCorrect = true;
+        // Normalise une expression algébrique pour comparaison souple :
+        // - supprime les espaces
+        // - accepte ² ou ^2
+        // - normalise le coefficient 1 implicite devant une lettre (x, y, a, b, t)
+        // - normalise le signe + en début ou après un signe
+        const normAlg = (s) => s
+            .replace(/\s+/g, '')
+            .replace(/²/g, '^2')
+            .replace(/\*\*/g, '^')
+            // Coefficient +1 ou -1 devant une lettre : "+-1x" → "-x", "+1x" → "+x"
+            .replace(/([\+\-])1([a-zA-Z])/g, '$1$2')
+            .replace(/^1([a-zA-Z])/g, '$1')
+            // Signe + en début inutile
+            .replace(/^\+/, '');
+        if (normAlg(userRaw) === normAlg(correctRaw)) isCorrect = true;
     }
 
     // Affichage résultat
