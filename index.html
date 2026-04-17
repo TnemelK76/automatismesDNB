@@ -958,14 +958,15 @@
 	
 	    // 1. CAS PARFAIT : l'élève a mis les bonnes unités (ex: 1h30min, 45min, 1h)
 	    // On accepte aussi "0h45min" si la réponse attendue est "45min"
-	    if (u === c || u === "0" + c) {
+	    if (u === c || u === "0h" + c || u === c + "0min") {
 	        isCorrect = true;
 	    } 
 	    // 2. CAS PARTIEL (0,5 pt) : il manque "min" mais les nombres sont bons (ex: 1h30)
 	    else {
 	        // On crée une version de la réponse attendue sans le "min" pour comparer
-	        let cSansMin = c.replace('min', '').replace('h', '');
-	        if (u === cSansMin && (c.includes('min') || c.includes('h'))) {
+	        let cSansU = c.replace('min', '').replace('h', '');
+			let uSansU = u.replace('min', '').replace('h', '');
+	        if (uSansU === cSansU) {
 	            partial = true;
 	        }
 	    }
