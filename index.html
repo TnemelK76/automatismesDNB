@@ -357,7 +357,7 @@
                 const n = Math.floor(Math.random() * 12) + 1;
                 return { q: `Calculer : $${n}^2$`, a: (n * n).toString(), h: `$${n} \\times ${n}$.` };
             },
-			() {
+			() => {
 			    const type = Math.random() > 0.5 ? 'DEC_TO_HM' : 'MIN_TO_HM';
 			    
 			    if (type === 'DEC_TO_HM') {
