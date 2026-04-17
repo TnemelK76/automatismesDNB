@@ -370,9 +370,9 @@
 				    
 				    // On définit la réponse "parfaite" pour la base de données
 				    let reponseParfaite = "";
-				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull} \\text{h} ${m} \\text{min}`;
-				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull} \\text{h}`;
-				    else reponseParfaite = `${m} \\text{min}`;
+				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull} \\text{ h } ${m} \\text{ min}`;
+				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull} \\text{ h}`;
+				    else reponseParfaite = `${m} \\text{ min}`;
 				
 				    return {
 				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
