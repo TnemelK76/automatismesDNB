@@ -13,7 +13,8 @@
         :root {
             --purple-light: #EEEDFE; --purple-mid: #7F77DD; --purple-dark: #3C3489; --purple-deep: #26215C;
             --green-light: #EAF3DE; --green-dark: #27500A; --red-light: #FCEBEB; --red-dark: #501313;
-            --bg: #F8F7FF; --surface: #ffffff; --text: #1a1a2e; --text2: #5a5a7a; --border: #E1E0EF;
+            --bg: #F8F7FF; --surface: #ffffff; --text: #1a1a2e; --text2: #5a5a7a; --border: #E1E0EF; --orange-light: #FFF4E5;
+    		--orange-dark: #B05B00;
         }
         body { font-family: 'DM Sans', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .app-container { width: 100%; max-width: 500px; background: var(--surface); border-radius: 24px; padding: 32px; box-shadow: 0 12px 40px rgba(60, 52, 137, 0.08); border: 1px solid var(--border); }
@@ -35,6 +36,11 @@
         .validate-btn { width: 100%; background: var(--purple-dark); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
         .feedback { margin-top: 20px; padding: 15px; border-radius: 12px; font-weight: 500; text-align: center; }
         .feedback.correct { background: var(--green-light); color: var(--green-dark); }
+		.feedback.partial {
+			background: var(--orange-light);
+			color: var(--orange-dark);
+			border: 1px solid #FFD8A8;
+		}
         .feedback.wrong { background: var(--red-light); color: var(--red-dark); }
 		.svg-text {
 			font-size: 14px;
@@ -84,6 +90,13 @@
 		.row-wrong { background-color: #fffafa; }
 		.text-wrong { color: var(--red-dark); font-weight: bold; }
 		.text-correct { color: var(--green-dark); font-weight: bold; }
+		.row-partial {
+		    background-color: var(--orange-light) !important;
+		}
+		.text-partial {
+		    color: var(--orange-dark);
+		    font-weight: bold;
+		}
 		/* Pour arrondir les coins du tableau */
 		#history-container {
 		    border-radius: 16px;
@@ -529,7 +542,8 @@
     const q = session[currentIdx];
     const correctRaw = q.a.toLowerCase().replace(',', '.');
     let isCorrect = false;
-
+	let partial = false;
+		
     const clean = (s) => s.replace(/\s+/g, '');
 
 	// 0. TRIGONOMÉTRIE (rapport de deux segments)
@@ -541,9 +555,19 @@
 	// Gestion unités
 	else if (q.q.includes("Calcule") && (q.a.includes("cm") || q.a.includes("m") || q.a.includes("mm"))) {
 		// On retire tous les espaces pour comparer "5cm" avec "5 cm"
-		if (userRaw.replace(/\s+/g, '') === q.a.replace(/\s+/g, '')) {
-			isCorrect = true;
-		}
+		const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
+	    const correctClean = q.a.toLowerCase().replace(/\s/g, '').replace(',', '.');
+	    
+	    // Valeur numérique seule (on extrait les chiffres)
+	    const userValue = userClean.replace(/[a-z]/g, '');
+	    const correctValue = correctClean.replace(/[a-z]/g, '');
+	
+	    if (userClean === correctClean) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        // Bonne valeur mais unité absente ou fausse
+	        partial = true;
+	    }
 	}
     // 1. THALÈS (Rapports)
     else if (q.q.includes("rapports de Thalès")) {
@@ -659,20 +683,25 @@
 
 	// On enregistre les données pour l'historique
     session[currentIdx].userAns = userRaw;
-    session[currentIdx].isCorrect = isCorrect;
+    session[currentIdx].status = isCorrect ? 'correct' : (partial ? 'partial' : 'wrong');
 		
-    if(isCorrect) {
-        score++; fb.textContent = "✓ Bravo !"; fb.classList.add('correct');
-        document.getElementById('live-score').textContent = score;
-        setTimeout(next, 1000);
-    } else {
-        fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
-        renderMathInElement(fb, { delimiters: [{left: "$", right: "$", display: false}] });
-        fb.classList.add('wrong');
-        setTimeout(next, 3000);
-    }
+    if (isCorrect) {
+	    score += 1;
+	    fb.textContent = "✓ Parfait !";
+	    fb.className = "feedback correct";
+		setTimeout(next, 1000)
+	} else if (partial) {
+	    score += 0.5;
+	    fb.innerHTML = `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
+	    fb.className = "feedback partial"; // On va créer ce style CSS
+		setTimeout(next, 3000)
+	} else {
+	    fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
+	    fb.className = "feedback wrong";
+		setTimeout(next, 3000)
+	}
 }
-
+setTimeout(next, 3000)
     function next() {
         currentIdx++;
         if(currentIdx < 10) {
@@ -701,23 +730,31 @@
                 <tbody>`;
 
         session.forEach(q => {
-            // Couleurs de fond : vert très clair ou rouge très clair
-            const bgColor = q.isCorrect ? 'rgba(234, 243, 222, 0.7)' : 'rgba(252, 235, 235, 0.8)';
-            const textColor = q.isCorrect ? 'var(--green-dark)' : 'var(--red-dark)';
-            const icon = q.isCorrect ? '✓' : '✗';
-            
-            // On enlève le SVG de l'énoncé pour le tableau
-            const cleanQ = q.q.split('<br>')[0];
-
-            html += `
-            <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                <td style="padding: 10px 12px;">${cleanQ}</td>
-                <td style="padding: 10px 12px; text-align: center; font-weight: bold; color: ${textColor};">
-                    ${icon} ${q.userAns || '-'}
-                </td>
-                <td style="padding: 10px 12px; text-align: center;">$${q.a}$</td>
-            </tr>`;
-        });
+		    let bgColor, textColor, icon;
+		    
+		    if (q.status === 'correct') {
+		        bgColor = 'rgba(234, 243, 222, 0.7)';
+		        textColor = 'var(--green-dark)';
+		        icon = '✓';
+		    } else if (q.status === 'partial') {
+		        bgColor = 'rgba(255, 244, 229, 0.8)'; // Orange clair
+		        textColor = 'var(--orange-dark)';
+		        icon = '⚠';
+		    } else {
+		        bgColor = 'rgba(252, 235, 235, 0.8)';
+		        textColor = 'var(--red-dark)';
+		        icon = '✗';
+		    }
+		
+		    html += `
+		    <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
+		        <td style="padding: 10px 12px;">${q.q.split('<br>')[0]}</td>
+		        <td style="padding: 10px 12px; text-align: center; color: ${textColor}; font-weight: bold;">
+		            ${icon} ${q.userAns || '-'}
+		        </td>
+		        <td style="padding: 10px 12px; text-align: center;">$${q.a}$</td>
+		    </tr>`;
+		});
 
         html += `</tbody></table></div>`;
         
