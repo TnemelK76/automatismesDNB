@@ -384,13 +384,13 @@
             },
             () => {
                 const entry = SCI_DATABASE[Math.floor(Math.random()*SCI_DATABASE.length)];
-                return { q: `Donner l'écriture scientifique de $${entry.v}$ <br><small>(Utilise * pour multiplier et ^ pour puissance)</small>`, a: entry.a, h: "Un chiffre non nul avant la virgule." };
+                return { q: `Donner l'écriture scientifique de $${entry.v}$ <br><small>(Utilise * pour multiplier et ^ pour puissance)</small>`, a: entry.a, h: "Nombre entre 1 et 10 exclu × une puissance de 10" };
             },
             () => {
                 const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
                 let n, d, pgcd;
                 do { n = Math.floor(Math.random() * 40) + 2; d = Math.floor(Math.random() * 40) + 2; pgcd = getPGCD(n, d); } while (pgcd === 1 || n === d);
-                return { q: `Simplifier au maximum : $\\frac{${n}}{${d}}$`, a: `${n/pgcd}/${d/pgcd}`, h: `Divise par $${pgcd}$.` };
+                return { q: `Simplifier au maximum : $\\frac{${n}}{${d}}$`, a: `${n/pgcd}/${d/pgcd}`, h: `Divise par $${pgcd}$ au numérateur et au dénominateur.` };
             },
             () => {
                 const p = [50, 25, 10][Math.floor(Math.random() * 3)];
@@ -411,7 +411,12 @@
 				    
 				    const hFull = Math.floor(hDec);
 				    const m = Math.round((hDec - hFull) * 60);
-				    
+
+					let hint 
+					if (hDec - hFull === 0.25) hint = `0.25 h = $\\frac14$ h = 15 min`;
+					else if (hDec - hFull === 0.5) hint = `0.5 h = $\\frac12$ h = 30 min`;
+					else if (hDec - hFull === 0.75) hint = `0.75 h = $\\frac34$ h = 45 min`;
+					
 				    // On définit la réponse "parfaite" pour la base de données
 				    let reponseParfaite = "";
 				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull} \\text{ h } ${m} \\text{ min}`;
