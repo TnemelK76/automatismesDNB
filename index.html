@@ -159,6 +159,7 @@
             <button class="theme-btn" onclick="startQuiz('alg')">🧩 Calcul littéral et fonctions</button>
             <button class="theme-btn" onclick="startQuiz('geo')">📐 Espace, géométrie et grandeurs </button>
             <button class="theme-btn" onclick="startQuiz('proba')">📊 Probabilités et statistiques</button>
+            <button class="theme-btn" onclick="startQuiz('scratch')" style="background:var(--orange-light); color:var(--orange-dark); border-color: #FFD8A8;">🐱 Algorithmique Scratch</button>
             <button class="theme-btn all" onclick="startQuiz('tout')">🚀 Tous les thèmes</button>
         </div>
     </div>
@@ -833,14 +834,393 @@
 		            a: reponse.toString()
 		        };
 		    }
+        ],
+        scratch: [
+            // ── RECTANGLE ──────────────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const longueur = [80,100,120,150][Math.floor(Math.random()*4)];
+                const largeur  = [40,50,60,70,80][Math.floor(Math.random()*5)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 4 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${longueur}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'move',   label:`Avancer de ${largeur}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return {
+                    q: `Voici un script Scratch qui trace un <b>rectangle</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '90' : '2',
+                    h: missingAngle
+                        ? 'Un rectangle a 4 angles droits à 90°.'
+                        : 'Un rectangle a 4 côtés (2 paires) → il faut répéter 2 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── CARRÉ ──────────────────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const cote = [60,80,100,120][Math.floor(Math.random()*4)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 4 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${cote}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return {
+                    q: `Voici un script Scratch qui trace un <b>carré</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '90' : '4',
+                    h: missingAngle
+                        ? 'Un carré a 4 angles droits à 90°.'
+                        : 'Un carré a 4 côtés → il faut répéter 4 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── TRIANGLE ÉQUILATÉRAL ────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const cote = [60,80,100,120][Math.floor(Math.random()*4)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 3 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${cote}` },
+                    { type:'turn',   label:`Tourner de 120°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return {
+                    q: `Voici un script Scratch qui trace un <b>triangle équilatéral</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '120' : '3',
+                    h: missingAngle
+                        ? '360° ÷ 3 côtés = 120° par rotation.'
+                        : 'Un triangle a 3 côtés → il faut répéter 3 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── ALGORITHME : trace le déroulement du programme ─────────────────
+            () => {
+                // Valeur de départ choisie parmi des petits entiers simples
+                const startVal = [2, 3, 4, 5, 6, 7, 8, 10][Math.floor(Math.random() * 8)];
+
+                // Catalogue d'opérations possibles : { desc (SVG expr), fn, hint }
+                // On construit un programme de 2 opérations dont le résultat reste ≤ 100
+                const OPS = [
+                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'2'}],  fn: v => v * 2,  txt: v => `${v} * 2` },
+                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'3'}],  fn: v => v * 3,  txt: v => `${v} * 3` },
+                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'4'}],  fn: v => v * 4,  txt: v => `${v} * 4` },
+                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'5'}],  fn: v => v * 5,  txt: v => `${v} * 5` },
+                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'10'}], fn: v => v + 10, txt: v => `${v} + 10` },
+                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'5'}],  fn: v => v + 5,  txt: v => `${v} + 5`  },
+                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'8'}],  fn: v => v + 8,  txt: v => `${v} + 8`  },
+                    { desc: () => [{kind:'op',val:'-'},{kind:'num',val:'1'}],  fn: v => v - 1,  txt: v => `${v} - 1`  },
+                    { desc: () => [{kind:'op',val:'/'},{kind:'num',val:'2'}],  fn: v => v / 2,  txt: v => `${v} / 2`, ok: v => v % 2 === 0 && v >= 4 },
+                ];
+
+                // Tire 2 opérations compatibles avec startVal sans dépasser 100
+                let val = startVal;
+                const chosen = [];
+                const shuffled = OPS.slice().sort(() => Math.random() - 0.5);
+                for (const op of shuffled) {
+                    if (chosen.length >= 2) break;
+                    if (op.ok && !op.ok(val)) continue;
+                    const next = op.fn(val);
+                    if (next > 100 || next < 0 || !Number.isInteger(next)) continue;
+                    chosen.push({ op, fromVal: val });
+                    val = next;
+                }
+                // Fallback si pas assez d'opérations valides
+                if (chosen.length < 2) {
+                    val = startVal;
+                    chosen.length = 0;
+                    chosen.push({ op: OPS[4], fromVal: val }); val = OPS[4].fn(val);
+                    chosen.push({ op: OPS[0], fromVal: val }); val = OPS[0].fn(val);
+                }
+
+                const finalVal = val;
+
+                // Construction des blocs :
+                // Chapeau → Demander → mettre résultat à réponse → mettre résultat à résultat OP n → … → Dire
+                const blocks = [
+                    { type: 'hat' },
+                    { type: 'ask', msg: 'Choisir un nombre' },
+                    { type: 'setvar', label: 'résultat', expr: [{kind:'reply', val:'réponse'}] },
+                ];
+                for (const c of chosen) {
+                    const opToks = c.op.desc();
+                    // expr = [ puce variable "résultat" ] [ opérateur ] [ nombre ]
+                    const expr = [{kind:'var', val:'résultat'}, ...opToks];
+                    blocks.push({ type: 'setvar', label: 'résultat', expr });
+                }
+                blocks.push({ type: 'say', msg: 'J\'obtiens :', varName: 'résultat' });
+
+                const svg = buildScratchSVG(blocks, 80);
+
+                // Hint : déroulé du calcul étape par étape
+                let hintSteps = `résultat ← ${startVal}`;
+                let v2 = startVal;
+                for (const c of chosen) {
+                    const next = c.op.fn(v2);
+                    hintSteps += ` → résultat ← ${c.op.txt(v2)} = ${next}`;
+                    v2 = next;
+                }
+
+                return {
+                    q: `On choisit <b>${startVal}</b> comme nombre de départ. Quel nombre le lutin va-t-il dire ?<br>${svg}`,
+                    a: String(finalVal),
+                    h: hintSteps,
+                    t: 'scratch'
+                };
+            }
         ]
     };
+
+    // ── Constructeur de blocs Scratch SVG ──────────────────────────────────────
+    function buildScratchSVG(blocks, offset) {
+        const W      = 210 + offset;
+        const hatH   = 40;
+        const blockH = 34;
+        const repH   = 38;
+        const endH   = 14;
+        const barW   = 14;
+        const innerX = 4 + barW + 4;
+        const innerW = W - 8 - barW - 4;
+        const gap    = 3;
+
+        const C = {
+            hat:        '#FFAB18',
+            repeat:     '#FF8C1A',
+            repeatDark: '#DB6E00',
+            move:       '#4C97FF',
+            moveDark:   '#3373CC',
+            pen:        '#59C059',
+            penDark:    '#389438',
+            variable:   '#FF8C1A', // Variables : orange
+            variableDark:'#DB6E00',
+            varChip:    '#FF6680', // puce nom de variable : rose-rouge
+            varChipDk:  '#CC0033',
+            operator:   '#59C059', // Opérateurs : vert
+            operatorDk: '#389438',
+            say:        '#9966FF', // Looks/Dire : violet
+            sayDark:    '#7744CC',
+            text:       '#ffffff',
+        };
+		
+
+        // ── Badge ovale générique ────────────────────────────────────────────
+        function oval(x, y, w, h, fill, stroke, dasharray, label, labelFill, fontSize) {
+            let o = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h/2}" fill="${fill}"`;
+            if (stroke) o += ` stroke="${stroke}" stroke-width="2"`;
+            if (dasharray) o += ` stroke-dasharray="${dasharray}"`;
+            o += `/>`;
+            o += `<text x="${x + w/2}" y="${y + h/2 + 4}" text-anchor="middle" font-size="${fontSize||12}" font-weight="bold" fill="${labelFill}" font-family="sans-serif">${label}</text>`;
+            return o;
+        }
+
+        // ── Bloc simple avec badges auto sur les nombres ─────────────────────
+        function simpleBlock(bx, by, bw, bh, col, colDark, label, hasBlank) {
+            let out = `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${col}"/>`;
+            out += `<rect x="${bx}" y="${by + bh - 4}" width="${bw}" height="4" rx="3" fill="${colDark}" opacity="0.45"/>`;
+            const tmid = by + bh / 2 + 5;
+            const tx   = bx + 12;
+            const parts = label.split(/(\d+)/);
+            let cx = tx;
+            parts.forEach(p => {
+                if (/^\d+$/.test(p)) {
+                    if (hasBlank) {
+                        out += oval(cx - 2, by + 7, 34, 20, 'white', colDark, '4,2', '?', colDark, 14);
+                    } else {
+                        out += oval(cx - 2, by + 7, 34, 20, 'rgba(255,255,255,0.28)', null, null, p, C.text, 13);
+                    }
+                    cx += 38;
+                } else if (p) {
+                    out += `<text x="${cx}" y="${tmid}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">${p}</text>`;
+                    cx += p.length * 7.2;
+                }
+            });
+            return out;
+        }
+		
+		
+        // ── Passe 1 : calcul des y ───────────────────────────────────────────
+        let y = 4;
+        let repeatStartY = null, endRepeatY = null;
+        const computed = [];
+        for (const b of blocks) {
+            computed.push({ ...b, y });
+            if      (b.type === 'hat')       y += hatH;
+            else if (b.type === 'pen')       y += blockH;
+            else if (b.type === 'repeat')  { repeatStartY = y; y += repH; }
+            else if (b.type === 'move' || b.type === 'turn') y += blockH + gap;
+            else if (b.type === 'setvar')    y += blockH + gap;
+            else if (b.type === 'ask')       y += blockH + gap;
+            else if (b.type === 'say')       y += blockH + gap;
+            else if (b.type === 'endrepeat'){ endRepeatY = y; y += endH; }
+        }
+        const totalH = y + 8;
+
+        // ── Passe 2 : rendu ──────────────────────────────────────────────────
+        let svgParts = [];
+
+        // Barre orange verticale de boucle
+        if (repeatStartY !== null && endRepeatY !== null) {
+            svgParts.push(`<rect x="4" y="${repeatStartY + repH}" width="${barW}" height="${endRepeatY - (repeatStartY + repH) + endH}" fill="${C.repeat}"/>`);
+        }
+
+        for (const b of computed) {
+            const by = b.y;
+
+            // CHAPEAU
+            if (b.type === 'hat') {
+                svgParts.push(`
+                  <rect x="4" y="${by}" width="${W-8}" height="${hatH}" rx="14" fill="${C.hat}"/>
+                  <rect x="4" y="${by + hatH - 14}" width="${W-8}" height="14" fill="${C.hat}"/>
+                `);
+                svgParts.push(`<text x="${W/2}" y="${by + hatH/2 + 5}" text-anchor="middle" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">Quand 🏳️ est cliqué</text>`);
+
+            // STYLO
+            } else if (b.type === 'pen') {
+                svgParts.push(simpleBlock(4, by, W-8, blockH, C.pen, C.penDark, b.label, false));
+
+            // RÉPÉTER
+            } else if (b.type === 'repeat') {
+                svgParts.push(`<rect x="4" y="${by}" width="${W-8}" height="${repH}" rx="5" fill="${C.repeat}"/>`);
+                svgParts.push(`<rect x="4" y="${by+repH-4}" width="${W-8}" height="4" rx="3" fill="${C.repeatDark}" opacity="0.45"/>`);
+                svgParts.push(`<text x="16" y="${by+repH/2+5}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">Répéter</text>`);
+                const num = b.label.match(/\d+/)?.[0] || '';
+                if (b.blank) {
+                    svgParts.push(oval(82, by+9, 34, 20, 'white', C.repeatDark, '4,2', '?', C.repeatDark, 14));
+                } else {
+                    svgParts.push(oval(82, by+9, 34, 20, 'rgba(255,255,255,0.28)', null, null, num, C.text, 13));
+                }
+                svgParts.push(`<text x="122" y="${by+repH/2+5}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">fois</text>`);
+
+            // MOVE / TURN
+            } else if (b.type === 'move' || b.type === 'turn') {
+                svgParts.push(simpleBlock(innerX, by, innerW, blockH, C.move, C.moveDark, b.label, b.blank));
+
+            // FIN RÉPÉTER
+            } else if (b.type === 'endrepeat') {
+                svgParts.push(`<rect x="4" y="${by}" width="${W-8}" height="${endH}" rx="5" fill="${C.repeat}"/>`);
+
+            // ── METTRE [variable] À [expr] ─────────────────────────────────
+            // b.label = nom de la variable, b.expr = tableau de tokens
+            // token : { kind:'text'|'num'|'var'|'op'|'reply', val }
+            } else if (b.type === 'setvar') {
+                const bx = 4, bw = W - 8 ;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.variable}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.variableDark}" opacity="0.45"/>`);
+
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+
+                // "mettre"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">mettre</text>`);
+                cx += 48;
+
+                // puce nom variable (rose arrondie)
+                const vname = b.label;
+                const vnameW = Math.max(36, vname.length * 7 + 16);
+                svgParts.push(oval(cx, by+8, vnameW, 18, C.varChip, null, null, vname, C.text, 11));
+                cx += vnameW + 6;
+
+                // "à"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">à</text>`);
+                cx += 14;
+
+                // expression : tableau de tokens
+                for (const tok of b.expr) {
+                    if (tok.kind === 'num') {
+                        // badge blanc semi-transparent, largeur adaptée au contenu
+                        const nw = Math.max(24, String(tok.val).length * 8 + 14);
+                        svgParts.push(oval(cx, by+8, nw, 18, 'rgba(255,255,255,0.28)', null, null, tok.val, C.text, 11));
+                        cx += nw + 4;
+                    } else if (tok.kind === 'var') {
+                        const tw = Math.max(36, tok.val.length * 7 + 16);
+                        svgParts.push(oval(cx, by+8, tw, 18, C.varChip, null, null, tok.val, C.text, 11));
+                        cx += tw + 4;
+                    } else if (tok.kind === 'reply') {
+                        // puce "réponse" en bleu ciel (même couleur que le bloc demander)
+                        const rw = Math.max(42, tok.val.length * 7 + 16);
+                        svgParts.push(oval(cx, by+8, rw, 18, C.move, null, null, tok.val, C.text, 11));
+                        cx += rw + 4;
+                    } else if (tok.kind === 'op') {
+                        // opérateur dans ellipse verte, un peu plus large pour * et /
+                        const ow = Math.max(20, String(tok.val).length * 9 + 10);
+                        svgParts.push(oval(cx - 2, by+7, ow, 20, C.operator, null, null, tok.val, C.text, 13));
+                        cx += ow + 2;
+                    } else {
+                        svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">${tok.val}</text>`);
+                        cx += tok.val.length * 7;
+                    }
+                }
+
+            // ── DEMANDER … ET ATTENDRE ─────────────────────────────────────
+            } else if (b.type === 'ask') {
+                const bx = 4, bw = W - 8;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.move}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.moveDark}" opacity="0.45"/>`);
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">demander</text>`);
+                cx += 68;
+                const msgW = Math.max(60, b.msg.length * 6.5 + 14);
+                svgParts.push(oval(cx, by+8, msgW, 18, 'white', null, null, b.msg, '#333', 10));
+                cx += msgW + 6;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">et attendre</text>`);
+
+            // ── DIRE [texte] ET [variable] ─────────────────────────────────
+            } else if (b.type === 'say') {
+                const bx = 4, bw = W - 8;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.say}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.sayDark}" opacity="0.45"/>`);
+
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">dire</text>`);
+                cx += 30;
+
+                // bulle de texte blanc pour la chaîne
+                const msgW = b.msg.length * 6.5 + 14;
+                svgParts.push(oval(cx, by+8, msgW, 18, 'white', null, null, b.msg, '#333', 10));
+                cx += msgW + 6;
+
+                // "et"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">et</text>`);
+                cx += 18;
+
+                // puce variable résultat
+                const rv = b.varName || 'résultat';
+                const rvW = Math.max(30, rv.length * 7 + 14);
+                svgParts.push(oval(cx, by+8, rvW, 18, C.varChip, null, null, rv, C.text, 11));
+            }
+        }
+
+        return `<div style="display:flex;justify-content:center;margin:10px 0;">
+          <svg viewBox="0 0 ${W} ${totalH}" style="width:100%;max-width:${W}px;font-family:sans-serif;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15));">
+            ${svgParts.join('')}
+          </svg>
+        </div>`;
+    }
 
     let session = [], currentIdx = 0, score = 0, isLocked = false;
 
 	 // ── Génération sans répétition ──────────────────────────────────────────
     function buildSession(theme) {
-        const cats = theme === 'tout' ? Object.keys(GENERATORS) : [theme];
+        const cats = theme === 'tout' ? Object.keys(GENERATORS).filter(k => k !== 'scratch') : [theme];
         const pool = [];
         // Crée un pool large (jusqu'à 40 tentatives) puis déduplique par texte
         const seen = new Set();
@@ -873,6 +1253,8 @@
         });
         session = buildSession(theme);
         currentIdx = 0; score = 0;
+        const labels = { calc: '🔢 Nombres & calculs', alg: '🧩 Calcul littéral', geo: '📐 Géométrie', proba: '📊 Proba & stats', scratch: '🐱 Scratch', tout: '🚀 Tous les thèmes' };
+        document.getElementById('label-theme').textContent = labels[theme] || 'Entraînement';
         document.getElementById('menu-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
         showQuestion();
