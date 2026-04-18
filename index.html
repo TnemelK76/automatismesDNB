@@ -376,7 +376,7 @@
                 let type, div, n;
                 if (r < 0.33) {
                     type = "tiers"; div = 3;
-                    const multiplesDeTrois = [12, 15, 18, 21, 24, 27, 30, 33, 36, 45, 60, 75, 90, 120, 360, 630, 915, 1200];
+                    const multiplesDeTrois = [12, 15, 18, 21, 24, 27, 30, 33, 36, 45, 60, 75, 90, 120, 180, 360, 600, 630, 915, 1200];
                     n = multiplesDeTrois[Math.floor(Math.random() * multiplesDeTrois.length)];
                 } else if (r < 0.66) {
                     type = "quart"; div = 4; n = (Math.floor(Math.random() * 30) + 1) * 4;
@@ -433,7 +433,7 @@
 				    };
 			    } else {
 			        // Minutes vers Heures et Minutes (ex: 90 min -> 1h30)
-			        const totalMin = [75, 90, 105, 120, 135, 150, 180, 210][Math.floor(Math.random() * 8)];
+			        const totalMin = [75, 90, 95, 100, 105, 120, 135, 145, 150, 155, 175, 195, 180, 210, 240, 250][Math.floor(Math.random() * 8)];
 			        const h = Math.floor(totalMin / 60);
 			        const m = totalMin % 60;
 			        
