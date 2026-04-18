@@ -751,11 +751,13 @@
 				        <text x="70" y="95" font-size="12" fill="currentColor">${chercherHypo ? b + " " + unit : "?"}</text>
 				        <text x="80" y="45" font-size="12" fill="currentColor">${chercherHypo ? "?" : c + " " + unit}</text>
 				    </svg>`;
-				    
+					const cc = c*c
+					const bb = b*b
+					
 				    return { 
 				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
 				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
-				        h: `${chercherHypo ? `$$${a}^2 + ${b}^2= ${c*c} \\text{ puis } \\sqrt{${c*c}} = ${c}$$ ${unit}` : `$$${c}^2 - ${a}^2 = ${b*b} \\text{ puis } \\sqrt{${b*b}} = ${b}$$ ${unit}`} ` 
+				        h: `${chercherHypo ? `$$${a}^2 + ${b}^2= ${cc} \\text{ puis } \\sqrt{${cc}} = ${c}$$ ${unit}` : `$$${c}^2 - ${a}^2 = ${bb} \\text{ puis } \\sqrt{${bb}} = ${b}$$ ${unit}`} ` 
 				    };
                 }
             },
