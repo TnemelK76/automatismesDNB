@@ -1646,7 +1646,7 @@
 	// 0. OUI / NON (divisibilité)
     if (correctRaw === 'oui' || correctRaw === 'non') {
         const u = userRaw.trim();
-        if (u === correctRaw || u === 'o' && correctRaw === 'oui') isCorrect = true;
+        if (u === correctRaw || u === 'o' && correctRaw === 'oui' || u === 'n' && correctRaw === 'non') isCorrect = true;
     }
     // 0b. LECTURE GRAPHIQUE antécédent : accepte tout antécédent valide de la parabole
     else if (q.q.includes("antécédent") && q.q.includes("graphiquement")) {
