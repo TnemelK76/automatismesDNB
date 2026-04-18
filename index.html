@@ -760,7 +760,7 @@
 				    return { 
 				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
 				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
-				        h: `${chercherHypo ? `$$${a}^2 + ${b}^2 = ${cc} \\text{ puis } \\sqrt{16} = ${c}$$ ${unit}` : `$$${c}^2 - ${a}^2 = ${bb} \\text{ puis } \\sqrt{16} = ${b}$$ ${unit}`} ` 
+				        h: `${chercherHypo ? `\\(${a}^2 + ${b}^2 = ${cc} \\text{ puis } \\sqrt{16} = ${c}\\) ${unit}` : `\\(${c}^2 - ${a}^2 = ${bb} \\text{ puis } \\sqrt{16} = ${b}\\) ${unit}`} ` 
 				    };
                 }
             },
