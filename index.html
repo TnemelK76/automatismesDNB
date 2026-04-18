@@ -755,7 +755,7 @@
 				    return { 
 				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
 				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
-				        h: `${chercherHypo ? String.raw`$${a}^2+${b}^2=${c*c} \\text{ puis } \\sqrt{${c*c}}=${c}$ ${unit}` : String.raw`$${c}^2-${a}^2=${b*b} \\text{ puis } \\sqrt{${b*b}}=${b}$ ${unit}`} ` 
+				        h: `${chercherHypo ? `$${a}^2+${b}^2=${c*c} \\text{ puis } \\sqrt{${c*c}}=${c}$ ${unit}` : `$${c}^2-${a}^2=${b*b} \\text{ puis } \\sqrt{${b*b}}=${b}$ ${unit}`} ` 
 				    };
                 }
             },
