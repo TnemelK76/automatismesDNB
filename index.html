@@ -421,7 +421,7 @@
 				    return {
 				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
 				        a: reponseParfaite,
-				        t: "duree"
+				        h: `${hDec} h = $\\frac{1}{${1/hDec}}$ min`
 				    };
 			    } else {
 			        // Minutes vers Heures et Minutes (ex: 90 min -> 1h30)
@@ -432,7 +432,7 @@
 			        return {
 			            q: `Convertir en heures et minutes : $${totalMin}\\text{ min}$`,
 			            a: m === 0 ? `${h} \\text{ h}` : `${h} \\text{ h } ${m} \\text{ min}`,
-			            t: "duree"
+			            h: "60 min = 1 h"
 			        };
 			    }
 			},
@@ -553,7 +553,7 @@
                 const enonce = fmt(c1, v + "^2", true) + fmt(c2, v) + fmt(n1, "") + fmt(c3, v);
                 const resV2 = c1, resV = c2 + c3, resN = n1;
                 let reponse = fmt(resV2, v + "^2", true) + fmt(resV, v) + fmt(resN, "");
-                return { q: `Réduire l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: "Regroupe les familles." };
+                return { q: `Réduire l'expression : <span style="white-space:nowrap">$${enonce}$</span>`, a: reponse.replace(/\s+/g, ''), h: "Regroupe les termes de même famille." };
             },
             () => {
                 const vars = ['x', 'y', 'a', 'b'];
@@ -562,7 +562,7 @@
                 const k = genRelatif(), a = Math.floor(Math.random() * 5) + 2, b = genRelatif();
                 const enonce = `${k}(${a}${v} ${b > 0 ? "+" : "-"} ${Math.abs(b)})`;
                 const reponse = `${k*a}${v}${ (k*b) > 0 ? "+" + (k*b) : (k*b) }`;
-                return { q: `Développer l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: "Distribue et gère les signes." };
+                return { q: `Développer l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: `Distribue ${k} au deux termes de la parenthèse (atention aux signes).` };
             },
             () => {
                 const isHard = Math.random() > 0.5;
@@ -570,11 +570,11 @@
                 if (!isHard) {
                     let a = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 10) - 5, c = Math.floor(Math.random() * 15) - 5;
                     if (isFractional) {
-                        return { q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: (c-b) + "/" + a, h: "La réponse peut être une fraction." };
+                        return { q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: (c-b) + "/" + a, h: "Isole les inconnues à gauche et les constantes à droite." };
                     } else {
                         const sol = Math.floor(Math.random() * 15) - 7;
                         c = a * sol + b;
-                        return { q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: sol.toString(), h: "Isole x." };
+                        return { q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: sol.toString(), h: "Isole les inconnues à gauche et les constantes à droite." };
                     }
                 } else {
                     let a, c; do { a = Math.floor(Math.random()*9)-4; c = Math.floor(Math.random()*9)-4; } while (a === c || a === 0 || c === 0);
@@ -586,7 +586,7 @@
                         return res;
                     };
                     const enonce = `${fmtE(a, 'x', true)}${b >= 0 ? "+" : ""}${b} = ${fmtE(c, 'x', true)}${d >= 0 ? "+" : ""}${d}`;
-                    return { q: `Résoudre : $${enonce.replace(/\+\-/g, "-")}$`, a: num + "/" + den, h: "Donne une fraction si besoin." };
+                    return { q: `Résoudre : $${enonce.replace(/\+\-/g, "-")}$`, a: num + "/" + den, h: "Isole les inconnues à gauche et les constantes à droite." };
                 }
             },
             // ── ÉVALUATION D'UNE EXPRESSION DU SECOND DEGRÉ ───────────────────
@@ -731,7 +731,7 @@
                     const noms = [["A","B","C"], ["R","S","T"], ["I","J","K"]][Math.floor(Math.random()*3)];
                     const [p1, p2, p3] = noms; 
                     const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100"><path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" /><text x="35" y="15" font-size="14" fill="currentColor">${p1}</text><text x="30" y="95" font-size="14" fill="currentColor">${p2}</text><text x="125" y="95" font-size="14" fill="currentColor">${p3}</text></svg>`;
-                    return { q: `Écrire l'égalité de Pythagore pour ce triangle rectangle en ${p2} :${svg}`, a: `${p2}${p1}^2+${p2}${p3}^2=${p1}${p3}^2`, h: "Hypoténuse² = somme des carrés des deux autres côtés." };
+                    return { q: `Écrire l'égalité de Pythagore pour ce triangle rectangle en ${p2} :${svg}`, a: `${p2}${p1}^2+${p2}${p3}^2=${p1}${p3}^2`, h: "Hypoténuse² = Petit Côté² + Moyen Côté²" };
                 } 
                 else {
                     const triplets = [[3,4,5], [6,8,10], [5,12,13]];
@@ -750,7 +750,7 @@
 				    return { 
 				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
 				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
-				        h: `Réponse attendue en ${unit}.` 
+				        h: `${chercherHypo ? `$\\sqrt{${a}+${b}}=${c}$ ${unit}` : `$\\sqrt{${c}-${a}}=${b}$ ${unit}`} ` 
 				    };
                 }
             },
@@ -796,7 +796,7 @@
 			        return { 
 			            q: `Écrire l'égalité des rapports de Thalès ((${BL}${BR}) // (${AL}${AR})) :${svg}`, 
 			            a: `${d1}=${d2}=${b}`, 
-			            h: "Associe les segments sur la même droite passant par le sommet." 
+			            h: "Repère les côtés homologues et écris les rapports." 
 			        };
 			    } else {
 			        const k = [2, 2.5, 3, 1.5][Math.floor(Math.random()*4)];
@@ -808,7 +808,7 @@
 			        return { 
 			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL} = ${petit} ${unit}, ${grandSide} = ${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR} = ${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
 			            a: (baseP*k).toString().replace('.', ',') + ` \\text{ ${unit}}`, 
-			            h: `Agrandissement de rapport $${k}$. Réponse attendue en ${unit}.` 
+			            h: `C'est un agrandissement de rapport $${k}$.` 
 			        };
 			    }
 			},
@@ -918,7 +918,7 @@
 		        return {
 		            q: `${qText}<br>${svg}`,
 		            a: ans,
-		            h: type === "disque" ? "Périmètre d'un cercle : $P = 2 \\times \\pi \\times r$ ou $P = \\pi \\times d$." : "Le périmètre est la somme des longueurs des bords."
+		            h: type === "disque" ? "Périmètre d'un cercle : $P = 2 \\times \\pi \\times r$ ou $P = \\pi \\times d$." : "Le périmètre est la somme des longueurs des côtés."
 		        };
 		    }
 
@@ -929,13 +929,13 @@
                 let s = Array.from({length: size}, () => Math.floor(Math.random() * 20) + 1);
                 let sorted = [...s].sort((a, b) => a - b);
                 let res = size === 5 ? sorted[2] : (sorted[1] + sorted[2]) / 2;
-                return { q: `Déterminer la médiane de cette série : $${s.join(' \\, ; \\, ')}$`, a: res.toString().replace('.', ','), h: "Range dans l'ordre croissant." };
+                return { q: `Déterminer la médiane de cette série : $${s.join(' \\, ; \\, ')}$`, a: res.toString().replace('.', ','), h: "Range dans l'ordre croissant, puis prends la valeur milieu." };
             },
             () => {
                 const nbVal = [3, 4, 5][Math.floor(Math.random() * 3)];
                 let vals, sum;
                 do { vals = Array.from({length: nbVal}, () => Math.floor(Math.random() * 20)); sum = vals.reduce((a, b) => a + b, 0); } while (sum % nbVal !== 0 && (sum * 10) % nbVal !== 5); 
-                return { q: `Calculer la moyenne de : $${vals.join(' \\, ; \\, ')}$`, a: (sum / nbVal).toString().replace('.', ','), h: "Somme / Effectif total." };
+                return { q: `Calculer la moyenne de : $${vals.join(' \\, ; \\, ')}$`, a: (sum / nbVal).toString().replace('.', ','), h: "Somme des valeurs / Effectif total." };
             },
             () => {
                 const s = Array.from({length: 5}, () => Math.floor(Math.random() * 40));
@@ -945,16 +945,16 @@
                 const type = Math.floor(Math.random() * 4);
                 if (type === 0) {
                     const r = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 8) + 2;
-                    return { q: `Une urne contient ${r} boules rouges et ${b} bleues. Quelle est la probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "favorable / total" };
+                    return { q: `Une urne contient ${r} boules rouges et ${b} bleues. Quelle est la probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "Nb de boules bleues / Nb total de boules" };
                 } else if (type === 1) {
                     const seuil = Math.floor(Math.random() * 3) + 2;
-                    return { q: `Dé à 6 faces. Quelle est la probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "favorable / total" };
+                    return { q: `Dé à 6 faces. Quelle est la probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "Nb d'issues favorables / Nb d'issues total" };
                 } else if (type === 2) {
                     const p = Math.floor(Math.random() * 8) + 1;
                     return { q: `La probabilité qu'il pleuve demain est de $${p}/10$. Quelle est la probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
                 } else {
                     const secteurs = [8, 10, 12, 15, 20][Math.floor(Math.random()*3)]; const gagnants = Math.floor(Math.random()*secteurs/2) + 2 ;
-                    return { q: `Une roue de loterie de ${secteurs} secteurs a ${gagnants} secteurs gagnants. Quelle est la probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "favorable / total" };
+                    return { q: `Une roue de loterie de ${secteurs} secteurs a ${gagnants} secteurs gagnants. Quelle est la probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "Nb d'issues favorables / Nb d'issues total" };
                 }
             },
 			() => {
@@ -1020,7 +1020,8 @@
 			
 				return {
 					q: `À l'aide du diagramme ci-dessous, déterminer combien d'enfants ont <b>${ageConsigne} ans ou plus</b> dans cet échantillon. ${svg}`,
-					a: reponse.toString()
+					a: reponse.toString(),
+					h: `Additionne les effectifs des barres des enfants ayant ${ageConsigne} ou plus`
 				};
 			},
 		
@@ -1101,7 +1102,8 @@
 		
 		        return {
 		            q: `Le graphique représente l'évolution de la température sur une journée. <br> <b>De combien de degrés la température a-t-elle augmenté entre ${labels[idxA]} et ${labels[idxB]} ?</b> ${svg}`,
-		            a: reponse.toString()
+		            a: reponse.toString(),
+					h: `Fais la différence entre la température à ${labels[idxA]} et celle à ${labels[idxB]}h.`
 		        };
 		    }
         ],
@@ -1244,7 +1246,7 @@
                 let v2 = startVal;
                 for (const c of chosen) {
                     const next = c.op.fn(v2);
-                    hintSteps += ` → résultat ← ${c.op.txt(v2)} = ${next}`;
+                    hintSteps += ` ➤ résultat ← ${c.op.txt(v2)} = ${next}`;
                     v2 = next;
                 }
 
