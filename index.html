@@ -352,6 +352,23 @@
                 return { q: `Calculer : $${q}$`, a: `${numFinal}/${d2}`, h: `Mets tout sur $${d2}$.` };
             },
             () => {
+                const d1 = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                const k = [2, 3, 4][Math.floor(Math.random() * 3)];
+                const d2 = d1 * k;
+                const n1 = Math.floor(Math.random() * 5) + 1;
+                const n2 = Math.floor(Math.random() * 5) + 1;
+                const reverse = Math.random() > 0.5;
+                const q = reverse
+                    ? `\\frac{${n2}}{${d2}} - \\frac{${n1}}{${d1}}`
+                    : `\\frac{${n1}}{${d1}} - \\frac{${n2}}{${d2}}`;
+                const numFinal = reverse ? n2 - n1 * k : n1 * k - n2;
+                const reponse = numFinal === 0 ? '0' : `${numFinal}/${d2}`;
+                const hint = reverse
+                    ? `Mets tout sur $${d2}$ : $\\frac{${n2}}{${d2}} - \\frac{${n1 * k}}{${d2}}$.`
+                    : `Mets tout sur $${d2}$ : $\\frac{${n1 * k}}{${d2}} - \\frac{${n2}}{${d2}}$.`;
+                return { q: `Calculer : $${q}$`, a: reponse, h: hint };
+            },
+            () => {
                 const r = Math.random();
                 let type, div, n;
                 if (r < 0.33) {
@@ -418,7 +435,104 @@
 			            t: "duree"
 			        };
 			    }
-			}
+			},
+            // ── DROITE GRADUÉE ─────────────────────────────────────────────────
+            () => {
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+
+                // Nombre de subdivisions par unité (2, 3, 4 ou 5)
+                const subs = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+
+                // Position du point : entier k, jamais tombé sur une graduation entière
+                let k;
+                do { k = Math.floor(Math.random() * (2 * subs - 1)) + 1; } while (k % subs === 0);
+
+                // Fraction simplifiée
+                const pgcd = getPGCD(k, subs);
+                const num = k / pgcd;
+                const den = subs / pgcd;
+                const reponse = den === 1 ? num.toString() : `${num}/${den}`;
+
+                // ── SVG droite graduée ────────────────────────────────────────
+                const W = 340, H = 70;
+                // L'axe commence avant 0 et finit après 2, la flèche est encore plus loin
+                const x0 = 50;           // position du 0
+                const unitPx = 100;      // 1 unité = 100px
+                const xLineStart = x0 - 18;  // dépasse légèrement à gauche du 0
+                const xArrowTip = x0 + 2 * unitPx + 28;  // flèche bien après le 2
+                const y = 38;
+                const subPx = unitPx / subs;
+                const xPoint = x0 + k * subPx;
+
+                let s = '';
+
+                // Axe + flèche
+                s += `<line x1="${xLineStart}" y1="${y}" x2="${xArrowTip - 8}" y2="${y}" stroke="var(--purple-dark)" stroke-width="2"/>`;
+                s += `<polygon points="${xArrowTip},${y} ${xArrowTip-10},${y-5} ${xArrowTip-10},${y+5}" fill="var(--purple-dark)"/>`;
+
+                // Grandes graduations 0, 1, 2
+                [0, 1, 2].forEach(n => {
+                    const x = x0 + n * unitPx;
+                    s += `<line x1="${x}" y1="${y-9}" x2="${x}" y2="${y+9}" stroke="var(--purple-dark)" stroke-width="2"/>`;
+                    s += `<text x="${x}" y="${y+22}" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--purple-deep)" font-family="sans-serif">${n}</text>`;
+                });
+
+                // Petites graduations intermédiaires
+                for (let u = 0; u < 2; u++) {
+                    for (let t = 1; t < subs; t++) {
+                        const x = x0 + u * unitPx + t * subPx;
+                        s += `<line x1="${x}" y1="${y-5}" x2="${x}" y2="${y+5}" stroke="var(--purple-mid)" stroke-width="1.2"/>`;
+                    }
+                }
+
+                // Point A
+                s += `<circle cx="${xPoint}" cy="${y}" r="5" fill="var(--red-dark)"/>`;
+                s += `<text x="${xPoint}" y="${y-12}" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--red-dark)" font-family="sans-serif">A</text>`;
+
+                const svg = `<div style="display:flex;justify-content:center;margin:16px 0;"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;">${s}</svg></div>`;
+
+                return {
+                    q: `Quelle est l'abscisse du point A ?${svg}<small>Donne une fraction si besoin (ex : 3/4)</small>`,
+                    a: reponse,
+                    h: `Compte : le point est à la graduation ${k} sur ${subs} (chaque unité est découpée en ${subs} parts égales).`
+                };
+            },
+            // ── CRITÈRES DE DIVISIBILITÉ ───────────────────────────────────────
+            () => {
+                const diviseur = [2, 3, 5, 9][Math.floor(Math.random() * 4)];
+
+                // Génère un nombre 3 ou 4 chiffres, aléatoirement divisible ou non par le diviseur
+                const nbChiffres = Math.random() > 0.5 ? 3 : 4;
+                const min = Math.pow(10, nbChiffres - 1);
+                const max = Math.pow(10, nbChiffres) - 1;
+
+                let n;
+                if (Math.random() > 0.5) {
+                    // Divisible : on tire un multiple aléatoire
+                    const minK = Math.ceil(min / diviseur);
+                    const maxK = Math.floor(max / diviseur);
+                    n = (minK + Math.floor(Math.random() * (maxK - minK + 1))) * diviseur;
+                } else {
+                    // Non divisible : on tire au hasard jusqu'à trouver
+                    do { n = min + Math.floor(Math.random() * (max - min + 1)); } while (n % diviseur === 0);
+                }
+
+                const isDivisible = n % diviseur === 0;
+
+                // Hint selon le critère
+                const hints = {
+                    2: `Un nombre est divisible par 2 si son chiffre des unités est pair (0, 2, 4, 6 ou 8). Ici le chiffre des unités est ${n % 10}.`,
+                    3: `Un nombre est divisible par 3 si la somme de ses chiffres est divisible par 3. Ici : ${n.toString().split('').join('+')} = ${n.toString().split('').reduce((a,c)=>a+parseInt(c),0)}.`,
+                    5: `Un nombre est divisible par 5 si son chiffre des unités est 0 ou 5. Ici le chiffre des unités est ${n % 10}.`,
+                    9: `Un nombre est divisible par 9 si la somme de ses chiffres est divisible par 9. Ici : ${n.toString().split('').join('+')} = ${n.toString().split('').reduce((a,c)=>a+parseInt(c),0)}.`
+                };
+
+                return {
+                    q: `$${n}$ est-il divisible par $${diviseur}$ ?<br><small>Réponds par <b>oui</b> ou <b>non</b></small>`,
+                    a: isDivisible ? 'oui' : 'non',
+                    h: hints[diviseur]
+                };
+            }
         ],
         alg: [
             () => {
@@ -474,7 +588,141 @@
                     const enonce = `${fmtE(a, 'x', true)}${b >= 0 ? "+" : ""}${b} = ${fmtE(c, 'x', true)}${d >= 0 ? "+" : ""}${d}`;
                     return { q: `Résoudre : $${enonce.replace(/\+\-/g, "-")}$`, a: num + "/" + den, h: "Donne une fraction si besoin." };
                 }
-            }
+            },
+            // ── ÉVALUATION D'UNE EXPRESSION DU SECOND DEGRÉ ───────────────────
+            () => {
+                const vars = ['x', 'y', 't', 'n'];
+                const v = vars[Math.floor(Math.random() * vars.length)];
+
+                // Coefficients : a ∈ {1,2}, b et c ∈ [-5..5] non nuls
+                const a = Math.random() > 0.5 ? 1 : 2;
+                const genBC = () => { let n; do { n = Math.floor(Math.random() * 11) - 5; } while (n === 0); return n; };
+                const b = genBC();
+                const c = genBC();
+
+                // Valeur de x ∈ {-3,-2,-1,1,2,3} (on exclut 0 pour que ce soit intéressant)
+                const xVals = [-3, -2, -1, 1, 2, 3];
+                const xVal = xVals[Math.floor(Math.random() * xVals.length)];
+
+                // Résultat
+                const result = a * xVal * xVal + b * xVal + c;
+
+                // Mise en forme de l'expression LaTeX
+                const fmtTerm = (coef, unit, first) => {
+                    if (coef === 0) return '';
+                    const absC = Math.abs(coef);
+                    const sign = coef < 0 ? (first ? '-' : ' - ') : (first ? '' : ' + ');
+                    const display = (absC === 1 && unit !== '') ? '' : absC;
+                    return `${sign}${display}${unit}`;
+                };
+                const expr = fmtTerm(a, `${v}^2`, true) + fmtTerm(b, v, false) + fmtTerm(c, '', false);
+
+                // Hint : détail du calcul
+                const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+                const step1 = `${a}\\times${xDisp}^2 = ${a}\\times${xVal*xVal} = ${a*xVal*xVal}`;
+                const step2 = `${b < 0 ? '' : ''}${b}\\times${xDisp} = ${b*xVal}`;
+                const hint = `Remplace $${v}$ par $${xVal}$ : $${step1}$, $${step2}$, puis ajoute $${c}$.`;
+
+                return {
+                    q: `Calculer la valeur de l'expression <span style="white-space:nowrap">$${expr}$</span> pour <span style="white-space:nowrap">$${v} = ${xVal}$.</span>`,
+                    a: result.toString(),
+                    h: hint
+                };
+            },
+            // ── FONCTIONS : IMAGE ET ANTÉCÉDENT ───────────────────────────────
+            () => {
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+                const fname = ['f', 'g', 'h'][Math.floor(Math.random() * 3)];
+                const isDeg2 = Math.random() > 0.5;
+
+                // Coefficients non nuls dans [-5, 5]
+                const genCoef = (excludeZero = true) => {
+                    let n;
+                    do { n = Math.floor(Math.random() * 11) - 5; } while (excludeZero && n === 0);
+                    return n;
+                };
+
+                // Petits entiers pour x, excluant 0
+                const xPool = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
+                const pickX = () => xPool[Math.floor(Math.random() * xPool.length)];
+
+                if (isDeg2) {
+                    // ── Degré 2 : x² + bx + c, toujours une image ─────────────
+                    const b = genCoef(), c = genCoef();
+
+                    // Mise en forme LaTeX de x² + bx + c
+                    const fmtD2 = (b, c) => {
+                        let s = 'x^2';
+                        if (b !== 0) s += (b === 1 ? ' + x' : b === -1 ? ' - x' : b > 0 ? ` + ${b}x` : ` - ${Math.abs(b)}x`);
+                        if (c !== 0) s += (c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`);
+                        return s;
+                    };
+                    const expr = fmtD2(b, c);
+
+                    const xVal = pickX();
+                    const result = xVal * xVal + b * xVal + c;
+                    const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+
+                    // Question : alternance notation fonction / langage naturel
+                    const useNotation = Math.random() > 0.5;
+                    const question = useNotation
+                        ? `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Calculer $${fname}(${xVal})$.`
+                        : `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Quelle est l'image de $${xVal}$ par $${fname}$ ?`;
+
+                    const hint = `Remplace $x$ par $${xDisp}$ : $${xDisp}^2 + ${b}\\times${xDisp} + ${c} = ${xVal*xVal} + (${b*xVal}) + ${c}$.`;
+
+                    return { q: question, a: result.toString(), h: hint };
+
+                } else {
+                    // ── Degré 1 : ax + b ───────────────────────────────────────
+                    const a = genCoef(), b = genCoef();
+
+                    const fmtD1 = (a, b) => {
+                        let s = a === 1 ? 'x' : a === -1 ? '-x' : `${a}x`;
+                        if (b !== 0) s += (b > 0 ? ` + ${b}` : ` - ${Math.abs(b)}`);
+                        return s;
+                    };
+                    const expr = fmtD1(a, b);
+
+                    const isImage = Math.random() > 0.5;
+
+                    if (isImage) {
+                        // Image : f(xVal)
+                        const xVal = pickX();
+                        const result = a * xVal + b;
+                        const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+                        const hint = `$${fname}(${xVal}) = ${a}\\times${xDisp} + ${b} = ${a*xVal} + ${b}$.`;
+                        return {
+                            q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Calculer $${fname}(${xVal})$.`,
+                            a: result.toString(),
+                            h: hint
+                        };
+                    } else {
+                        // Antécédent : trouver x tel que ax + b = yVal
+                        // On choisit x entier dans xPool pour garantir un yVal entier,
+                        // puis on pose la question sur yVal. La réponse est x (entier ici).
+                        // Mais on accepte aussi les fractions : on tire yVal directement
+                        // et on calcule x = (yVal - b) / a, qui peut être une fraction.
+                        const yVal = genCoef(false); // yVal dans [-5,5], peut être 0
+                        const numX = yVal - b;       // x = (yVal - b) / a
+                        const pgcd = getPGCD(Math.abs(numX), Math.abs(a));
+                        const numS = numX / pgcd;
+                        const denS = Math.abs(a) / pgcd; // dénominateur toujours positif
+                        const signFix = (numX < 0 && a < 0) || (numX >= 0 && a > 0) ? 1 : -1;
+                        const reponse = denS === 1
+                            ? (signFix * Math.abs(numS)).toString()
+                            : `${signFix * Math.abs(numS)}/${denS}`;
+
+                        const hint = `On résout $${a}x + ${b} = ${yVal}$, soit $${a}x = ${yVal - b}$, donc $x = \\frac{${yVal-b}}{${a}}$.`;
+                        return {
+                            q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Quel est l'antécédent de $${yVal}$ par $${fname}$ ?`,
+                            a: reponse,
+                            h: hint
+                        };
+                    }
+                }
+            },
+            
         ],
         geo: [
             () => {			
@@ -1242,30 +1490,60 @@
 
 	 // ── Génération sans répétition ──────────────────────────────────────────
     function buildSession(theme) {
-        const cats = theme === 'tout' ? Object.keys(GENERATORS).filter(k => k !== 'scratch') : [theme];
-        const pool = [];
-        // Crée un pool large (jusqu'à 40 tentatives) puis déduplique par texte
-        const seen = new Set();
-        let tries = 0;
-        while (pool.length < 10 && tries < 80) {
-            tries++;
-            const cat = cats[Math.floor(Math.random() * cats.length)];
-            const gen = GENERATORS[cat][Math.floor(Math.random() * GENERATORS[cat].length)];
-            const q = gen();
-            // Clé de déduplication : les 60 premiers caractères de l'énoncé
-            const key = q.q.replace(/<[^>]+>/g, '').trim().slice(0, 60);
-            if (!seen.has(key)) {
-                seen.add(key);
-                pool.push(q);
+        // En mode "tout", on réserve exactement 1 place pour Scratch
+        const isTout = theme === 'tout';
+        const cats = isTout
+            ? Object.keys(GENERATORS).filter(k => k !== 'scratch')
+            : [theme];
+
+        // ── Génère N questions en limitant chaque générateur à maxPerGen appel(s) ──
+        function generateUnique(categories, count, maxPerGen) {
+            const pool = [];
+            // Compteur d'utilisation par générateur : clé = "cat|index"
+            const genUsage = {};
+
+            // Construit la liste de tous les générateurs disponibles (cat + index)
+            const allGens = [];
+            for (const cat of categories) {
+                GENERATORS[cat].forEach((gen, idx) => allGens.push({ cat, idx, gen }));
             }
+
+            // Passe 1 : chaque générateur au plus maxPerGen fois, ordre aléatoire
+            const shuffled = allGens.slice().sort(() => Math.random() - 0.5);
+            for (let pass = 0; pass < maxPerGen && pool.length < count; pass++) {
+                for (const entry of shuffled) {
+                    if (pool.length >= count) break;
+                    const key = entry.cat + '|' + entry.idx;
+                    const uses = genUsage[key] || 0;
+                    if (uses >= maxPerGen) continue;
+                    genUsage[key] = uses + 1;
+                    pool.push(entry.gen());
+                }
+            }
+
+            // Passe 2 (fallback) : complète sans contrainte si le pool est encore insuffisant
+            while (pool.length < count) {
+                const entry = allGens[Math.floor(Math.random() * allGens.length)];
+                pool.push(entry.gen());
+            }
+
+            // Mélange final pour ne pas avoir toujours le même ordre de thèmes
+            return pool.sort(() => Math.random() - 0.5);
         }
-        // Complète si le pool est insuffisant (thème très petit)
-        while (pool.length < 10) {
-            const cat = cats[Math.floor(Math.random() * cats.length)];
-            const gen = GENERATORS[cat][Math.floor(Math.random() * GENERATORS[cat].length)];
-            pool.push(gen());
+
+        if (isTout) {
+            // 9 questions variées sans Scratch + 1 question Scratch
+            const mainQuestions = generateUnique(cats, 9, 1);
+            const scratchGen = GENERATORS['scratch'][Math.floor(Math.random() * GENERATORS['scratch'].length)];
+            const scratchQ = scratchGen();
+
+            // Insère la question Scratch à une position aléatoire parmi les 10
+            const scratchPos = Math.floor(Math.random() * 10);
+            mainQuestions.splice(scratchPos, 0, scratchQ);
+            return mainQuestions;
+        } else {
+            return generateUnique(cats, 10, 1);
         }
-        return pool;
     }
 
 	
@@ -1365,8 +1643,25 @@
 		
     const clean = (s) => s.replace(/\s+/g, '');
 
-	// 0. TRIGONOMÉTRIE (rapport de deux segments)
-    if (q.q.includes("Quel rapport faut-il")) {
+	// 0. OUI / NON (divisibilité)
+    if (correctRaw === 'oui' || correctRaw === 'non') {
+        const u = userRaw.trim();
+        if (u === correctRaw || u === 'o' && correctRaw === 'oui') isCorrect = true;
+    }
+    // 0b. LECTURE GRAPHIQUE antécédent : accepte tout antécédent valide de la parabole
+    else if (q.q.includes("antécédent") && q.q.includes("graphiquement")) {
+        const uVal = parseFloat(userRaw.replace(',', '.'));
+        if (!isNaN(uVal)) {
+            // Retrouve les coefficients b et c depuis q.a (pt.x connu) et vérifie f(uVal) == f(pt.x)
+            // On stocke la valeur cible yTarget dans q.yTarget (ajouté au moment de la génération)
+            const yTarget = q.yTarget;
+            // Recalcule f(uVal) en utilisant les coefficients stockés dans q
+            const fVal = q.fa * uVal * uVal + q.fb * uVal + q.fc;
+            if (Math.abs(fVal - yTarget) < 0.001) isCorrect = true;
+        }
+    }
+	// 0c. TRIGONOMÉTRIE (rapport de deux segments)
+    else if (q.q.includes("Quel rapport faut-il")) {
         // Accepte AB/CD, BA/CD, AB/DC, BA/DC — on trie les lettres de chaque segment
         const normSeg = (s) => clean(s).split('/').map(p => p.split('').sort().join('')).join('/');
         if (normSeg(userRaw) === normSeg(correctRaw)) isCorrect = true;
@@ -1665,17 +1960,31 @@
 		        icon = '✗';
 		    }
 		
-		    // Ici on garde TOUTE la question (q.q) pour inclure le SVG
-		    // On ajoute un conteneur 'mini-svg' pour forcer la petite taille
+		    // Convertit "a/b" en "$\frac{a}{b}$", laisse le texte brut pour oui/non
+		    const toLatex = (val) => {
+		        if (!val) return '-';
+		        if (val === 'oui' || val === 'non') return val; // texte brut, pas de LaTeX
+		        const m = val.match(/^(-?\d+)\/(-?\d+)$/);
+		        return m ? `$\\frac{${m[1]}}{${m[2]}}$` : val;
+		    };
+
+		    const userDisplay = toLatex(q.userAns);
+		    const corrDisplay = (() => {
+		        const t = toLatex(q.a);
+		        // Si toLatex n'a pas transformé (pas de fraction, pas oui/non) → on entoure de $
+		        if (t === q.a && q.a !== 'oui' && q.a !== 'non') return `$${q.a}$`;
+		        return t;
+		    })();
+
 		    html += `
 		    <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
 		        <td style="padding: 10px 12px;" class="history-q-cell">
 		            <div class="mini-svg-container">${q.q}</div>
 		        </td>
 		        <td style="padding: 10px 12px; text-align: center; color: ${textColor}; font-weight: bold;">
-		            ${icon} ${q.userAns || '-'}
+		            ${icon} ${userDisplay}
 		        </td>
-		        <td style="padding: 10px 12px; text-align: center;">$${q.a}$</td>
+		        <td style="padding: 10px 12px; text-align: center;">${corrDisplay}</td>
 		    </tr>`;
 		});
 
