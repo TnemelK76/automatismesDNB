@@ -154,14 +154,37 @@
 		<p style="text-align: center; color: var(--text2); font-size: 0.85rem; margin-top: -15px; margin-bottom: 25px; font-style: italic;">
         Calculatrice interdite, mais papier et crayon vivement conseillés !
     </p>
-         <div class="theme-grid">
-            <button class="theme-btn" onclick="startQuiz('calc')">🔢 Nombres et calculs</button>
-            <button class="theme-btn" onclick="startQuiz('alg')">🧩 Calcul littéral et fonctions</button>
-            <button class="theme-btn" onclick="startQuiz('geo')">📐 Espace, géométrie et grandeurs </button>
-            <button class="theme-btn" onclick="startQuiz('proba')">📊 Probabilités et statistiques</button>
-            <button class="theme-btn" onclick="startQuiz('scratch')" style="background:var(--orange-light); color:var(--orange-dark); border-color: #FFD8A8;">🐱 Algorithmique Scratch</button>
-            <button class="theme-btn all" onclick="startQuiz('tout')">🚀 Tous les thèmes</button>
-        </div>
+        <div class="theme-grid">
+		    <button class="theme-btn" onclick="startQuiz('calc')" 
+		        style="background:var(--purple-light); color:var(--purple-dark); border-color: var(--purple-mid);">
+		        🔢 Nombres et calculs
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('alg')" 
+		        style="background:#F0EEFF; color:var(--purple-deep); border-color: #7F77DD;">
+		        🧩 Calcul littéral et fonctions
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('geo')" 
+		        style="background:var(--green-light); color:var(--green-dark); border-color: #B2D281;">
+		        📐 Espace, géométrie et grandeurs 
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('proba')" 
+		        style="background:var(--red-light); color:var(--red-dark); border-color: #EFA9A9;">
+		        📊 Probabilités et statistiques
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('scratch')" 
+		        style="background:var(--orange-light); color:var(--orange-dark); border-color: #FFD8A8;">
+		        🐱 Algorithmique Scratch
+		    </button>
+		    
+		    <button class="theme-btn all" onclick="startQuiz('tout')">
+		        🚀 Tous les thèmes
+		    </button>
+		</div>
+    </div>
 
     <div id="quiz-screen" class="hidden">
         <div class="question-header">
@@ -1252,7 +1275,7 @@
         });
         session = buildSession(theme);
         currentIdx = 0; score = 0;
-        const labels = { calc: '🔢 Nombres & calculs', alg: '🧩 Calcul littéral et fonctions', geo: '📐 Espace, géométrie et grandeurs', proba: '📊 Probabilités & Statistiques', scratch: '🐱 Algorithmique Scratch', tout: '🚀 Tous les thèmes' };
+        const labels = { calc: '🔢 Nombres & calculs', alg: '🧩 Calcul littéral', geo: '📐 Géométrie', proba: '📊 Proba & stats', scratch: '🐱 Scratch', tout: '🚀 Tous les thèmes' };
         document.getElementById('label-theme').textContent = labels[theme] || 'Entraînement';
         document.getElementById('menu-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
