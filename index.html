@@ -72,7 +72,7 @@
 		}
 		.short-btn {
 			flex: 1;            /* Donne la même largeur à chaque bouton */
-		    height: 55px;       /* Hauteur fixe pour éviter les déformations */
+		    height: 50px;       /* Hauteur fixe pour éviter les déformations */
 		    background: var(--purple-light);
 		    border: 1px solid var(--border);
 		    border-radius: 12px;
@@ -202,6 +202,7 @@
 		    <button type="button" class="short-btn" onclick="insertSymbol('/')">$\frac{a}{b}$</button>
 			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
 			<button type="button" class="short-btn" onclick="insertSymbol('^')">$x^n$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('π')">$\pi$</button>
 		</div>
         <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
         <div id="feedback" class="feedback hidden"></div>
