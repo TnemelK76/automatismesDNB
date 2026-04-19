@@ -806,11 +806,11 @@
                 const inner = q > 0 ? `${fmtP} + ${q}` : `${fmtP} - ${Math.abs(q)}`;
                 const reponse = `${k}(${inner})`;
 
-                const hint = `Le facteur commun est $${k}$ car $${A} = ${k}\\times${p}$ et $${Math.abs(B)} = ${k}\\times${Math.abs(q)}$. On obtient $${reponse}$.`;
+                const hint = `Le plus grand facteur commun est $${k}$ car $${A} = ${k}\\times${p}$ et $${Math.abs(B)} = ${k}\\times${Math.abs(q)}$. On obtient $${reponse}$.`;
 
                 return {
                     label: 'Factorisation d\'une expression',
-                    q: `Factoriser l'expression : $${enonce}$`,
+                    q: `Factoriser l'expression au maximum : $${enonce}$`,
                     a: reponse,
                     h: hint
                 };
