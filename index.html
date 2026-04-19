@@ -429,7 +429,7 @@
                 } else {
                     type = "moitié"; div = 2; n = (Math.floor(Math.random() * 100) + 1) * 2;
                 }
-                return { label: 'Moitié, tiers, quart', q: `Quel est le ${type} de $${n}$ ?`, a: (n / div).toString(), h: `Divise par $${div}$.` };
+                return { label: 'Fraction d\'un nombre', q: `Quel est le ${type} de $${n}$ ?`, a: (n / div).toString(), h: `Divise par $${div}$.` };
             },
             () => {
                 const entry = SCI_DATABASE[Math.floor(Math.random()*SCI_DATABASE.length)];
@@ -444,11 +444,11 @@
             () => {
                 const p = [50, 25, 10][Math.floor(Math.random() * 3)];
                 let v = p === 25 ? (Math.floor(Math.random() * 10) + 1) * 4 : (Math.floor(Math.random() * 20) + 1) * 10;
-                return { label: 'Pourcentages simples', q: `Calculer $${p}\\%$ de $${v}$`, a: ((v * p) / 100).toString().replace('.', ','), h: `Divise par ${100/p}.` };
+                return { label: 'Pourcentages d\'une quantité', q: `Calculer $${p}\\%$ de $${v}$`, a: ((v * p) / 100).toString().replace('.', ','), h: `Divise par ${100/p}.` };
             },
             () => {
                 const n = Math.floor(Math.random() * 12) + 1;
-                return { label: 'Carrés entiers', q: `Calculer : $${n}^2$`, a: (n * n).toString(), h: `$${n} \\times ${n}$.` };
+                return { label: 'Carrés d\'entiers', q: `Calculer : $${n}^2$`, a: (n * n).toString(), h: `$${n} \\times ${n}$.` };
             },
 			() => {
 			    const type = Math.random() > 0.5 ? 'DEC_TO_HM' : 'MIN_TO_HM';
@@ -545,7 +545,7 @@
 
                 const svg = `<div style="display:flex;justify-content:center;margin:16px 0;"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;">${s}</svg></div>`;
 
-                return { label: 'Droite graduée',
+                return { label: 'Repérage sur une droite graduée',
                     q: `Quelle est l'abscisse du point A ?${svg}<small>Donne une fraction si besoin (ex : 3/4)</small>`,
                     a: reponse,
                     h: `Compte : le point est à la graduation ${k} sur ${subs} (chaque unité est découpée en ${subs} parts égales).`
@@ -616,7 +616,7 @@
                 const k = genRelatif(), a = Math.floor(Math.random() * 5) + 2, b = genRelatif();
                 const enonce = `${k}(${a}${v} ${b > 0 ? "+" : "-"} ${Math.abs(b)})`;
                 const reponse = `${k*a}${v}${ (k*b) > 0 ? "+" + (k*b) : (k*b) }`;
-                return { label: 'Développement', q: `Développer l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: `Distribue ${k} au deux termes de la parenthèse (atention aux signes).` };
+                return { label: 'Développement d\'expression', q: `Développer l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: `Distribue ${k} au deux termes de la parenthèse (atention aux signes).` };
             },
             () => {
                 const isHard = Math.random() > 0.5;
@@ -677,7 +677,7 @@
                 const step2 = `${b < 0 ? '' : ''}${b}\\times${xDisp} = ${b*xVal}`;
                 const hint = `Remplace $${v}$ par $${xVal}$ : $${step1}$, $${step2}$, puis ajoute $${c}$.`;
 
-                return { label: 'Évaluation d\'expression',
+                return { label: 'Évaluer une expression litérale',
                     q: `Calculer la valeur de l'expression <span style="white-space:nowrap">$${expr}$</span> pour <span style="white-space:nowrap">$${v} = ${xVal}$.</span>`,
                     a: result.toString(),
                     h: hint
@@ -725,7 +725,7 @@
 
                     const hint = `Remplace $x$ par $${xDisp}$ : $${xDisp}^2 + ${b}\\times${xDisp} + ${c} = ${xVal*xVal} + (${b*xVal}) + ${c}$.`;
 
-                    return { label: 'Image et antécédent', q: question, a: result.toString(), h: hint };
+                    return { label: 'Image et antécédent d\'une fonction', q: question, a: result.toString(), h: hint };
 
                 } else {
                     // ── Degré 1 : ax + b ───────────────────────────────────────
@@ -746,7 +746,7 @@
                         const result = a * xVal + b;
                         const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
                         const hint = `$${fname}(${xVal}) = ${a}\\times${xDisp} + ${b} = ${a*xVal} + ${b}$.`;
-                        return { label: 'Image et antécédent',
+                        return { label: 'Image et antécédent d\'une fonction',
                             q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Calculer $${fname}(${xVal})$.`,
                             a: result.toString(),
                             h: hint
@@ -768,7 +768,7 @@
                             : `${signFix * Math.abs(numS)}/${denS}`;
 
                         const hint = `On résout $${a}x + ${b} = ${yVal}$, soit $${a}x = ${yVal - b}$, donc $x = \\frac{${yVal-b}}{${a}}$.`;
-                        return { label: 'Image et antécédent',
+                        return { label: 'Image et antécédent d\'une fonction',
                             q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Quel est l'antécédent de $${yVal}$ par $${fname}$ ?`,
                             a: reponse,
                             h: hint
@@ -809,7 +809,7 @@
                 const hint = `Le facteur commun est $${k}$ car $${A} = ${k}\\times${p}$ et $${Math.abs(B)} = ${k}\\times${Math.abs(q)}$. On obtient $${reponse}$.`;
 
                 return {
-                    label: 'Factorisation',
+                    label: 'Factorisation d\'une expression',
                     q: `Factoriser l'expression : $${enonce}$`,
                     a: reponse,
                     h: hint
@@ -824,7 +824,7 @@
                     const noms = [["A","B","C"], ["R","S","T"], ["I","J","K"]][Math.floor(Math.random()*3)];
                     const [p1, p2, p3] = noms; 
                     const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100"><path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" /><text x="35" y="15" font-size="14" fill="currentColor">${p1}</text><text x="30" y="95" font-size="14" fill="currentColor">${p2}</text><text x="125" y="95" font-size="14" fill="currentColor">${p3}</text></svg>`;
-                    return { label: 'Théorème de Pythagore', q: `Écrire l'égalité de Pythagore pour ce triangle rectangle en ${p2} :${svg}`, a: `${p2}${p1}^2+${p2}${p3}^2=${p1}${p3}^2`, h: "Hypoténuse² = Petit Côté² + Moyen Côté²" };
+                    return { label: 'Utiliser le théorème de Pythagore', q: `Écrire l'égalité de Pythagore pour ce triangle rectangle en ${p2} :${svg}`, a: `${p2}${p1}^2+${p2}${p3}^2=${p1}${p3}^2`, h: "Hypoténuse² = Petit Côté² + Moyen Côté²" };
                 } 
                 else {
                     const triplets = [[3,4,5], [6,8,10], [5,12,13]];
@@ -842,7 +842,7 @@
 					const cc = c*c
 					const bb = b*b
 					
-				    return { label: 'Théorème de Pythagore', 
+				    return { label: 'Utiliser le théorème de Pythagore', 
 				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
 				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
 				        h: `${chercherHypo ? `$$${a}^2 + ${b}^2 = ${cc} \\text{ et on sait que } ${c}^2 = ${cc}$$` : `$$${c}^2 - ${a}^2 = ${bb} \\text{ et on sait que } ${b}^2 = ${bb}$$`} ` 
@@ -888,7 +888,7 @@
 			        const d1 = isPapillon ? `${S}${BL}/${S}${AR}` : `${S}${BL}/${S}${AL}`;
 			        const d2 = isPapillon ? `${S}${BR}/${S}${AL}` : `${S}${BR}/${S}${AR}`;
 			        const b = `${BL}${BR}/${AL}${AR}`;
-			        return { label: 'Théorème de Thalès', 
+			        return { label: 'Utiliser le théorème de Thalès', 
 			            q: `Écrire l'égalité des rapports de Thalès ((${BL}${BR}) // (${AL}${AR})) :${svg}`, 
 			            a: `${d1}=${d2}=${b}`, 
 			            h: "Repère les côtés homologues et écris les rapports." 
@@ -900,7 +900,7 @@
 			        const grandSide = isPapillon ? S+AR : S+AL;
 			        
 			        // On ajoute l'unité aux valeurs numériques de l'énoncé
-			        return { label: 'Théorème de Thalès', 
+			        return { label: 'Utiliser le théorème de Thalès', 
 			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL} = ${petit} ${unit}, ${grandSide} = ${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR} = ${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
 			            a: (baseP*k).toString().replace('.', ',') + ` \\text{ ${unit}}`, 
 			            h: `C'est un agrandissement de rapport $${k}$.` 
@@ -947,7 +947,7 @@
                     <text x="125" y="95" font-size="14" fill="currentColor">${p3}</text>
                 </svg>`;
 
-                return { label: 'Trigonométrie (sin, cos, tan)',
+                return { label: 'Rapports de trigonométrie',
                     q: `Quel rapport faut-il calculer pour obtenir $\\${ratio}(\\widehat{${angleEn}})$ ?${svg}`,
                     a: `${ansNum}/${ansDen}`,
                     h: ratio === "sin" ? "sinus = opposé / hypoténuse"
@@ -971,7 +971,7 @@
 		        }
 		
 		        const ans = 180 - a1 - a2;
-		        return { label: 'Angles d\'un triangle',
+		        return { label: 'Calculer un angle dans un triangle',
 		            q: `${qText}<br>${generateTriangleSVG(a1, a2, isRight ? "rectangle" : "normal")}`,
 		            a: ans.toString() + "°",
 		            h: "La somme des angles d'un triangle est toujours égale à $180°$."
@@ -1009,7 +1009,7 @@
 
 				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
 
-				    return { label: 'Périmètre',
+				    return { label: 'Périmètres divers',
 				        q: `${qText}<br>${svg}`,
 				        a: ans,
 				        h: isRayon
@@ -1021,7 +1021,7 @@
 				    };
 				}
 		
-		        return { label: 'Périmètre',
+		        return { label: 'Périmètres divers',
 		            q: `${qText}<br>${svg}`,
 		            a: ans,
 		            h: "Le périmètre est la somme des longueurs des côtés."
@@ -1159,7 +1159,7 @@
                     qText = `Quel calcul faut-il effectuer pour obtenir l'aire de ce disque ?`;
                     hint = `Aire = $\\pi \\times r^2 = \\pi \\times ${r}^2$`;
 
-                    return { label: 'Calcul d\'aire',
+                    return { label: 'Calcul d\'aires',
                         q: `${qText}<br>${svg}`,
                         a: `\\pi\\times${r}²`,
                         h: hint,
@@ -1185,7 +1185,7 @@
 
                 const aireStr = aire.toString().replace('.', ',');
 
-                return { label: 'Calcul d\'aire',
+                return { label: 'Calcul d\'aires',
                     q: `${qText}<br>${svg}`,
                     a: `${aireStr} \\text{ ${unit}}^2`,
                     h: hint,
@@ -1362,7 +1362,7 @@
 
                     svg = `<svg viewBox="0 0 210 175" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
 
-                    return { label: 'Calcul de volume',
+                    return { label: 'Calcul de volumes',
                         q: `Quel calcul faut-il effectuer pour obtenir le volume de ce cylindre ?<br>${svg}`,
                         a: `\\pi\\times${r}²\\times${h}`,
                         h: `V = $\\pi \\times r^2 \\times h = \\pi \\times ${r}^2 \\times ${h}$`,
@@ -1373,7 +1373,7 @@
                 }
 
                 const volStr = vol.toString().replace('.', ',');
-                return { label: 'Calcul de volume',
+                return { label: 'Calcul de volumes',
                     q: `${qText}<br>${svg}`,
                     a: `${volStr} \\text{ m}^3`,
                     h: hint,
@@ -1389,32 +1389,32 @@
                 let s = Array.from({length: size}, () => Math.floor(Math.random() * 20) + 1);
                 let sorted = [...s].sort((a, b) => a - b);
                 let res = size === 5 ? sorted[2] : (sorted[1] + sorted[2]) / 2;
-                return { label: 'Médiane', q: `Déterminer la médiane de cette série : $${s.join(' \\, ; \\, ')}$`, a: res.toString().replace('.', ','), h: "Range dans l'ordre croissant, puis prends la valeur milieu." };
+                return { label: 'Médiane d\'une série statistique', q: `Déterminer la médiane de cette série : $${s.join(' \\, ; \\, ')}$`, a: res.toString().replace('.', ','), h: "Range dans l'ordre croissant, puis prends la valeur milieu." };
             },
             () => {
                 const nbVal = [3, 4, 5][Math.floor(Math.random() * 3)];
                 let vals, sum;
                 do { vals = Array.from({length: nbVal}, () => Math.floor(Math.random() * 20)); sum = vals.reduce((a, b) => a + b, 0); } while (sum % nbVal !== 0 && (sum * 10) % nbVal !== 5); 
-                return { label: 'Moyenne', q: `Calculer la moyenne de : $${vals.join(' \\, ; \\, ')}$`, a: (sum / nbVal).toString().replace('.', ','), h: "Somme des valeurs / Effectif total." };
+                return { label: 'Moyenne d\'une série statistique', q: `Calculer la moyenne de : $${vals.join(' \\, ; \\, ')}$`, a: (sum / nbVal).toString().replace('.', ','), h: "Somme des valeurs / Effectif total." };
             },
             () => {
                 const s = Array.from({length: 5}, () => Math.floor(Math.random() * 40));
-                return { label: 'Étendue', q: `Quelle est l'étendue de cette série : $${s.join(' \\, ; \\, ')}$ ?`, a: (Math.max(...s) - Math.min(...s)).toString(), h: "Max - Min." };
+                return { label: 'Étendue d\'une série statistique', q: `Quelle est l'étendue de cette série : $${s.join(' \\, ; \\, ')}$ ?`, a: (Math.max(...s) - Math.min(...s)).toString(), h: "Max - Min." };
             },
             () => {
                 const type = Math.floor(Math.random() * 4);
                 if (type === 0) {
                     const r = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 8) + 2;
-                    return { label: 'Probabilités', q: `Une urne contient ${r} boules rouges et ${b} bleues. Quelle est la probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "Nb de boules bleues / Nb total de boules" };
+                    return { label: 'Calcul de probabilités', q: `Une urne contient ${r} boules rouges et ${b} bleues. Quelle est la probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "Nb de boules bleues / Nb total de boules" };
                 } else if (type === 1) {
                     const seuil = Math.floor(Math.random() * 3) + 2;
-                    return { label: 'Probabilités', q: `Dé à 6 faces. Quelle est la probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "Nb d'issues favorables / Nb d'issues total" };
+                    return { label: 'Calcul de probabilités', q: `Dé à 6 faces. Quelle est la probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "Nb d'issues favorables / Nb d'issues total" };
                 } else if (type === 2) {
                     const p = Math.floor(Math.random() * 8) + 1;
-                    return { label: 'Probabilités', q: `La probabilité qu'il pleuve demain est de $${p}/10$. Quelle est la probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
+                    return { label: 'Calcul de probabilités', q: `La probabilité qu'il pleuve demain est de $${p}/10$. Quelle est la probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
                 } else {
                     const secteurs = [8, 10, 12, 15, 20][Math.floor(Math.random()*3)]; const gagnants = Math.floor(Math.random()*secteurs/2) + 2 ;
-                    return { label: 'Probabilités', q: `Une roue de loterie de ${secteurs} secteurs a ${gagnants} secteurs gagnants. Quelle est la probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "Nb d'issues favorables / Nb d'issues total" };
+                    return { label: 'Calcul de probabilités', q: `Une roue de loterie de ${secteurs} secteurs a ${gagnants} secteurs gagnants. Quelle est la probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "Nb d'issues favorables / Nb d'issues total" };
                 }
             },
 			() => {
@@ -1636,7 +1636,7 @@
                 ? prixFinal.toString()
                 : prixFinal.toFixed(2).replace('.', ',');
 
-            return { label: 'Augmentation / Diminution en %',
+            return { label: 'Augmentation / Diminution en pourcentage d\'une quantité',
                 q: `${frameText}<br>Son prix de départ était de $${prixDepart}$ €. Quel est son nouveau prix ?<br><small>Pense à inclure l'unité € (ex : 150 €)</small>`,
                 a: reponse + ' \\text{ €}',
                 h: hint,
@@ -1727,7 +1727,7 @@
                 hint    = 'Prix pour 1\u00a0: $' + fmt(p1) + ' \\div ' + cfg.q1 + ' = ' + fmt(cfg.pu) + '$ ' + ctx.uP + '. Puis\u00a0: $' + fmt(cfg.pu) + ' \\times ' + q2 + ' = ' + fmt(p2) + '$ ' + ctx.uP + '.';
             }
 
-            return { label: 'Proportionnalité',
+            return { label: 'Utiliser la proportionnalité',
                 q: q_text + '<br><small>Donne le résultat en ' + ctx.uP + ' (ex\u00a0: 6 ' + ctx.uP + ')</small>',
                 a: reponse + ' \\text{ ' + ctx.uP + '}',
                 h: hint,
@@ -1754,7 +1754,7 @@
                     { type:'endrepeat' }
                 ],0);
 
-                return { label: 'Script Scratch – Rectangle',
+                return { label: 'Script Scratch – Dessiner un rectangle',
                     q: `Voici un script Scratch qui trace un <b>rectangle</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
                     a: missingAngle ? '90' : '2',
                     h: missingAngle
@@ -1778,7 +1778,7 @@
                     { type:'endrepeat' }
                 ],0);
 
-                return { label: 'Script Scratch – Carré',
+                return { label: 'Script Scratch – Dessiner un carré',
                     q: `Voici un script Scratch qui trace un <b>carré</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
                     a: missingAngle ? '90' : '4',
                     h: missingAngle
@@ -1802,7 +1802,7 @@
                     { type:'endrepeat' }
                 ],0);
 
-                return { label: 'Script Scratch – Triangle équilatéral',
+                return { label: 'Script Scratch – Dessiner un triangle équilatéral',
                     q: `Voici un script Scratch qui trace un <b>triangle équilatéral</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
                     a: missingAngle ? '120' : '3',
                     h: missingAngle
@@ -1879,7 +1879,7 @@
                     v2 = next;
                 }
 
-                return { label: 'Script Scratch – Déroulement de programme',
+                return { label: 'Script Scratch – Appliquer un programme à un nombre',
                     q: `On choisit <b>${startVal}</b> comme nombre de départ. Quel nombre le lutin va-t-il dire ?<br>${svg}`,
                     a: String(finalVal),
                     h: hintSteps,
