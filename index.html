@@ -2122,8 +2122,8 @@
         const valOk = !isNaN(userVal) && Math.abs(userVal - correctVal) < 0.015;
 		
 		const raw2 = raw.replace('¤','2')
-        const hasUnit2   = raw.includes(unit + '2');          // cm2, m2 (après normalisation de ² et ^2)
-        const hasUnitOnly = !hasUnit2 && raw.includes(unit);  // cm ou m sans le carré
+        const hasUnit2   = raw2.includes(unit + '2');          // cm2, m2 (après normalisation de ² et ^2)
+        const hasUnitOnly = !hasUnit2 && raw2.includes(unit);  // cm ou m sans le carré
         const hasNoUnit   = !hasUnit2 && !hasUnitOnly;        // aucune unité
 
         if (valOk && hasUnit2) {
