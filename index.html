@@ -920,7 +920,7 @@
 				    qText = `Quel calcul faut-il effectuer pour obtenir le périmètre de ce disque ?`;
 				    // Réponse canonique stockée sous forme normalisée (sans espaces, pi minuscule)
 				    // On accepte 2*pi*r ou pi*d (les deux sont corrects)
-				    ans = isRayon ? `2*pi*${r}` : `pi*${d}`;
+				    ans = isRayon ? `2\\times\\pi*${r}` : `\\pi\\times${d}`;
 
 				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
 
@@ -1076,7 +1076,7 @@
 
                     return {
                         q: `${qText}<br>${svg}`,
-                        a: `pi*${r}²`,
+                        a: `\\pi\\times${r}²`,
                         h: hint,
                         _aireCircleTag: true,
                         _aireCircleR: r
@@ -1279,7 +1279,7 @@
 
                     return {
                         q: `Quel calcul faut-il effectuer pour obtenir le volume de ce cylindre ?<br>${svg}`,
-                        a: `pi*${r}²*${h}`,
+                        a: `\\pi\\times${r}²\\times${h}`,
                         h: `V = $\\pi \\times r^2 \\times h = \\pi \\times ${r}^2 \\times ${h}$`,
                         _volCylTag: true,
                         _volCylR: r,
@@ -1396,7 +1396,7 @@
 				return {
 					q: `À l'aide du diagramme ci-dessous, déterminer combien d'enfants ont <b>${ageConsigne} ans ou plus</b> dans cet échantillon. ${svg}`,
 					a: reponse.toString(),
-					h: `Additionne les effectifs des barres des enfants ayant ${ageConsigne} ou plus`
+					h: `Additionne les effectifs des barres des enfants ayant ${ageConsigne} ans ou plus`
 				};
 			},
 		
