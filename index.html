@@ -1175,7 +1175,7 @@
 
                 // ── CUBE ─────────────────────────────────────────────────────────
                 if (type === 'cube') {
-                    const c = Math.floor(Math.random() * 6) + 2;
+                    const c = Math.floor(Math.random() * 4) + 2;
                     vol = c * c * c;
                     const PX = 70;
                     const inner = drawBox(30, 145, PX, PX, PX, { w: `${c} m` });
@@ -1187,8 +1187,8 @@
                 } else if (type === 'pave') {
                     const L = Math.floor(Math.random() * 7) + 2;
                     let l, h;
-                    do { l = Math.floor(Math.random() * 7) + 2; } while (l === L);
-                    do { h = Math.floor(Math.random() * 7) + 2; } while (h === L || h === l);
+                    do { l = Math.floor(Math.random() * 5) + 2; } while (l === L);
+                    do { h = Math.floor(Math.random() * 4) + 2; } while (h === L || h === l);
                     vol = L * l * h;
                     const WPX = 90, HPX = 55, DPX = 50;
                     const inner = drawBox(20, 140, WPX, HPX, DPX, { w: `${L} m`, h: `${h} m`, d: `${l} m` });
@@ -1198,10 +1198,10 @@
 
                 // ── PRISME DROIT (base triangulaire rectangle) ───────────────────
                 } else if (type === 'prisme') {
-                    const b = Math.floor(Math.random() * 6) + 2;
+                    const b = Math.floor(Math.random() * 5) + 2;
                     let hT, prof;
-                    do { hT = Math.floor(Math.random() * 6) + 2; } while (hT === b);
-                    do { prof = Math.floor(Math.random() * 6) + 2; } while (prof === b || prof === hT);
+                    do { hT = Math.floor(Math.random() * 5) + 2; } while (hT === b);
+                    do { prof = Math.floor(Math.random() * 5) + 2; } while (prof === b || prof === hT);
                     const aire_base = (b * hT) / 2;
                     vol = aire_base * prof;
 
