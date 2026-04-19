@@ -1053,10 +1053,10 @@
                         <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1"/>
                         <path d="M ${x} ${y+w-s} L ${x+s} ${y+w-s} L ${x+s} ${y+w}" fill="none" stroke="${accent}" stroke-width="1"/>
                         <path d="M ${x+w-s} ${y+w} L ${x+w-s} ${y+w-s} L ${x+w} ${y+w-s}" fill="none" stroke="${accent}" stroke-width="1"/>
-                        <line x1="${x+w/2-5}" y1="${y+4}" x2="${x+w/2+5}" y2="${y+4}" stroke="${accent}" stroke-width="2"/>
-                        <line x1="${x+w/2-5}" y1="${y+w-4}" x2="${x+w/2+5}" y2="${y+w-4}" stroke="${accent}" stroke-width="2"/>
-                        <line x1="${x+4}" y1="${y+w/2-5}" x2="${x+4}" y2="${y+w/2+5}" stroke="${accent}" stroke-width="2"/>
-                        <line x1="${x+w-4}" y1="${y+w/2-5}" x2="${x+w-4}" y2="${y+w/2+5}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w/2}" y1="${y-4}" x2="${x+w/2}" y2="${y+8}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w/2}" y1="${y+w-8}" x2="${x+w/2}" y2="${y+w+4}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x-4}" y1="${y+w/2}" x2="${x+8}" y2="${y+w/2}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w-8}" y1="${y+w/2}" x2="${x+w+4}" y2="${y+w/2}" stroke="${accent}" stroke-width="2"/>
                         <text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${c} ${unit}</text>
                     </svg>`;
                     qText = `Calculer l'aire de ce carré :`;
@@ -1172,7 +1172,7 @@
                     const c = Math.floor(Math.random() * 6) + 2;
                     vol = c * c * c;
                     const PX = 70;
-                    const inner = drawBox(30, 145, PX, PX, PX, { w: `${c} m`, h: `${c} m`, d: `${c} m` });
+                    const inner = drawBox(30, 145, PX, PX, PX, { w: `${c} m` });
                     svg = `<svg viewBox="0 0 200 175" style="max-width:220px;margin:8px auto;display:block;overflow:visible;">${inner}</svg>`;
                     qText = `Calculer le volume de ce cube :`;
                     hint  = `V = côté³ = ${c}³ = ${vol} m³`;
@@ -1199,39 +1199,56 @@
                     const aire_base = (b * hT) / 2;
                     vol = aire_base * prof;
 
-                    // Triangle avant : angle droit en bas-gauche
-                    const ox = 25, oy = 148;
-                    const dx = prof * KX * 1.4, dy = prof * KY * 1.4;
-                    const WPX = 85, HPX = 70;
-                    const A = [ox,      oy     ];
-                    const B = [ox+WPX,  oy     ];
-                    const C = [ox,      oy-HPX ];
-                    const A2= [ox+dx,   oy+dy  ];
-                    const B2= [ox+WPX+dx, oy+dy];
-                    const C2= [ox+dx,   oy-HPX+dy];
-
+                    // Prisme debout : triangle rectangle sur la face GAUCHE
+                    // Angle droit en bas-gauche (A), base vers la droite (B), hauteur vers le haut (C)
+                    // La profondeur part en perspective cavalière vers la droite
                     const pt = ([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
                     const line = (p1,p2,dash='') =>
                         `<line x1="${p1[0].toFixed(1)}" y1="${p1[1].toFixed(1)}" x2="${p2[0].toFixed(1)}" y2="${p2[1].toFixed(1)}" stroke="${color}" stroke-width="1.8" ${dash}/>`;
 
-                    const sq = 10; // carré d'angle droit
+                    // Face gauche : triangle rectangle
+                    // A=bas-gauche (angle droit), B=bas-droite, C=haut-gauche
+                    const HPX = 90;  // hauteur en pixels
+                    const BPX = 75;  // base en pixels
+                    const PPX = 80;  // profondeur en pixels (vers la droite + légèrement haut)
+                    const pdx = PPX, pdy = -18; // vecteur de profondeur
+
+                    const A = [30,  160];
+                    const B = [30 + BPX, 160];
+                    const C = [30,  160 - HPX];
+
+                    // Face droite (triangle décalé par le vecteur de profondeur)
+                    const A2 = [A[0]+pdx, A[1]+pdy];
+                    const B2 = [B[0]+pdx, B[1]+pdy];
+                    const C2 = [C[0]+pdx, C[1]+pdy];
+
+                    const sq = 10;
                     let s = '';
+                    // Faces remplies
                     s += `<polygon points="${pt(A)} ${pt(B)} ${pt(C)}" fill="${fill}" stroke="none"/>`;
                     s += `<polygon points="${pt(A2)} ${pt(B2)} ${pt(C2)}" fill="${fill}" stroke="none"/>`;
-                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(B2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;
-                    s += `<polygon points="${pt(A)} ${pt(C)} ${pt(C2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;
-                    // Arêtes visibles
-                    s += line(A,B); s += line(B,C); s += line(C,A);
-                    s += line(A,A2); s += line(B,B2); s += line(C,C2);
-                    s += line(A2,B2); s += line(B2,C2); s += line(C2,A2);
-                    // Angle droit
-                    s += `<path d="M ${ox+sq} ${oy} L ${ox+sq} ${oy-sq} L ${ox} ${oy-sq}" fill="none" stroke="${accent}" stroke-width="1.2"/>`;
-                    // Labels
-                    s += `<text x="${(A[0]+B[0])/2}" y="${oy+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${b} m</text>`;
-                    s += `<text x="${ox-5}" y="${(A[1]+C[1])/2+4}" text-anchor="end" font-size="11" font-weight="bold" fill="${td}">${hT} m</text>`;
-                    s += `<text x="${(B[0]+B2[0])/2+4}" y="${(B[1]+B2[1])/2+4}" font-size="11" font-weight="bold" fill="${td}" transform="rotate(-18,${(B[0]+B2[0])/2+4},${(B[1]+B2[1])/2+4})">${prof} m</text>`;
+                    s += `<polygon points="${pt(A)} ${pt(A2)} ${pt(C2)} ${pt(C)}" fill="${fill}" stroke="none"/>`;   // face gauche verticale
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(B2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;  // face du bas
+                    s += `<polygon points="${pt(B)} ${pt(C)} ${pt(C2)} ${pt(B2)}" fill="${fillD}" stroke="none"/>`;  // face hypoténuse
 
-                    svg = `<svg viewBox="0 0 210 175" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
+                    // Arête cachée (AB du triangle arrière est visible, mais A-A2 du bas peut l'être)
+                    const dash = 'stroke-dasharray="4,3"';
+                    // Arêtes du triangle avant
+                    s += line(A,B); s += line(A,C); s += line(B,C);
+                    // Arêtes de profondeur
+                    s += line(A,A2); s += line(B,B2); s += line(C,C2);
+                    // Arêtes du triangle arrière
+                    s += line(A2,B2); s += line(A2,C2); s += line(B2,C2);
+
+                    // Angle droit sur le triangle avant
+                    s += `<path d="M ${A[0]+sq} ${A[1]} L ${A[0]+sq} ${A[1]-sq} L ${A[0]} ${A[1]-sq}" fill="none" stroke="${accent}" stroke-width="1.2"/>`;
+
+                    // Labels
+                    s += `<text x="${(A[0]+B[0])/2}" y="${A[1]+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${b} m</text>`;
+                    s += `<text x="${A[0]-6}" y="${(A[1]+C[1])/2+4}" text-anchor="end" font-size="11" font-weight="bold" fill="${td}">${hT} m</text>`;
+                    s += `<text x="${(B[0]+B2[0])/2}" y="${(B[1]+B2[1])/2+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${prof} m</text>`;
+
+                    svg = `<svg viewBox="0 0 230 185" style="max-width:250px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
                     qText = `Calculer le volume de ce prisme droit (base : triangle rectangle) :`;
                     hint  = `V = aire de la base × hauteur = (${b} × ${hT} ÷ 2) × ${prof} = ${aire_base} × ${prof} = ${vol} m³`;
 
