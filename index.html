@@ -913,22 +913,33 @@
 		        } else {
 				    const val = Math.floor(Math.random() * 9) + 2;
 				    const isRayon = Math.random() > 0.5;
-				    const r = isRayon ? val : val / 2;
-				    
-				    qText = `Calculer le périmètre de ce disque au dixième près :`;
-				    
-				    // Calcul de la réponse attendue au dixième
-				    const calcul = 2 * Math.PI * r;
-				    // On garde la valeur numérique pour la validation et l'affichage propre
-				    ans = (Math.round(calcul * 10) / 10).toString().replace('.', ',') + " \\text{ " + unit + "}";
-				    
+				    const r = isRayon ? val : val;   // val = rayon si isRayon, sinon val = diamètre
+				    const d = isRayon ? val * 2 : val;
+				    const reel = isRayon ? val : val / 2;
+
+				    qText = `Quel calcul faut-il effectuer pour obtenir le périmètre de ce disque ?`;
+				    // Réponse canonique stockée sous forme normalisée (sans espaces, pi minuscule)
+				    // On accepte 2*pi*r ou pi*d (les deux sont corrects)
+				    ans = isRayon ? `2*pi*${r}` : `pi*${d}`;
+
 				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
+
+				    return {
+				        q: `${qText}<br>${svg}`,
+				        a: ans,
+				        h: isRayon
+				            ? `Périmètre = $2 \\times \\pi \\times r = 2 \\times \\pi \\times ${r}$`
+				            : `Périmètre = $\\pi \\times d = \\pi \\times ${d}$`,
+				        _perimCircleTag: true,
+				        _perimR: reel,
+				        _perimD: d
+				    };
 				}
 		
 		        return {
 		            q: `${qText}<br>${svg}`,
 		            a: ans,
-		            h: type === "disque" ? "Périmètre d'un cercle : $P = 2 \\times \\pi \\times r$ ou $P = \\pi \\times d$." : "Le périmètre est la somme des longueurs des côtés."
+		            h: "Le périmètre est la somme des longueurs des côtés."
 		        };
 		    },
 
@@ -1042,8 +1053,10 @@
                         <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1"/>
                         <path d="M ${x} ${y+w-s} L ${x+s} ${y+w-s} L ${x+s} ${y+w}" fill="none" stroke="${accent}" stroke-width="1"/>
                         <path d="M ${x+w-s} ${y+w} L ${x+w-s} ${y+w-s} L ${x+w} ${y+w-s}" fill="none" stroke="${accent}" stroke-width="1"/>
-                        <line x1="${x+w/2-4}" y1="${y+w/2}" x2="${x+w/2+4}" y2="${y+w/2}" stroke="${accent}" stroke-width="1.5"/>
-                        <line x1="${x+w/2}" y1="${y+w/2-4}" x2="${x+w/2}" y2="${y+w/2+4}" stroke="${accent}" stroke-width="1.5"/>
+                        <line x1="${x+w/2-5}" y1="${y+4}" x2="${x+w/2+5}" y2="${y+4}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w/2-5}" y1="${y+w-4}" x2="${x+w/2+5}" y2="${y+w-4}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+4}" y1="${y+w/2-5}" x2="${x+4}" y2="${y+w/2+5}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w-4}" y1="${y+w/2-5}" x2="${x+w-4}" y2="${y+w/2+5}" stroke="${accent}" stroke-width="2"/>
                         <text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${c} ${unit}</text>
                     </svg>`;
                     qText = `Calculer l'aire de ce carré :`;
@@ -1051,15 +1064,23 @@
 
                 } else if (type === 'disque') {
                     const r = Math.floor(Math.random() * 7) + 2;
-                    aire = Math.round(Math.PI * r * r * 100) / 100;
+                    aire = null; // pas de valeur numérique attendue
                     svg = `<svg viewBox="0 0 180 120" style="max-width:200px;margin:5px auto;display:block;overflow:visible;">
                         <circle cx="90" cy="60" r="40" fill="none" stroke="${color}" stroke-width="2"/>
                         <circle cx="90" cy="60" r="2" fill="${color}"/>
                         <line x1="90" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
                         <text x="110" y="55" text-anchor="middle" font-size="11" fill="${textColor}" font-weight="bold">r = ${r} ${unit}</text>
                     </svg>`;
-                    qText = `Calculer l'aire de ce disque (arrondir au centième) :`;
-                    hint = `Aire = π × r² = π × ${r}² ≈ ${aire} ${unit2}`;
+                    qText = `Quel calcul faut-il effectuer pour obtenir l'aire de ce disque ?`;
+                    hint = `Aire = $\\pi \\times r^2 = \\pi \\times ${r}^2$`;
+
+                    return {
+                        q: `${qText}<br>${svg}`,
+                        a: `pi*${r}²`,
+                        h: hint,
+                        _aireCircleTag: true,
+                        _aireCircleR: r
+                    };
 
                 } else { // triangle rectangle
                     const base = Math.floor(Math.random() * 8) + 2;
@@ -1086,6 +1107,170 @@
                     _aireTag: true,
                     _aireVal: aireStr,
                     _unit: unit
+                };
+            },
+
+            // ── CALCUL DE VOLUME (perspective cavalière) ────────────────────────
+            () => {
+                const color  = "var(--purple-dark)";
+                const accent = "var(--purple-mid)";
+                const fill   = "rgba(127,119,221,0.08)";
+                const fillD  = "rgba(127,119,221,0.14)";
+                const td     = "var(--purple-deep)";
+
+                // Perspective cavalière : décalage oblique 45°, coeff 0.5
+                const KX = 0.35, KY = -0.35; // vecteur de profondeur par unité de profondeur px
+
+                const types = ['cube', 'pave', 'prisme', 'cylindre'];
+                const type  = types[Math.floor(Math.random() * types.length)];
+
+                let vol, svg, qText, hint;
+
+                // ── Fonction utilitaire : parallélépipède en perspective ──────────
+                // w, h, d = largeur, hauteur, profondeur en pixels SVG
+                // ox, oy = coin avant-bas-gauche
+                function drawBox(ox, oy, w, h, d, labels) {
+                    // 8 sommets : face avant = rectangle, face arrière = décalée
+                    const dx = d * KX, dy = d * KY;
+                    // Face avant
+                    const A = [ox,      oy     ]; // bas-gauche avant
+                    const B = [ox+w,    oy     ]; // bas-droit avant
+                    const C = [ox+w,    oy-h   ]; // haut-droit avant
+                    const D = [ox,      oy-h   ]; // haut-gauche avant
+                    // Face arrière
+                    const E = [ox+dx,   oy+dy  ];
+                    const F = [ox+w+dx, oy+dy  ];
+                    const G = [ox+w+dx, oy-h+dy];
+                    const H = [ox+dx,   oy-h+dy];
+
+                    const pt = ([x,y]) => `${x},${y}`;
+                    const line = (p1,p2,dash='') =>
+                        `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${color}" stroke-width="1.8" ${dash}/>`;
+
+                    let s = '';
+                    // Faces (remplies légèrement)
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(C)} ${pt(D)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(D)} ${pt(C)} ${pt(G)} ${pt(H)}" fill="${fillD}" stroke="none"/>`;
+                    s += `<polygon points="${pt(B)} ${pt(C)} ${pt(G)} ${pt(F)}" fill="${fillD}" stroke="none"/>`;
+                    // Arêtes visibles
+                    s += line(A,B); s += line(B,C); s += line(C,D); s += line(D,A);
+                    s += line(C,G); s += line(B,F); s += line(D,H);
+                    s += line(F,G); s += line(G,H);
+                    // Arêtes cachées (pointillées)
+                    const dash = 'stroke-dasharray="3,3"';
+                    s += line(A,E,dash); s += line(E,F,dash); s += line(E,H,dash);
+
+                    // Labels
+                    if (labels.w) s += `<text x="${(A[0]+B[0])/2}" y="${A[1]+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${labels.w}</text>`;
+                    if (labels.h) s += `<text x="${C[0]+6}"          y="${(C[1]+B[1])/2+4}"  font-size="11" font-weight="bold" fill="${td}">${labels.h}</text>`;
+                    if (labels.d) s += `<text x="${(B[0]+F[0])/2+4}" y="${(B[1]+F[1])/2+4}" font-size="11" font-weight="bold" fill="${td}" transform="rotate(-18,${(B[0]+F[0])/2+4},${(B[1]+F[1])/2+4})">${labels.d}</text>`;
+                    return s;
+                }
+
+                // ── CUBE ─────────────────────────────────────────────────────────
+                if (type === 'cube') {
+                    const c = Math.floor(Math.random() * 6) + 2;
+                    vol = c * c * c;
+                    const PX = 70;
+                    const inner = drawBox(30, 145, PX, PX, PX, { w: `${c} m`, h: `${c} m`, d: `${c} m` });
+                    svg = `<svg viewBox="0 0 200 175" style="max-width:220px;margin:8px auto;display:block;overflow:visible;">${inner}</svg>`;
+                    qText = `Calculer le volume de ce cube :`;
+                    hint  = `V = côté³ = ${c}³ = ${vol} m³`;
+
+                // ── PAVÉ DROIT ───────────────────────────────────────────────────
+                } else if (type === 'pave') {
+                    const L = Math.floor(Math.random() * 7) + 2;
+                    let l, h;
+                    do { l = Math.floor(Math.random() * 7) + 2; } while (l === L);
+                    do { h = Math.floor(Math.random() * 7) + 2; } while (h === L || h === l);
+                    vol = L * l * h;
+                    const WPX = 90, HPX = 55, DPX = 50;
+                    const inner = drawBox(20, 140, WPX, HPX, DPX, { w: `${L} m`, h: `${h} m`, d: `${l} m` });
+                    svg = `<svg viewBox="0 0 210 165" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${inner}</svg>`;
+                    qText = `Calculer le volume de ce pavé droit :`;
+                    hint  = `V = longueur × largeur × hauteur = ${L} × ${l} × ${h} = ${vol} m³`;
+
+                // ── PRISME DROIT (base triangulaire rectangle) ───────────────────
+                } else if (type === 'prisme') {
+                    const b = Math.floor(Math.random() * 6) + 2;
+                    let hT, prof;
+                    do { hT = Math.floor(Math.random() * 6) + 2; } while (hT === b);
+                    do { prof = Math.floor(Math.random() * 6) + 2; } while (prof === b || prof === hT);
+                    const aire_base = (b * hT) / 2;
+                    vol = aire_base * prof;
+
+                    // Triangle avant : angle droit en bas-gauche
+                    const ox = 25, oy = 148;
+                    const dx = prof * KX * 1.4, dy = prof * KY * 1.4;
+                    const WPX = 85, HPX = 70;
+                    const A = [ox,      oy     ];
+                    const B = [ox+WPX,  oy     ];
+                    const C = [ox,      oy-HPX ];
+                    const A2= [ox+dx,   oy+dy  ];
+                    const B2= [ox+WPX+dx, oy+dy];
+                    const C2= [ox+dx,   oy-HPX+dy];
+
+                    const pt = ([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
+                    const line = (p1,p2,dash='') =>
+                        `<line x1="${p1[0].toFixed(1)}" y1="${p1[1].toFixed(1)}" x2="${p2[0].toFixed(1)}" y2="${p2[1].toFixed(1)}" stroke="${color}" stroke-width="1.8" ${dash}/>`;
+
+                    const sq = 10; // carré d'angle droit
+                    let s = '';
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(C)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(A2)} ${pt(B2)} ${pt(C2)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(B2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;
+                    s += `<polygon points="${pt(A)} ${pt(C)} ${pt(C2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;
+                    // Arêtes visibles
+                    s += line(A,B); s += line(B,C); s += line(C,A);
+                    s += line(A,A2); s += line(B,B2); s += line(C,C2);
+                    s += line(A2,B2); s += line(B2,C2); s += line(C2,A2);
+                    // Angle droit
+                    s += `<path d="M ${ox+sq} ${oy} L ${ox+sq} ${oy-sq} L ${ox} ${oy-sq}" fill="none" stroke="${accent}" stroke-width="1.2"/>`;
+                    // Labels
+                    s += `<text x="${(A[0]+B[0])/2}" y="${oy+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${b} m</text>`;
+                    s += `<text x="${ox-5}" y="${(A[1]+C[1])/2+4}" text-anchor="end" font-size="11" font-weight="bold" fill="${td}">${hT} m</text>`;
+                    s += `<text x="${(B[0]+B2[0])/2+4}" y="${(B[1]+B2[1])/2+4}" font-size="11" font-weight="bold" fill="${td}" transform="rotate(-18,${(B[0]+B2[0])/2+4},${(B[1]+B2[1])/2+4})">${prof} m</text>`;
+
+                    svg = `<svg viewBox="0 0 210 175" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
+                    qText = `Calculer le volume de ce prisme droit (base : triangle rectangle) :`;
+                    hint  = `V = aire de la base × hauteur = (${b} × ${hT} ÷ 2) × ${prof} = ${aire_base} × ${prof} = ${vol} m³`;
+
+                // ── CYLINDRE ─────────────────────────────────────────────────────
+                } else {
+                    const r = Math.floor(Math.random() * 5) + 2;
+                    const h = Math.floor(Math.random() * 7) + 3;
+
+                    const cx = 105, cy = 60, rx = 50, ry = 16, hpx = 85;
+                    let s = '';
+                    s += `<ellipse cx="${cx}" cy="${cy+hpx}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<rect x="${cx-rx}" y="${cy}" width="${rx*2}" height="${hpx}" fill="${fill}" stroke="none"/>`;
+                    s += `<line x1="${cx-rx}" y1="${cy}" x2="${cx-rx}" y2="${cy+hpx}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<line x1="${cx+rx}" y1="${cy}" x2="${cx+rx}" y2="${cy+hpx}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<line x1="${cx}" y1="${cy}" x2="${cx+rx}" y2="${cy}" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>`;
+                    s += `<text x="${cx+rx/2}" y="${cy-6}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">r = ${r} m</text>`;
+                    s += `<line x1="${cx+rx+8}" y1="${cy}" x2="${cx+rx+8}" y2="${cy+hpx}" stroke="${accent}" stroke-width="1.2" stroke-dasharray="3"/>`;
+                    s += `<text x="${cx+rx+22}" y="${cy+hpx/2+4}" text-anchor="start" font-size="11" font-weight="bold" fill="${td}">${h} m</text>`;
+
+                    svg = `<svg viewBox="0 0 210 175" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
+
+                    return {
+                        q: `Quel calcul faut-il effectuer pour obtenir le volume de ce cylindre ?<br>${svg}`,
+                        a: `pi*${r}²*${h}`,
+                        h: `V = $\\pi \\times r^2 \\times h = \\pi \\times ${r}^2 \\times ${h}$`,
+                        _volCylTag: true,
+                        _volCylR: r,
+                        _volCylH: h
+                    };
+                }
+
+                const volStr = vol.toString().replace('.', ',');
+                return {
+                    q: `${qText}<br>${svg}`,
+                    a: `${volStr} \\text{ m}^3`,
+                    h: hint,
+                    _volTag: true,
+                    _volVal: volStr
                 };
             },
 
@@ -1854,6 +2039,54 @@
 	        partial = true;
 	    }
 	}
+    // 0b-bis. PÉRIMÈTRE DISQUE (calcul littéral)
+    else if (q._perimCircleTag) {
+        // Normalise la saisie : espaces, ×→*, x→*, π→pi, ^→rien, ²→2
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/\^/g, '')
+            .replace(/²/g, '2')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._perimR;
+        const d = q._perimD;
+        // Toutes les formes acceptées (avec * optionnel entre facteurs)
+        const valids = [
+            // 2*pi*r et permutations
+            `2*pi*${r}`, `2*${r}*pi`, `pi*2*${r}`, `pi*${r}*2`, `${r}*2*pi`, `${r}*pi*2`,
+            // sans étoiles
+            `2pi${r}`, `2${r}pi`, `pi2${r}`, `pi${r}2`, `${r}2pi`, `${r}pi2`,
+            // pi*d et permutations
+            `pi*${d}`, `${d}*pi`, `pi${d}`, `${d}pi`
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
+    // 0b-ter. AIRE DISQUE (calcul littéral)
+    else if (q._aireCircleTag) {
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/\^/g, '')
+            .replace(/²/g, '2')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._aireCircleR;
+        const r2 = `${r}2`; // r² normalisé
+        // Toutes les formes acceptées pour pi*r²
+        const valids = [
+            `pi*${r2}`, `pi*${r}*${r}`, `${r2}*pi`, `${r}*${r}*pi`,
+            `pi${r2}`, `pi${r}${r}`, `${r2}pi`, `${r}${r}pi`,
+            `${r}*pi*${r}`, `${r}pi${r}`
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
     // 0c. AIRE
     else if (q._aireTag) {
         // Normalise la saisie : on remplace toutes les formes de "au carré"
@@ -1872,6 +2105,60 @@
         const hasNoUnit   = !hasUnit2 && !hasUnitOnly;        // aucune unité
 
         if (valOk && hasUnit2) {
+            isCorrect = true;
+        } else if (valOk && (hasUnitOnly || hasNoUnit)) {
+            partial = true;
+        }
+    }
+    // 0c-bis. VOLUME CYLINDRE (calcul littéral)
+    else if (q._volCylTag) {
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/\^/g, '')
+            .replace(/²/g, '2')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._volCylR;
+        const h = q._volCylH;
+        const r2 = `${r}2`; // r² normalisé
+        // Toutes les permutations de pi * r² * h
+        const valids = [
+            // avec * entre chaque facteur
+            `pi*${r2}*${h}`, `pi*${r}*${r}*${h}`,
+            `pi*${h}*${r2}`, `pi*${h}*${r}*${r}`,
+            `${r2}*pi*${h}`, `${r}*${r}*pi*${h}`,
+            `${r2}*${h}*pi`, `${r}*${r}*${h}*pi`,
+            `${h}*pi*${r2}`, `${h}*pi*${r}*${r}`,
+            `${h}*${r2}*pi`, `${h}*${r}*${r}*pi`,
+            `${r}*pi*${r}*${h}`, `${r}*${h}*pi*${r}`,
+            `${r}*${h}*${r}*pi`, `${r}*pi*${h}*${r}`,
+            // sans * (collé)
+            `pi${r2}${h}`, `pi${r}${r}${h}`,
+            `pi${h}${r2}`, `pi${h}${r}${r}`,
+            `${r2}pi${h}`, `${r2}${h}pi`,
+            `${h}pi${r2}`, `${h}${r2}pi`,
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
+    // 0c-ter. VOLUME (numérique)
+    else if (q._volTag) {
+        const raw = inputEl.value.trim().toLowerCase()
+            .replace(/\s/g, '')
+            .replace('³', '3')
+            .replace('^3', '3')
+            .replace(',', '.');
+        const correctVal = parseFloat(q._volVal.replace(',', '.'));
+        const userVal    = parseFloat(raw);
+        const valOk      = !isNaN(userVal) && Math.abs(userVal - correctVal) < 0.015;
+        const hasUnit3   = raw.includes('m3');
+        const hasUnitOnly = !hasUnit3 && raw.includes('m');
+        const hasNoUnit   = !hasUnit3 && !hasUnitOnly;
+
+        if (valOk && hasUnit3) {
             isCorrect = true;
         } else if (valOk && (hasUnitOnly || hasNoUnit)) {
             partial = true;
