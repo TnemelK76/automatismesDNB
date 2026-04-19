@@ -1481,7 +1481,176 @@
 		            a: reponse.toString(),
 					h: `Fais la différence entre la température à ${labels[idxA]} et celle à ${labels[idxB]}h.`
 		        };
-		    }
+		    },
+
+        // ── AUGMENTATION / DIMINUTION DE POURCENTAGE ──────────────────────────
+        () => {
+            const contextes = [
+                { obj: "une console de jeux",    prix: [200, 250, 300, 400] },
+                { obj: "un vélo",                prix: [150, 200, 300, 400, 500] },
+                { obj: "un smartphone",          prix: [200, 300, 400, 600, 800] },
+                { obj: "un billet d'avion",      prix: [100, 150, 200, 250, 300] },
+                { obj: "une paire de baskets",   prix: [60, 80, 100, 120, 150] },
+                { obj: "un abonnement annuel",   prix: [40, 60, 80, 100, 120] },
+                { obj: "une télévision",         prix: [300, 400, 500, 600, 800] },
+                { obj: "un appareil photo",      prix: [200, 300, 400, 500] },
+                { obj: "un manteau",             prix: [80, 100, 120, 150, 200] },
+                { obj: "une tablette",           prix: [150, 200, 300, 400] },
+                { obj: "un loyer mensuel",       prix: [400, 500, 600, 800] },
+                { obj: "un repas au restaurant", prix: [20, 25, 30, 40] },
+            ];
+
+            const pourcentagesHausse = [10, 25, 50, 100];
+            const pourcentagesBaisse = [10, 25, 50];
+
+            const framesHausse = [
+                (obj, pct) => `Le prix de ${obj} a augmenté de ${pct} %.`,
+                (obj, pct) => `Suite à une hausse de ${pct} %, le prix de ${obj} a changé.`,
+                (obj, pct) => `${obj.charAt(0).toUpperCase() + obj.slice(1)} a subi une augmentation de ${pct} %.`,
+            ];
+            const framesBaisse = [
+                (obj, pct) => `Le prix de ${obj} a diminué de ${pct} %.`,
+                (obj, pct) => `Lors des soldes, ${obj} est remisé de ${pct} %.`,
+                (obj, pct) => `${obj.charAt(0).toUpperCase() + obj.slice(1)} bénéficie d'une réduction de ${pct} %.`,
+            ];
+
+            const ctx = contextes[Math.floor(Math.random() * contextes.length)];
+            const isHausse = Math.random() > 0.5;
+            const pourcentages = isHausse ? pourcentagesHausse : pourcentagesBaisse;
+            const pct = pourcentages[Math.floor(Math.random() * pourcentages.length)];
+            const prixDepart = ctx.prix[Math.floor(Math.random() * ctx.prix.length)];
+
+            let prixFinal, frameText, hint;
+
+            // Méthodes mentales par pourcentage
+            const methodeHausse = {
+                10:  (p) => `10 % de ${p} = ${p} ÷ 10 = ${p/10} €. Donc : ${p} + ${p/10} = ${p + p/10} €`,
+                25:  (p) => `25 % de ${p} = ${p} ÷ 4 = ${p/4} €. Donc : ${p} + ${p/4} = ${p + p/4} €`,
+                50:  (p) => `50 % de ${p} = ${p} ÷ 2 = ${p/2} €. Donc : ${p} + ${p/2} = ${p + p/2} €`,
+                100: (p) => `100 % de ${p} = ${p} € (le prix entier). Donc : ${p} + ${p} = ${p*2} €`,
+            };
+            const methodeBaisse = {
+                10:  (p) => `10 % de ${p} = ${p} ÷ 10 = ${p/10} €. Donc : ${p} − ${p/10} = ${p - p/10} €`,
+                25:  (p) => `25 % de ${p} = ${p} ÷ 4 = ${p/4} € (le quart). Donc : ${p} − ${p/4} = ${p - p/4} €`,
+                50:  (p) => `50 % de ${p} = ${p} ÷ 2 = ${p/2} € (la moitié). Donc : ${p} − ${p/2} = ${p/2} €`,
+                100: (p) => `100 % de ${p} = ${p} € (le prix entier). Donc : ${p} − ${p} = 0 € (gratuit !)`,
+            };
+
+            if (isHausse) {
+                prixFinal = prixDepart * (1 + pct / 100);
+                const frame = framesHausse[Math.floor(Math.random() * framesHausse.length)];
+                frameText = frame(ctx.obj, pct);
+                hint = methodeHausse[pct](prixDepart);
+            } else {
+                prixFinal = prixDepart * (1 - pct / 100);
+                const frame = framesBaisse[Math.floor(Math.random() * framesBaisse.length)];
+                frameText = frame(ctx.obj, pct);
+                hint = methodeBaisse[pct](prixDepart);
+            }
+
+            const reponse = Number.isInteger(prixFinal)
+                ? prixFinal.toString()
+                : prixFinal.toFixed(2).replace('.', ',');
+
+            return {
+                q: `${frameText}<br>Son prix de départ était de $${prixDepart}$ €. Quel est son nouveau prix ?<br><small>Pense à inclure l'unité € (ex : 150 €)</small>`,
+                a: reponse + ' \\text{ €}',
+                h: hint,
+                _pctTag: true,
+                _pctVal: reponse
+            };
+        },
+
+        // ── PROPORTIONNALITÉ ───────────────────────────────────────────────────
+        () => {
+            const contextes = [
+                { pl: "pommes",           uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "carottes",         uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "tomates",          uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "fraises",          uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "bouteilles d'eau", uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "pamplemousses",    uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "oranges",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "citrons",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "yaourts",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "stylos",           uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "tissu",            uQ: "m",  uP: "€", de: true,  elide: false },
+                { pl: "essence",          uQ: "L",  uP: "€", de: true,  elide: true  },
+            ];
+
+            const ctx = contextes[Math.floor(Math.random() * contextes.length)];
+            const useLinearite = Math.random() > 0.5;
+
+            let q_text, reponse, hint;
+
+            if (useLinearite) {
+                // ── Méthode : linéarité (× k) ──────────────────────────────────
+                const configs = [
+                    { q1: 2,  p1: 3,   k: [3, 4, 5, 10] },
+                    { q1: 2,  p1: 4,   k: [3, 4, 5, 10] },
+                    { q1: 2,  p1: 5,   k: [3, 4, 5, 10] },
+                    { q1: 3,  p1: 6,   k: [2, 4, 5, 10] },
+                    { q1: 3,  p1: 9,   k: [2, 4, 5, 10] },
+                    { q1: 4,  p1: 8,   k: [2, 3, 5, 10] },
+                    { q1: 5,  p1: 10,  k: [2, 3, 4, 10] },
+                    { q1: 5,  p1: 15,  k: [2, 3, 4, 10] },
+                    { q1: 10, p1: 12,  k: [2, 3, 4, 5]  },
+                    { q1: 10, p1: 15,  k: [2, 3, 4, 5]  },
+                    { q1: 10, p1: 20,  k: [2, 3, 4, 5]  },
+                ];
+                const cfg = configs[Math.floor(Math.random() * configs.length)];
+                const k   = cfg.k[Math.floor(Math.random() * cfg.k.length)];
+                const q2  = cfg.q1 * k;
+                const p2  = cfg.p1 * k;
+
+                const qU1 = ctx.uQ ? cfg.q1 + '~\\text{' + ctx.uQ + '}' : String(cfg.q1);
+                const qU2 = ctx.uQ ? q2 + '~\\text{' + ctx.uQ + '}' : String(q2);
+
+                const sep = ctx.elide ? "\u00a0d'" : (ctx.de ? ' de ' : ' ');
+                q_text  = '$' + qU1 + '$' + sep + ctx.pl + ' coûtent $' + cfg.p1 + '$ ' + ctx.uP + '. Combien coûtent $' + qU2 + '$' + sep + ctx.pl + '\u00a0?';
+                reponse = String(p2);
+                hint    = 'On multiplie la quantité par $' + k + '$, donc on multiplie aussi le prix par $' + k + '$\u00a0: $' + cfg.p1 + ' \\times ' + k + ' = ' + p2 + '$ ' + ctx.uP + '.';
+
+            } else {
+                // ── Méthode : passage à l'unité ────────────────────────────────
+                const configs = [
+                    { q1: 4,  pu: 1.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 4,  pu: 2.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 4,  pu: 0.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 5,  pu: 1.2,  q2choices: [2, 3, 4, 10]    },
+                    { q1: 5,  pu: 0.6,  q2choices: [2, 3, 4, 10]    },
+                    { q1: 4,  pu: 1.1,  q2choices: [2, 3, 5, 10]    },
+                    { q1: 4,  pu: 2,    q2choices: [3, 5, 6, 7, 9]  },
+                    { q1: 3,  pu: 1.5,  q2choices: [2, 4, 6, 9]     },
+                    { q1: 2,  pu: 1.5,  q2choices: [3, 4, 6, 8, 10] },
+                    { q1: 6,  pu: 1.5,  q2choices: [2, 4, 8, 10]    },
+                    { q1: 10, pu: 1.2,  q2choices: [3, 4, 5, 7]     },
+                    { q1: 10, pu: 0.5,  q2choices: [3, 4, 6, 7, 9]  },
+                ];
+                const cfg = configs[Math.floor(Math.random() * configs.length)];
+                const q2  = cfg.q2choices[Math.floor(Math.random() * cfg.q2choices.length)];
+                const p1  = Math.round(cfg.q1 * cfg.pu * 100) / 100;
+                const p2  = Math.round(q2 * cfg.pu * 100) / 100;
+
+                const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
+
+                const qU1 = ctx.uQ ? cfg.q1 + '~\\text{' + ctx.uQ + '}' : String(cfg.q1);
+                const qU2 = ctx.uQ ? q2 + '~\\text{' + ctx.uQ + '}' : String(q2);
+
+                const sep = ctx.elide ? " d'" : (ctx.de ? ' de ' : ' ');
+                q_text  = '$' + qU1 + '$' + sep + ctx.pl + ' coûtent $' + fmt(p1) + '$ ' + ctx.uP + '. Combien coûtent $' + qU2 + '$' + sep + ctx.pl + ' ?';
+                reponse = fmt(p2);
+                hint    = 'Prix pour 1\u00a0: $' + fmt(p1) + ' \\div ' + cfg.q1 + ' = ' + fmt(cfg.pu) + '$ ' + ctx.uP + '. Puis\u00a0: $' + fmt(cfg.pu) + ' \\times ' + q2 + ' = ' + fmt(p2) + '$ ' + ctx.uP + '.';
+            }
+
+            return {
+                q: q_text + '<br><small>Donne le résultat en ' + ctx.uP + ' (ex\u00a0: 6 ' + ctx.uP + ')</small>',
+                a: reponse + ' \\text{ ' + ctx.uP + '}',
+                h: hint,
+                _propTag: true,
+                _propVal: reponse
+            };
+        }
         ],
         scratch: [
             // ── RECTANGLE ──────────────────────────────────────────────────────
@@ -2320,6 +2489,36 @@
 	    // 3. Comparaison (on accepte avec ou sans le symbole ^ selon la saisie)
 	    if (u === c || u === c.replace('^', '')) {
 	        isCorrect = true;
+	    }
+	}
+	// Validation proportionnalité
+	else if (q._propTag) {
+	    const hasUnit = userRaw.includes(q._propVal.includes(',') ? '€' : '€') || /[€L]/.test(userRaw);
+	    const uClean = userRaw.replace(/\s/g, '').replace(/[€L]/g, '').replace(',', '.');
+	    const cClean = q._propVal.replace(',', '.');
+	    const uNum = parseFloat(uClean);
+	    const cNum = parseFloat(cClean);
+	    if (!isNaN(uNum) && Math.abs(uNum - cNum) < 0.01) {
+	        if (hasUnit) {
+	            isCorrect = true;
+	        } else {
+	            partial = true;
+	        }
+	    }
+	}
+	// Validation pourcentages (augmentation/diminution)
+	else if (q._pctTag) {
+	    const hasUnit = userRaw.includes('€');
+	    const uClean = userRaw.replace(/\s/g, '').replace('€', '').replace(',', '.');
+	    const cClean = q._pctVal.replace(',', '.');
+	    const uNum = parseFloat(uClean);
+	    const cNum = parseFloat(cClean);
+	    if (!isNaN(uNum) && Math.abs(uNum - cNum) < 0.01) {
+	        if (hasUnit) {
+	            isCorrect = true;
+	        } else {
+	            partial = true; // Bonne valeur mais unité € oubliée
+	        }
 	    }
 	}
 	// Validation des durées
