@@ -170,12 +170,12 @@
 				    
 		    <button class="theme-btn" onclick="startQuiz('geo')" 
 		        style="background:var(--green-light); color:var(--green-dark); border-color: #B2D281;">
-		        📐 Espace, géométrie et grandeurs 
+		        📐 Espace, géométrie et mesures 
 		    </button>
 		    
 		    <button class="theme-btn" onclick="startQuiz('proba')" 
 		        style="background:#F3E5F5; color:#4A148C; border-color: #E1BEE7;">
-		        📊 Probabilités et statistiques
+		        📊 Probabilités et gestion de données
 		    </button>
 				    
 		    <button class="theme-btn" onclick="startQuiz('scratch')" 
@@ -1644,7 +1644,7 @@
             }
 
             return {
-                q: q_text + '<br><small>Donne le résultat en ' + ctx.uP + ' (ex\u00a0: 6 ' + ctx.uP + ')</small>',
+                q: q_text,
                 a: reponse + ' \\text{ ' + ctx.uP + '}',
                 h: hint,
                 _propTag: true,
