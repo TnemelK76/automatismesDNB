@@ -2113,14 +2113,15 @@
         // Normalise la saisie : on remplace toutes les formes de "au carré"
         const raw = inputEl.value.trim().toLowerCase()
             .replace(/\s/g, '')
-            .replace('²', '2')
-            .replace('^2', '2');
+            .replace('²', '¤')
+            .replace('^2', '¤');
         
         const unit = q._unit; // 'cm' ou 'm'
-        const correctVal = q._aireVal.replace(',', '.');
-        const userVal = raw;
-        const valOk = (correctVal === userVal);
-
+        const correctVal = parseFloat(q._aireVal.replace(',', '.'));
+        const userVal = parseFloat(raw);
+        const valOk = !isNaN(userVal) && Math.abs(userVal - correctVal) < 0.015;
+		
+		const raw2 = raw.replace('¤','2')
         const hasUnit2   = raw.includes(unit + '2');          // cm2, m2 (après normalisation de ² et ^2)
         const hasUnitOnly = !hasUnit2 && raw.includes(unit);  // cm ou m sans le carré
         const hasNoUnit   = !hasUnit2 && !hasUnitOnly;        // aucune unité
