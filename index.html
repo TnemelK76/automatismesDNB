@@ -920,7 +920,7 @@
 				    qText = `Quel calcul faut-il effectuer pour obtenir le périmètre de ce disque ?`;
 				    // Réponse canonique stockée sous forme normalisée (sans espaces, pi minuscule)
 				    // On accepte 2*pi*r ou pi*d (les deux sont corrects)
-				    ans = isRayon ? `2\\times\\pi*${r}` : `\\pi\\times${d}`;
+				    ans = isRayon ? `2\\times\\pi\\times${r}` : `\\pi\\times${d}`;
 
 				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
 
@@ -2069,8 +2069,6 @@
             .replace(/\s/g, '')
             .replace(/×/g, '*')
             .replace(/π/g, 'pi')
-            .replace(/\^/g, '')
-            .replace(/²/g, '2')
             .replace(/pi/g, '§')
             .replace(/x/g, '*')
             .replace(/§/g, 'pi');
