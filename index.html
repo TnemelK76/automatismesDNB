@@ -586,7 +586,42 @@
                     a: isDivisible ? 'oui' : 'non',
                     h: hints[diviseur]
                 };
+            },
+
+            // ── ÉCRITURE DÉCIMALE DE FRACTIONS SIMPLES ───────────────────────
+            () => {
+           
+
+                // Catalogue de fractions avec leur écriture décimale exacte
+                // [numérateur, dénominateur, décimal (string), indice de difficulté]
+                const fractions = [
+                    // dénominateur 2
+                    [1,2,'0,5'], [3,2,'1,5'], [5,2,'2,5'], [7,2,'3,5'], [9,2,'4,5'],
+                    // dénominateur 4
+                    [1,4,'0,25'], [3,4,'0,75'],
+                    // dénominateur 10
+                    [1,10,'0,1'], [3,10,'0,3'], [7,10,'0,7'], [9,10,'0,9'],
+                    [11,10,'1,1'], [13,10,'1,3'], [17,10,'1,7'],[29,10,'2,9']
+                    // dénominateur 100
+                    [1,100,'0,01'], [3,100,'0,03'], [7,100,'0,07'],[2,100,'0,02']
+                    [25,100,'0,25'], [50,100,'0,5'], [75,100,'0,75'],[43,100,'0,43']
+                    // fractions = entiers (n/1 ou n/n)
+                    [7,1,'7'], [13,1,'13'], [5,5,'1'], [12,12,'1'], [8,8,'1'],
+                    [3,1,'3'], [9,1,'9'], [4,4,'1'], [6,6,'1'],
+                ];
+
+                const [num, den, dec] = fractions[Math.floor(Math.random() * fractions.length)];
+                const fracTeX = `\\dfrac{${num}}{${den}}`;
+        
+				label: 'Entretenir l'écriture décimale de certaines fractions',
+				q: `Donner l'écriture décimale de $${fracTeX}$`,
+				a: dec,
+				h: `$${fracTeX} = ${num} \\div ${den} = ${dec}$`,
+				_fracDecTag: true,
+				_fracDecVal: dec
+                   
             }
+            
         ],
         alg: [
             () => {
@@ -812,7 +847,10 @@
                     label: 'Factorisation d\'une expression',
                     q: `Factoriser l'expression au maximum : <span style="white-space:nowrap">$${enonce}$</span>`,
                     a: reponse,
-                    h: hint
+                    h: hint,
+                    _factA: A,
+                    _factB: B,
+                    _factVar: v
                 };
             },
             
@@ -1382,6 +1420,236 @@
                 };
             },
 
+            // ── CONVERSIONS D'UNITÉS ──────────────────────────────────────────
+            () => {
+                // Toutes les paires sont (valeur_énoncé, valeur_résultat) choisies pour
+                // donner des nombres propres des deux côtés (pas de virgule flottante bizarre).
+                const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+                const fmt  = n => n.toString().replace('.', ',');
+
+                const variant = Math.floor(Math.random() * 5);
+
+                // ── Variante 0 : m → cm / mm / km ─────────────────────────────
+                if (variant === 0) {
+                    const configs = [
+                        // [valM, cible, résultat, unité]
+                        // m → cm (×100) : valeurs entières ou demi-entières propres
+                        [1.5,'m',150,'cm'], [2.5,'m',250,'cm'], [3,'m',300,'cm'],
+                        [0.5,'m',50,'cm'],  [4,'m',400,'cm'],   [7,'m',700,'cm'],
+                        [12,'m',1200,'cm'], [0.25,'m',25,'cm'], [6,'m',600,'cm'],
+                        // m → mm (×1000) : résultats entiers
+                        [1,'m',1000,'mm'],  [2,'m',2000,'mm'],  [3,'m',3000,'mm'],
+                        [0.5,'m',500,'mm'], [1.5,'m',1500,'mm'],[0.25,'m',250,'mm'],
+                        [4,'m',4000,'mm'],  [5,'m',5000,'mm'],
+                        // m → km (÷1000) : résultats avec au plus 3 décimales propres
+                        [500,'m',0.5,'km'], [1500,'m',1.5,'km'],[2000,'m',2,'km'],
+                        [250,'m',0.25,'km'],[750,'m',0.75,'km'],[3000,'m',3,'km'],
+                        [100,'m',0.1,'km'], [5000,'m',5,'km'],
+                    ];
+                    const [val, , res, unit] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorStr = unit === 'cm' ? '100' : unit === 'mm' ? '1\\,000' : '0{,}001';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en ${unit} : $${valStr}\\text{ m}$`,
+                        a: resStr,
+                        h: `$1\\text{ m} = ${factorStr}\\text{ ${unit}}$, donc $${valStr} \\times ${factorStr} = ${resStr}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 1 : cm / mm / km → m ─────────────────────────────
+                if (variant === 1) {
+                    const configs = [
+                        // cm → m (÷100)
+                        [150,'cm',1.5,'m'],  [250,'cm',2.5,'m'],  [300,'cm',3,'m'],
+                        [50,'cm',0.5,'m'],   [400,'cm',4,'m'],    [75,'cm',0.75,'m'],
+                        [125,'cm',1.25,'m'], [600,'cm',6,'m'],    [200,'cm',2,'m'],
+                        // mm → m (÷1000)
+                        [1000,'mm',1,'m'],   [2000,'mm',2,'m'],   [500,'mm',0.5,'m'],
+                        [1500,'mm',1.5,'m'], [250,'mm',0.25,'m'], [3000,'mm',3,'m'],
+                        [750,'mm',0.75,'m'], [4000,'mm',4,'m'],
+                        // km → m (×1000)
+                        [1.5,'km',1500,'m'], [2.5,'km',2500,'m'], [0.5,'km',500,'m'],
+                        [3,'km',3000,'m'],   [0.25,'km',250,'m'], [4,'km',4000,'m'],
+                        [0.75,'km',750,'m'], [2,'km',2000,'m'],
+                    ];
+                    const [val, srcUnit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorStr = srcUnit === 'cm' ? '0{,}01' : srcUnit === 'mm' ? '0{,}001' : '1\\,000';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en m : $${valStr}\\text{ ${srcUnit}}$`,
+                        a: resStr,
+                        h: `$1\\text{ ${srcUnit}} = ${factorStr}\\text{ m}$, donc $${valStr} \\times ${factorStr} = ${resStr}\\text{ m}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: 'm'
+                    };
+                }
+
+                // ── Variante 2 : m² → cm² / mm² / km² ────────────────────────
+                if (variant === 2) {
+                    const configs = [
+                        // m² → cm² (×10 000) : valeurs entières simples
+                        [1,'cm²',10000],[2,'cm²',20000],[3,'cm²',30000],
+                        [5,'cm²',50000],[0.5,'cm²',5000],[4,'cm²',40000],
+                        // m² → mm² (×1 000 000) : valeurs entières simples
+                        [1,'mm²',1000000],[2,'mm²',2000000],[3,'mm²',3000000],
+                        [0.5,'mm²',500000],[5,'mm²',5000000],
+                        // m² → km² (÷1 000 000) : résultats propres avec ≤2 décimales
+                        [1000000,'km²',1],[500000,'km²',0.5],[2000000,'km²',2],
+                        [250000,'km²',0.25],[1500000,'km²',1.5],[3000000,'km²',3],
+                    ];
+                    const [val, unit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorLabel = unit === 'cm²' ? '10\\,000' : unit === 'mm²' ? '1\\,000\\,000' : '\\frac{1}{1\\,000\\,000}';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en $\\text{${unit}}$ : $${valStr}\\text{ m}^2$`,
+                        a: resStr,
+                        h: `$1\\text{ m}^2 = ${factorLabel}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 3 : m³ → dm³ / cm³ ──────────────────────────────
+                if (variant === 3) {
+                    const configs = [
+                        // m³ → dm³ (×1000)
+                        [1,'dm³',1000],[2,'dm³',2000],[3,'dm³',3000],
+                        [0.5,'dm³',500],[4,'dm³',4000],[1.5,'dm³',1500],
+                        [5,'dm³',5000],[0.25,'dm³',250],
+                        // m³ → cm³ (×1 000 000)
+                        [1,'cm³',1000000],[2,'cm³',2000000],[0.5,'cm³',500000],
+                        [3,'cm³',3000000],[0.001,'cm³',1000],[0.002,'cm³',2000],
+                    ];
+                    const [val, unit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorLabel = unit === 'dm³' ? '1\\,000' : '1\\,000\\,000';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en $\\text{${unit}}$ : $${valStr}\\text{ m}^3$`,
+                        a: resStr,
+                        h: `$1\\text{ m}^3 = ${factorLabel}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 4 : dm³ ou m³ → L ────────────────────────────────
+                {
+                    const configs = [
+                        // dm³ → L (×1, résultat = même nombre)
+                        [1,'dm³',1,'L'],[2,'dm³',2,'L'],[5,'dm³',5,'L'],
+                        [0.5,'dm³',0.5,'L'],[3,'dm³',3,'L'],[10,'dm³',10,'L'],
+                        [1.5,'dm³',1.5,'L'],[4,'dm³',4,'L'],[0.25,'dm³',0.25,'L'],
+                        // m³ → L (×1000)
+                        [1,'m³',1000,'L'],[2,'m³',2000,'L'],[0.5,'m³',500,'L'],
+                        [3,'m³',3000,'L'],[0.25,'m³',250,'L'],[1.5,'m³',1500,'L'],
+                        [4,'m³',4000,'L'],[0.1,'m³',100,'L'],
+                    ];
+                    const [val, srcUnit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const hintFactor = srcUnit === 'dm³'
+                        ? `$1\\text{ dm}^3 = 1\\text{ L}$, donc $${valStr}\\text{ dm}^3 = ${resStr}\\text{ L}$`
+                        : `$1\\text{ m}^3 = 1\\,000\\text{ L}$, donc $${valStr} \\times 1\\,000 = ${resStr}\\text{ L}$`;
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en litres : $${valStr}\\text{ ${srcUnit === 'dm³' ? 'dm' : 'm'}}^3$`,
+                        a: resStr,
+                        h: hintFactor,
+                        _convTag: true, _convVal: resStr, _convUnit: 'L'
+                    };
+                }
+            },
+            // ── ANGLES À L'INTERSECTION DE DEUX DROITES ───────────────────────
+            () => {
+                // lineAngleDeg EST la mesure de l'angle1 : l'écartement visuel correspond à l'angle affiché
+                const lineAngleDeg = 30 + Math.floor(Math.random() * 121);
+                const ldR = lineAngleDeg * Math.PI / 180;
+                const angle1 = lineAngleDeg;
+                const angle2 = 180 - lineAngleDeg;
+
+                // Les 4 secteurs (sens anti-horaire depuis +x) :
+                //   secteur 0 : angle1 (entre +x et droite inclinée)
+                //   secteur 1 : angle2 (entre droite inclinée et -x)
+                //   secteur 2 : angle1 (opposé à 0)
+                //   secteur 3 : angle2 (opposé à 1)
+                const sectorMeasure = s => (s === 0 || s === 2) ? angle1 : angle2;
+
+                const isOpposite = Math.random() < 0.5;
+                let sectorA, sectorB;
+                if (isOpposite) {
+                    [sectorA, sectorB] = Math.random() < 0.5 ? [0, 2] : [1, 3];
+                } else {
+                    const adj = [[0,1],[1,2],[2,3],[3,0]];
+                    [sectorA, sectorB] = adj[Math.floor(Math.random() * 4)];
+                }
+
+                const knownSector   = Math.random() < 0.5 ? sectorA : sectorB;
+                const unknownSector = knownSector === sectorA ? sectorB : sectorA;
+                const knownVal   = sectorMeasure(knownSector);
+                const unknownVal = sectorMeasure(unknownSector);
+
+                // Milieux angulaires des 4 secteurs (angles mathématiques, sens anti-horaire)
+                const midRad = [
+                    ldR / 2,
+                    ldR + (Math.PI - ldR) / 2,
+                    Math.PI + ldR / 2,
+                    Math.PI + ldR + (Math.PI - ldR) / 2,
+                ];
+
+                const W = 220, H = 180, cx = 110, cy = 90, L = 92;
+                const ARC_R = 22, LBL_R = 40;
+
+                const dx = Math.cos(ldR) * L, dy = Math.sin(ldR) * L;
+
+                const drawArc = (sector, color) => {
+                    const startR = [0, ldR, Math.PI, Math.PI + ldR][sector];
+                    const endR   = [ldR, Math.PI, Math.PI + ldR, 2 * Math.PI][sector];
+                    const x1 = (cx + ARC_R * Math.cos(startR)).toFixed(1);
+                    const y1 = (cy - ARC_R * Math.sin(startR)).toFixed(1);
+                    const x2 = (cx + ARC_R * Math.cos(endR)).toFixed(1);
+                    const y2 = (cy - ARC_R * Math.sin(endR)).toFixed(1);
+                    const large = (endR - startR) > Math.PI ? 1 : 0;
+                    return `<path d="M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 ${large} 0 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="2.2"/>`;
+                };
+
+                const drawLabel = (sector, text, color) => {
+                    const mx = (cx + LBL_R * Math.cos(midRad[sector])).toFixed(1);
+                    const my = (cy - LBL_R * Math.sin(midRad[sector])).toFixed(1);
+                    return `<text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="${color}" font-family="sans-serif">${text}</text>`;
+                };
+
+                let s = '';
+                // Droite horizontale
+                s += `<line x1="${cx-L}" y1="${cy}" x2="${cx+L}" y2="${cy}" stroke="var(--purple-deep)" stroke-width="2"/>`;
+                // Droite inclinée
+                s += `<line x1="${(cx-dx).toFixed(1)}" y1="${(cy+dy).toFixed(1)}" x2="${(cx+dx).toFixed(1)}" y2="${(cy-dy).toFixed(1)}" stroke="var(--purple-deep)" stroke-width="2"/>`;
+                // Point central
+                s += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--purple-deep)"/>`;
+                // Arc connu (violet) + label
+                s += drawArc(knownSector, 'var(--purple-mid)');
+                s += drawLabel(knownSector, `${knownVal}°`, 'var(--purple-mid)');
+                // Arc inconnu (rouge) + ?
+                s += drawArc(unknownSector, 'var(--red-dark)');
+                s += drawLabel(unknownSector, '?', 'var(--red-dark)');
+
+                const svg = `<div style="text-align:center;margin:12px 0;"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;">${s}</svg></div>`;
+
+                const hint = isOpposite
+                    ? `Ces deux angles sont <b>opposés par le sommet</b> : ils sont égaux. Réponse : ${unknownVal}°.`
+                    : `Ces deux angles sont <b>supplémentaires</b> : leur somme vaut 180°. Donc ${knownVal}° + ? = 180°, soit ? = ${unknownVal}°.`;
+
+                return {
+                    label: "Calcul d'angle entre deux sécantes",
+                    q: `Quelle est la mesure de l'angle inconnu ?${svg}`,
+                    a: `${unknownVal}°`,
+                    h: hint,
+                    _angleIntTag: true,
+                    _angleIntVal: unknownVal
+                };
+            },
+
+
         ],
         proba: [
             () => {
@@ -1818,37 +2086,41 @@
                 const startVal = [2, 3, 4, 5, 6, 7, 8, 10][Math.floor(Math.random() * 8)];
 
                 // Catalogue d'opérations possibles : { desc (SVG expr), fn, hint }
-                // On construit un programme de 2 opérations dont le résultat reste ≤ 100
+                // On construit un programme de 3 opérations DISTINCTES dont le résultat reste ≤ 100
                 const OPS = [
-                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'2'}],  fn: v => v * 2,  txt: v => `${v} * 2` },
-                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'3'}],  fn: v => v * 3,  txt: v => `${v} * 3` },
-                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'4'}],  fn: v => v * 4,  txt: v => `${v} * 4` },
-                    { desc: () => [{kind:'op',val:'*'},{kind:'num',val:'5'}],  fn: v => v * 5,  txt: v => `${v} * 5` },
-                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'10'}], fn: v => v + 10, txt: v => `${v} + 10` },
-                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'5'}],  fn: v => v + 5,  txt: v => `${v} + 5`  },
-                    { desc: () => [{kind:'op',val:'+'},{kind:'num',val:'8'}],  fn: v => v + 8,  txt: v => `${v} + 8`  },
-                    { desc: () => [{kind:'op',val:'-'},{kind:'num',val:'1'}],  fn: v => v - 1,  txt: v => `${v} - 1`  },
-                    { desc: () => [{kind:'op',val:'/'},{kind:'num',val:'2'}],  fn: v => v / 2,  txt: v => `${v} / 2`, ok: v => v % 2 === 0 && v >= 4 },
+                    { id:'x2',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'2'}],  fn: v => v * 2,  txt: v => `${v} × 2` },
+                    { id:'x3',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'3'}],  fn: v => v * 3,  txt: v => `${v} × 3` },
+                    { id:'x4',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'4'}],  fn: v => v * 4,  txt: v => `${v} × 4` },
+                    { id:'x5',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'5'}],  fn: v => v * 5,  txt: v => `${v} × 5` },
+                    { id:'+10', desc: () => [{kind:'op',val:'+'},{kind:'num',val:'10'}], fn: v => v + 10, txt: v => `${v} + 10` },
+                    { id:'+5',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'5'}],  fn: v => v + 5,  txt: v => `${v} + 5`  },
+                    { id:'+8',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'8'}],  fn: v => v + 8,  txt: v => `${v} + 8`  },
+                    { id:'+3',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'3'}],  fn: v => v + 3,  txt: v => `${v} + 3`  },
+                    { id:'-1',  desc: () => [{kind:'op',val:'-'},{kind:'num',val:'1'}],  fn: v => v - 1,  txt: v => `${v} - 1`  },
+                    { id:'-2',  desc: () => [{kind:'op',val:'-'},{kind:'num',val:'2'}],  fn: v => v - 2,  txt: v => `${v} - 2`  },
+                    { id:'/2',  desc: () => [{kind:'op',val:'/'},{kind:'num',val:'2'}],  fn: v => v / 2,  txt: v => `${v} ÷ 2`, ok: v => v % 2 === 0 && v >= 4 },
                 ];
 
-                // Tire 2 opérations compatibles avec startVal sans dépasser 100
+                // Tire 3 opérations DISTINCTES compatibles avec startVal sans dépasser 100
                 let val = startVal;
                 const chosen = [];
                 const shuffled = OPS.slice().sort(() => Math.random() - 0.5);
                 for (const op of shuffled) {
-                    if (chosen.length >= 2) break;
+                    if (chosen.length >= 3) break;
                     if (op.ok && !op.ok(val)) continue;
                     const next = op.fn(val);
                     if (next > 100 || next < 0 || !Number.isInteger(next)) continue;
                     chosen.push({ op, fromVal: val });
                     val = next;
                 }
-                // Fallback si pas assez d'opérations valides
-                if (chosen.length < 2) {
+                // Fallback si pas assez d'opérations valides (3 opérations sûres)
+                if (chosen.length < 3) {
                     val = startVal;
                     chosen.length = 0;
-                    chosen.push({ op: OPS[4], fromVal: val }); val = OPS[4].fn(val);
-                    chosen.push({ op: OPS[0], fromVal: val }); val = OPS[0].fn(val);
+                    const safe = [OPS.find(o=>o.id==='+5'), OPS.find(o=>o.id==='x2'), OPS.find(o=>o.id==='+3')];
+                    for (const op of safe) {
+                        chosen.push({ op, fromVal: val }); val = op.fn(val);
+                    }
                 }
 
                 const finalVal = val;
@@ -2274,8 +2546,16 @@
 		
     const clean = (s) => s.replace(/\s+/g, '');
 
-	// 0. OUI / NON (divisibilité)
-    if (correctRaw === 'oui' || correctRaw === 'non') {
+	// 0. FRACTION → DÉCIMAL
+    if (q._fracDecTag) {
+        // Accepte virgule ou point, et zéros superflus (0.50 = 0.5)
+        const norm = s => parseFloat(s.replace(',', '.'));
+        const uVal = norm(userRaw);
+        const cVal = norm(q._fracDecVal);
+        if (!isNaN(uVal) && Math.abs(uVal - cVal) < 0.0001) isCorrect = true;
+    }
+	// 0b. OUI / NON (divisibilité)
+    else if (correctRaw === 'oui' || correctRaw === 'non') {
         const u = userRaw.trim();
         if (u === correctRaw || u === 'o' && correctRaw === 'oui' || u === 'n' && correctRaw === 'non') isCorrect = true;
     }
@@ -2316,6 +2596,19 @@
 	        partial = true;
 	    }
 	}
+    // 0b. CONVERSIONS D'UNITÉS
+    else if (q._convTag) {
+        const stripUnit = (s) => s.toLowerCase()
+            .replace(/\s/g, '').replace(',', '.')
+            .replace(/dm[³3]?(\^3)?/g, '').replace(/cm[²2³3]?(\^[23])?/g, '')
+            .replace(/mm[²2]?(\^2)?/g, '').replace(/km[²2]?(\^2)?/g, '')
+            .replace(/m[²2³3]?(\^[23])?/g, '').replace(/litres?/g, '').replace(/l$/, '');
+        const userNum    = parseFloat(stripUnit(userRaw));
+        const correctNum = parseFloat(q._convVal.replace(',', '.'));
+        if (!isNaN(userNum) && Math.abs(userNum - correctNum) <= 0.0001 * Math.max(1, Math.abs(correctNum))) {
+            isCorrect = true;
+        }
+    }
     // 0b-bis. PÉRIMÈTRE DISQUE (calcul littéral)
     else if (q._perimCircleTag) {
         // Normalise la saisie : espaces, ×→*, x→*, π→pi, ^→rien, ²→2
@@ -2528,6 +2821,17 @@
 	    }
 	}
 	// Validation Somme des angles avec gestion du score partiel
+// Angles à l'intersection de deux droites
+	else if (q._angleIntTag) {
+	    const userClean = userRaw.replace(/\s/g, '');
+	    const userValue = userClean.replace('°', '');
+	    const correctValue = String(q._angleIntVal);
+	    if (userValue + '°' === userClean && userValue === correctValue) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        partial = true; // bonne valeur mais ° oublié
+	    }
+	}
 	else if (q.q.includes("angle manquant")) {
 	    const userClean = userRaw.replace(/\s/g, '');
 	    const correctClean = q.a.replace(/\s/g, ''); // Contient le "°"
@@ -2662,7 +2966,58 @@
             if (uN * cD === cN * uD) isCorrect = true;
         }
 	}
-    // 4. RESTE (Algèbre, développement, réduction, etc.)
+    // 4. FACTORISATION
+    else if (q.q.includes("Factoriser")) {
+        // q.a est de la forme "k(pv + q)", ex: "9(2x+1)"
+        // On stocke A=k*p et B=k*q dans le générateur
+        const A = q._factA; // coeff de la variable dans l'énoncé
+        const B = q._factB; // constante dans l'énoncé
+        const varName = q._factVar; // variable utilisée (x, y, a, b, t)
+
+        // Fonction qui développe une expression de la forme "k(pv+q)" ou "k(pv-q)"
+        // et retourne {valid, outerFactor} ou null
+        const parseFactor = (raw) => {
+            // Nettoyer la saisie : espaces, × → *, accepter * optionnel avant la parenthèse
+            const s = raw.replace(/\s/g, '').replace(/×/g, '*');
+            // Regex : nombre optionnel * ( contenu )
+            // ex: 9(2x+1), 3*(6x+3), -2(x-4)
+            const m = s.match(/^(-?\d+)\*?\((.+)\)$/);
+            if (!m) return null;
+            const outerK = parseInt(m[1]);
+            const inner = m[2]; // "2x+1", "6x+3", "2x-1"
+            if (isNaN(outerK) || outerK === 0) return null;
+
+            // Parser l'intérieur : terme en variable + constante
+            // Formes attendues : "pv+q", "pv-q", "v+q", "v-q", "-pv+q", etc.
+            const v = varName;
+            // Regex : optional coefficient, variable, then sign and constant
+            const innerM = inner.match(
+                new RegExp(`^(-?\\d*)(${v})([+-]\\d+)$`)
+            );
+            if (!innerM) return null;
+            const innerP = innerM[1] === '' ? 1 : innerM[1] === '-' ? -1 : parseInt(innerM[1]);
+            const innerQ = parseInt(innerM[3]);
+            if (isNaN(innerP) || isNaN(innerQ)) return null;
+
+            const devA = outerK * innerP; // développé : coeff de v
+            const devB = outerK * innerQ; // développé : constante
+            return { valid: devA === A && devB === B, outerFactor: outerK };
+        };
+
+        const result = parseFactor(userRaw);
+        if (result && result.valid) {
+            // C'est algébriquement correct — est-ce bien le PGCD ?
+            const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+            const pgcd = getPGCD(Math.abs(A), Math.abs(B));
+            if (Math.abs(result.outerFactor) === pgcd) {
+                isCorrect = true; // factorisation maximale
+            } else {
+                partial = true;   // factorisé mais pas au maximum
+            }
+        }
+        // Si result est null ou result.valid === false → faux (isCorrect et partial restent false)
+    }
+    // 5. RESTE (Algèbre, développement, réduction, etc.)
     else {
 	    const userNorm = normalizeAlgebra(userRaw);
 	    const correctNorm = normalizeAlgebra(correctRaw);
@@ -2689,7 +3044,10 @@
 	    fb.className = "feedback correct";
 	} else if (partial) { // <--- Changé en 'partial' pour correspondre à votre variable
 	    score += 0.5;
-	    fb.innerHTML = `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
+	    const partialMsg = q.q.includes("Factoriser")
+	        ? `⚠ Factorisé, mais pas au maximum !<br>Réponse attendue : $${q.a}$`
+	        : `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
+	    fb.innerHTML = partialMsg;
 	    fb.className = "feedback partial";
 	} else {
 	    fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
