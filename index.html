@@ -475,7 +475,8 @@
 				    return { label: 'Conversions de durées',
 				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
 				        a: reponseParfaite,
-				        h: hint
+				        h: hint,
+				        _dureeTag: true
 				    };
 			    } else {
 			        // Minutes vers Heures et Minutes (ex: 90 min -> 1h30)
@@ -486,7 +487,8 @@
 			        return { label: 'Conversions de durées',
 			            q: `Convertir en heures et minutes : $${totalMin}\\text{ min}$`,
 			            a: m === 0 ? `${h} \\text{ h}` : `${h} \\text{ h } ${m} \\text{ min}`,
-			            h: "60 min = 1 h"
+			            h: "60 min = 1 h",
+			            _dureeTag: true
 			        };
 			    }
 			},
@@ -2912,7 +2914,7 @@
 	    }
 	}
 	// Validation des durées
-	else if (q.q.includes("minutes")) {
+	else if (q._dureeTag) {
 	    let u = userRaw.toLowerCase().replace(/\s/g, '').replace('heures', 'h').replace('heure', 'h'); // Réponse élève nettoyée
 	    let c = q.a.toLowerCase()
                .replace(/\\text\{/g, '')
