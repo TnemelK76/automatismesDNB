@@ -2,6 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automatismes Maths — DNB 2026</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -1641,6 +1645,3303 @@
 
                 return {
                     label: "Calcul d'angle entre deux sécantes",
+                    q: `Quelle est la mesure de l'angle inconnu ?${svg}`,
+                    a: `${unknownVal}°`,
+                    h: hint,
+                    _angleIntTag: true,
+                    _angleIntVal: unknownVal
+                };
+            },
+
+
+        ],
+        proba: [
+            () => {
+                const size = Math.random() > 0.5 ? 5 : 4;
+                let s = Array.from({length: size}, () => Math.floor(Math.random() * 20) + 1);
+                let sorted = [...s].sort((a, b) => a - b);
+                let res = size === 5 ? sorted[2] : (sorted[1] + sorted[2]) / 2;
+                return { label: 'Médiane d\'une série statistique', q: `Déterminer la médiane de cette série : $${s.join(' \\, ; \\, ')}$`, a: res.toString().replace('.', ','), h: "Range dans l'ordre croissant, puis prends la valeur milieu." };
+            },
+            () => {
+                const nbVal = [3, 4, 5][Math.floor(Math.random() * 3)];
+                let vals, sum;
+                do { vals = Array.from({length: nbVal}, () => Math.floor(Math.random() * 20)); sum = vals.reduce((a, b) => a + b, 0); } while (sum % nbVal !== 0 && (sum * 10) % nbVal !== 5); 
+                return { label: 'Moyenne d\'une série statistique', q: `Calculer la moyenne de : $${vals.join(' \\, ; \\, ')}$`, a: (sum / nbVal).toString().replace('.', ','), h: "Somme des valeurs / Effectif total." };
+            },
+            () => {
+                const s = Array.from({length: 5}, () => Math.floor(Math.random() * 40));
+                return { label: 'Étendue d\'une série statistique', q: `Quelle est l'étendue de cette série : $${s.join(' \\, ; \\, ')}$ ?`, a: (Math.max(...s) - Math.min(...s)).toString(), h: "Max - Min." };
+            },
+            () => {
+                const type = Math.floor(Math.random() * 4);
+                if (type === 0) {
+                    const r = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 8) + 2;
+                    return { label: 'Calcul de probabilités', q: `Une urne contient ${r} boules rouges et ${b} bleues. Quelle est la probabilité de tirer une bleue ?`, a: `${b}/${r+b}`, h: "Nb de boules bleues / Nb total de boules" };
+                } else if (type === 1) {
+                    const seuil = Math.floor(Math.random() * 3) + 2;
+                    return { label: 'Calcul de probabilités', q: `Dé à 6 faces. Quelle est la probabilité d'obtenir un nombre supérieur ou égal à ${seuil} ?`, a: `${7-seuil}/6`, h: "Nb d'issues favorables / Nb d'issues total" };
+                } else if (type === 2) {
+                    const p = Math.floor(Math.random() * 8) + 1;
+                    return { label: 'Calcul de probabilités', q: `La probabilité qu'il pleuve demain est de $${p}/10$. Quelle est la probabilité qu'il ne pleuve pas ?`, a: `${10-p}/10`, h: "Utilise l'événement contraire." };
+                } else {
+                    const secteurs = [8, 10, 12, 15, 20][Math.floor(Math.random()*3)]; const gagnants = Math.floor(Math.random()*secteurs/2) + 2 ;
+                    return { label: 'Calcul de probabilités', q: `Une roue de loterie de ${secteurs} secteurs a ${gagnants} secteurs gagnants. Quelle est la probabilité de gagner ?`, a: `${gagnants}/${secteurs}`, h: "Nb d'issues favorables / Nb d'issues total" };
+                }
+            },
+			() => {
+				// 1. Définir les âges et générer 5 effectifs aléatoires (13 à 17 ans)
+				const labels = ["13", "14", "15", "16", "17"];
+				const effectifs = Array.from({ length: 5 }, () => Math.floor(Math.random() * 8) + 1);
+				
+				// 2. Tirer au sort l'âge charnière (14, 15 ou 16)
+				const agesPossibles = [14, 15, 16];
+				const ageConsigne = agesPossibles[Math.floor(Math.random() * agesPossibles.length)];
+				
+				// 3. Calculer la réponse (somme des effectifs pour âge >= ageConsigne)
+				// L'index dans le tableau correspond à (âge - 13)
+				let reponse = 0;
+				for (let i = 0; i < labels.length; i++) {
+					if (parseInt(labels[i]) >= ageConsigne) {
+						reponse += effectifs[i];
+					}
+				}
+			
+				const bWidth = 28; // Légèrement réduit pour faire tenir 5 barres
+				const spacing = 12;
+				const unit = 8;
+				const gridMax = 10;
+			
+				// 4. Génération du quadrillage
+				let gridSVG = "";
+				for (let i = 2; i <= gridMax; i += 2) {
+					const yGrid = 100 - (i * unit);
+					gridSVG += `
+						<line x1="25" y1="${yGrid}" x2="215" y2="${yGrid}" 
+							  stroke="rgba(0,0,0,0.3)" stroke-width="0.5" stroke-dasharray="2,2" />
+						<text x="22" y="${yGrid + 3}" font-size="7" text-anchor="end" fill="#999">${i}</text>
+					`;
+				}
+				
+				// 5. Génération des 5 barres
+				let barsSVG = "";
+				effectifs.forEach((eff, i) => {
+					const x = 32 + i * (bWidth + spacing);
+					const h = eff * unit;
+					const y = 100 - h;
+					
+					barsSVG += `
+						<rect x="${x}" y="${y}" width="${bWidth}" height="${h}" 
+							  fill="var(--purple-mid)" fill-opacity="0.8" 
+							  stroke="var(--purple-dark)" stroke-width="1" />
+						<text x="${x + bWidth/2}" y="115" font-size="10" text-anchor="middle" fill="var(--purple-deep)">${labels[i]}</text>
+					`;
+				});
+			
+				const svg = `
+				<div style="text-align:center; margin: 15px 0;">
+					<svg viewBox="0 0 230 135" class="svg-math" style="max-width:300px; background: #fff; border-radius: 8px;">
+						${gridSVG}
+						<line x1="25" y1="100" x2="215" y2="100" stroke="#333" stroke-width="1.5" />
+						<line x1="25" y1="100" x2="25" y2="10" stroke="#333" stroke-width="1.5" />
+						${barsSVG}
+						<text x="120" y="130" font-size="9" font-weight="600" text-anchor="middle">Âge des enfants</text>
+						<text x="10" y="55" font-size="8" font-weight="600" text-anchor="middle" transform="rotate(-90 10,55)">Effectif</text>
+					</svg>
+				</div>`;
+			
+				return { label: 'Lecture de diagramme en barres',
+					q: `À l'aide du diagramme ci-dessous, déterminer combien d'enfants ont <b>${ageConsigne} ans ou plus</b> dans cet échantillon. ${svg}`,
+					a: reponse.toString(),
+					h: `Additionne les effectifs des barres des enfants ayant ${ageConsigne} ans ou plus`
+				};
+			},
+		
+				    () => {
+		        const heures = [8, 11, 14, 17, 20];
+		        const labels = ["8h", "11h", "14h", "17h", "20h"];
+		        
+		        // 1. Génération de températures logiques
+		        const t8 = Math.floor(Math.random() * 5) + 4;
+		        const t11 = t8 + Math.floor(Math.random() * 4) + 2;
+		        const t14 = t11 + Math.floor(Math.random() * 5) + 3;
+		        const t17 = t14 + Math.floor(Math.random() * 3) + 1;
+		        const t20 = t17 - (Math.floor(Math.random() * 3) + 1);
+		        const temps = [t8, t11, t14, t17, t20];
+		
+		        // 2. Tirage au sort de l'intervalle pour la question
+		        const idxA = Math.floor(Math.random() * 3); 
+		        const idxB = idxA + 1 + Math.floor(Math.random() * (4 - idxA - 1));
+		        const reponse = temps[idxB] - temps[idxA];
+		
+		        // 3. Paramètres du graphique
+		        const padding = 30;
+		        const width = 230;
+		        const height = 150; // Augmenté pour plus de confort visuel
+		        const xStep = (width - 2 * padding) / 4;
+		        const yUnit = 4; 
+		        const maxDeg = 25;
+		
+		        // 4. Construction du quadrillage complexe
+		        let gridSVG = "";
+		        for (let deg = 0; deg <= maxDeg; deg++) {
+		            const y = height - padding - (deg * yUnit);
+		            
+		            if (deg % 5 === 0) {
+		                // Lignes principales tous les 5 degrés
+		                gridSVG += `
+		                    <line x1="${padding}" y1="${y}" x2="${width - 15}" y2="${y}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8" />
+		                    <text x="${padding - 5}" y="${y + 3}" font-size="8" text-anchor="end" font-weight="bold">${deg}°</text>
+		                `;
+		            } else {
+		                // Lignes secondaires tous les 1 degré
+		                gridSVG += `
+		                    <line x1="${padding}" y1="${y}" x2="${width - 15}" y2="${y}" stroke="rgba(0,0,0,0.2)" stroke-width="0.5"/>
+		                `;
+		            }
+		        }
+		
+		        // 5. Tracé de la courbe et des points
+		        let pointsStr = "";
+		        let markers = "";
+		        let xLabels = "";
+		
+		        temps.forEach((t, i) => {
+		            const x = padding + i * xStep;
+		            const y = height - padding - (t * yUnit);
+		            pointsStr += `${x},${y} `;
+		            markers += `<circle cx="${x}" cy="${y}" r="3" fill="var(--red-dark)" />`;
+		            xLabels += `
+		                <line x1="${x}" y1="${height - padding}" x2="${x}" y2="${height - padding + 4}" stroke="black" />
+		                <text x="${x}" y="${height - 12}" font-size="9" text-anchor="middle">${labels[i]}</text>
+		            `;
+		        });
+		
+		        const svg = `
+		        <div style="text-align:center; margin: 15px 0;">
+		            <svg viewBox="0 0 ${width} ${height}" class="svg-math" style="max-width:320px; background:white; border-radius:8px; border: 1px solid #eee;">
+		                ${gridSVG}
+		                <line x1="${padding}" y1="${height - padding}" x2="${width - 10}" y2="${height - padding}" stroke="black" stroke-width="1.2" />
+		                <line x1="${padding}" y1="${height - padding}" x2="${padding}" y2="10" stroke="black" stroke-width="1.2" />
+		                
+		                <polyline points="${pointsStr}" fill="none" stroke="var(--red-mid)" stroke-width="2.5" stroke-linejoin="round" />
+		                ${markers}
+		                ${xLabels}
+		                
+		                <text x="${width/2 + 10}" y="${height - 2}" font-size="8" font-weight="bold" text-anchor="middle">Heure de la journée</text>
+		            </svg>
+		        </div>`;
+		
+		        return { label: 'Lecture de graphique',
+		            q: `Le graphique représente l'évolution de la température sur une journée. <br> <b>De combien de degrés la température a-t-elle augmenté entre ${labels[idxA]} et ${labels[idxB]} ?</b> ${svg}`,
+		            a: reponse.toString(),
+					h: `Fais la différence entre la température à ${labels[idxA]} et celle à ${labels[idxB]}h.`
+		        };
+		    },
+
+        // ── AUGMENTATION / DIMINUTION DE POURCENTAGE ──────────────────────────
+        () => {
+            const contextes = [
+                { obj: "une console de jeux",    prix: [200, 250, 300, 400] },
+                { obj: "un vélo",                prix: [150, 200, 300, 400, 500] },
+                { obj: "un smartphone",          prix: [200, 300, 400, 600, 800] },
+                { obj: "un billet d'avion",      prix: [100, 150, 200, 250, 300] },
+                { obj: "une paire de baskets",   prix: [60, 80, 100, 120, 150] },
+                { obj: "un abonnement annuel",   prix: [40, 60, 80, 100, 120] },
+                { obj: "une télévision",         prix: [300, 400, 500, 600, 800] },
+                { obj: "un appareil photo",      prix: [200, 300, 400, 500] },
+                { obj: "un manteau",             prix: [80, 100, 120, 150, 200] },
+                { obj: "une tablette",           prix: [150, 200, 300, 400] },
+                { obj: "un loyer mensuel",       prix: [400, 500, 600, 800] },
+                { obj: "un repas au restaurant", prix: [20, 25, 30, 40] },
+            ];
+
+            const pourcentagesHausse = [10, 25, 50, 100];
+            const pourcentagesBaisse = [10, 25, 50];
+
+            const framesHausse = [
+                (obj, pct) => `Le prix de ${obj} a augmenté de ${pct} %.`,
+                (obj, pct) => `Suite à une hausse de ${pct} %, le prix de ${obj} a changé.`,
+                (obj, pct) => `${obj.charAt(0).toUpperCase() + obj.slice(1)} a subi une augmentation de ${pct} %.`,
+            ];
+            const framesBaisse = [
+                (obj, pct) => `Le prix de ${obj} a diminué de ${pct} %.`,
+                (obj, pct) => `Lors des soldes, ${obj} est remisé de ${pct} %.`,
+                (obj, pct) => `${obj.charAt(0).toUpperCase() + obj.slice(1)} bénéficie d'une réduction de ${pct} %.`,
+            ];
+
+            const ctx = contextes[Math.floor(Math.random() * contextes.length)];
+            const isHausse = Math.random() > 0.5;
+            const pourcentages = isHausse ? pourcentagesHausse : pourcentagesBaisse;
+            const pct = pourcentages[Math.floor(Math.random() * pourcentages.length)];
+            const prixDepart = ctx.prix[Math.floor(Math.random() * ctx.prix.length)];
+
+            let prixFinal, frameText, hint;
+
+            // Méthodes mentales par pourcentage
+            const methodeHausse = {
+                10:  (p) => `10 % de ${p} = ${p} ÷ 10 = ${p/10} €. Donc : ${p} + ${p/10} = ${p + p/10} €`,
+                25:  (p) => `25 % de ${p} = ${p} ÷ 4 = ${p/4} €. Donc : ${p} + ${p/4} = ${p + p/4} €`,
+                50:  (p) => `50 % de ${p} = ${p} ÷ 2 = ${p/2} €. Donc : ${p} + ${p/2} = ${p + p/2} €`,
+                100: (p) => `100 % de ${p} = ${p} € (le prix entier). Donc : ${p} + ${p} = ${p*2} €`,
+            };
+            const methodeBaisse = {
+                10:  (p) => `10 % de ${p} = ${p} ÷ 10 = ${p/10} €. Donc : ${p} − ${p/10} = ${p - p/10} €`,
+                25:  (p) => `25 % de ${p} = ${p} ÷ 4 = ${p/4} € (le quart). Donc : ${p} − ${p/4} = ${p - p/4} €`,
+                50:  (p) => `50 % de ${p} = ${p} ÷ 2 = ${p/2} € (la moitié). Donc : ${p} − ${p/2} = ${p/2} €`,
+                100: (p) => `100 % de ${p} = ${p} € (le prix entier). Donc : ${p} − ${p} = 0 € (gratuit !)`,
+            };
+
+            if (isHausse) {
+                prixFinal = prixDepart * (1 + pct / 100);
+                const frame = framesHausse[Math.floor(Math.random() * framesHausse.length)];
+                frameText = frame(ctx.obj, pct);
+                hint = methodeHausse[pct](prixDepart);
+            } else {
+                prixFinal = prixDepart * (1 - pct / 100);
+                const frame = framesBaisse[Math.floor(Math.random() * framesBaisse.length)];
+                frameText = frame(ctx.obj, pct);
+                hint = methodeBaisse[pct](prixDepart);
+            }
+
+            const reponse = Number.isInteger(prixFinal)
+                ? prixFinal.toString()
+                : prixFinal.toFixed(2).replace('.', ',');
+
+            return { label: 'Augmentation / Diminution en pourcentage d\'une quantité',
+                q: `${frameText}<br>Son prix de départ était de $${prixDepart}$ €. Quel est son nouveau prix ?<br><small>Pense à inclure l'unité € (ex : 150 €)</small>`,
+                a: reponse + ' \\text{ €}',
+                h: hint,
+                _pctTag: true,
+                _pctVal: reponse
+            };
+        },
+
+        // ── PROPORTIONNALITÉ ───────────────────────────────────────────────────
+        () => {
+            const contextes = [
+                { pl: "pommes",           uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "carottes",         uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "tomates",          uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "fraises",          uQ: "kg", uP: "€", de: true,  elide: false },
+                { pl: "bouteilles d'eau", uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "pamplemousses",    uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "oranges",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "citrons",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "yaourts",          uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "stylos",           uQ: "",   uP: "€", de: false, elide: false },
+                { pl: "tissu",            uQ: "m",  uP: "€", de: true,  elide: false },
+                { pl: "essence",          uQ: "L",  uP: "€", de: true,  elide: true  },
+            ];
+
+            const ctx = contextes[Math.floor(Math.random() * contextes.length)];
+            const useLinearite = Math.random() > 0.5;
+
+            let q_text, reponse, hint;
+
+            if (useLinearite) {
+                // ── Méthode : linéarité (× k) ──────────────────────────────────
+                const configs = [
+                    { q1: 2,  p1: 3,   k: [3, 4, 5, 10] },
+                    { q1: 2,  p1: 4,   k: [3, 4, 5, 10] },
+                    { q1: 2,  p1: 5,   k: [3, 4, 5, 10] },
+                    { q1: 3,  p1: 6,   k: [2, 4, 5, 10] },
+                    { q1: 3,  p1: 9,   k: [2, 4, 5, 10] },
+                    { q1: 4,  p1: 8,   k: [2, 3, 5, 10] },
+                    { q1: 5,  p1: 10,  k: [2, 3, 4, 10] },
+                    { q1: 5,  p1: 15,  k: [2, 3, 4, 10] },
+                    { q1: 10, p1: 12,  k: [2, 3, 4, 5]  },
+                    { q1: 10, p1: 15,  k: [2, 3, 4, 5]  },
+                    { q1: 10, p1: 20,  k: [2, 3, 4, 5]  },
+                ];
+                const cfg = configs[Math.floor(Math.random() * configs.length)];
+                const k   = cfg.k[Math.floor(Math.random() * cfg.k.length)];
+                const q2  = cfg.q1 * k;
+                const p2  = cfg.p1 * k;
+
+                const qU1 = ctx.uQ ? cfg.q1 + '~\\text{' + ctx.uQ + '}' : String(cfg.q1);
+                const qU2 = ctx.uQ ? q2 + '~\\text{' + ctx.uQ + '}' : String(q2);
+
+                const sep = ctx.elide ? "\u00a0d'" : (ctx.de ? ' de ' : ' ');
+                q_text  = '$' + qU1 + '$' + sep + ctx.pl + ' coûtent $' + cfg.p1 + '$ ' + ctx.uP + '. Combien coûtent $' + qU2 + '$' + sep + ctx.pl + '\u00a0?';
+                reponse = String(p2);
+                hint    = 'On multiplie la quantité par $' + k + '$, donc on multiplie aussi le prix par $' + k + '$\u00a0: $' + cfg.p1 + ' \\times ' + k + ' = ' + p2 + '$ ' + ctx.uP + '.';
+
+            } else {
+                // ── Méthode : passage à l'unité ────────────────────────────────
+                const configs = [
+                    { q1: 4,  pu: 1.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 4,  pu: 2.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 4,  pu: 0.5,  q2choices: [2, 3, 6, 8, 10] },
+                    { q1: 5,  pu: 1.2,  q2choices: [2, 3, 4, 10]    },
+                    { q1: 5,  pu: 0.6,  q2choices: [2, 3, 4, 10]    },
+                    { q1: 4,  pu: 1.1,  q2choices: [2, 3, 5, 10]    },
+                    { q1: 4,  pu: 2,    q2choices: [3, 5, 6, 7, 9]  },
+                    { q1: 3,  pu: 1.5,  q2choices: [2, 4, 6, 9]     },
+                    { q1: 2,  pu: 1.5,  q2choices: [3, 4, 6, 8, 10] },
+                    { q1: 6,  pu: 1.5,  q2choices: [2, 4, 8, 10]    },
+                    { q1: 10, pu: 1.2,  q2choices: [3, 4, 5, 7]     },
+                    { q1: 10, pu: 0.5,  q2choices: [3, 4, 6, 7, 9]  },
+                ];
+                const cfg = configs[Math.floor(Math.random() * configs.length)];
+                const q2  = cfg.q2choices[Math.floor(Math.random() * cfg.q2choices.length)];
+                const p1  = Math.round(cfg.q1 * cfg.pu * 100) / 100;
+                const p2  = Math.round(q2 * cfg.pu * 100) / 100;
+
+                const fmt = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
+
+                const qU1 = ctx.uQ ? cfg.q1 + '~\\text{' + ctx.uQ + '}' : String(cfg.q1);
+                const qU2 = ctx.uQ ? q2 + '~\\text{' + ctx.uQ + '}' : String(q2);
+
+                const sep = ctx.elide ? " d'" : (ctx.de ? ' de ' : ' ');
+                q_text  = '$' + qU1 + '$' + sep + ctx.pl + ' coûtent $' + fmt(p1) + '$ ' + ctx.uP + '. Combien coûtent $' + qU2 + '$' + sep + ctx.pl + ' ?';
+                reponse = fmt(p2);
+                hint    = 'Prix pour 1\u00a0: $' + fmt(p1) + ' \\div ' + cfg.q1 + ' = ' + fmt(cfg.pu) + '$ ' + ctx.uP + '. Puis\u00a0: $' + fmt(cfg.pu) + ' \\times ' + q2 + ' = ' + fmt(p2) + '$ ' + ctx.uP + '.';
+            }
+
+            return { label: 'Utiliser la proportionnalité',
+                q: q_text + '<br><small>Donne le résultat en ' + ctx.uP + ' (ex\u00a0: 6 ' + ctx.uP + ')</small>',
+                a: reponse + ' \\text{ ' + ctx.uP + '}',
+                h: hint,
+                _propTag: true,
+                _propVal: reponse
+            };
+        }
+        ],
+        scratch: [
+            // ── RECTANGLE ──────────────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const longueur = [80,100,120,150][Math.floor(Math.random()*4)];
+                const largeur  = [40,50,60,70,80][Math.floor(Math.random()*5)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 4 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${longueur}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'move',   label:`Avancer de ${largeur}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return { label: 'Script Scratch – Dessiner un rectangle',
+                    q: `Voici un script Scratch qui trace un <b>rectangle</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '90' : '2',
+                    h: missingAngle
+                        ? 'Un rectangle a 4 angles droits à 90°.'
+                        : 'Un rectangle a 4 côtés (2 paires) → il faut répéter 2 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── CARRÉ ──────────────────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const cote = [60,80,100,120][Math.floor(Math.random()*4)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 4 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${cote}` },
+                    { type:'turn',   label:`Tourner de 90°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return { label: 'Script Scratch – Dessiner un carré',
+                    q: `Voici un script Scratch qui trace un <b>carré</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '90' : '4',
+                    h: missingAngle
+                        ? 'Un carré a 4 angles droits à 90°.'
+                        : 'Un carré a 4 côtés → il faut répéter 4 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── TRIANGLE ÉQUILATÉRAL ────────────────────────────────────────────
+            () => {
+                const missingAngle = Math.random() > 0.5;
+                const cote = [60,80,100,120][Math.floor(Math.random()*4)];
+
+                const svg = buildScratchSVG([
+                    { type:'hat',    label:'Quand 🚩 est cliqué' },
+                    { type:'pen',    label:'🖊️ Stylo en position d\'écriture' },
+                    { type:'repeat', label:`Répéter 3 fois`, blank: !missingAngle },
+                    { type:'move',   label:`Avancer de ${cote}` },
+                    { type:'turn',   label:`Tourner de 120°`, blank: missingAngle },
+                    { type:'endrepeat' }
+                ],0);
+
+                return { label: 'Script Scratch – Dessiner un triangle équilatéral',
+                    q: `Voici un script Scratch qui trace un <b>triangle équilatéral</b>. Trouve le nombre manquant&nbsp;:<br>${svg}`,
+                    a: missingAngle ? '120' : '3',
+                    h: missingAngle
+                        ? '360° ÷ 3 côtés = 120° par rotation.'
+                        : 'Un triangle a 3 côtés → il faut répéter 3 fois.',
+                    t: 'scratch'
+                };
+            },
+
+            // ── ALGORITHME : trace le déroulement du programme ─────────────────
+            () => {
+                // Valeur de départ choisie parmi des petits entiers simples
+                const startVal = [2, 3, 4, 5, 6, 7, 8, 10][Math.floor(Math.random() * 8)];
+
+                // Catalogue d'opérations possibles : { desc (SVG expr), fn, hint }
+                // On construit un programme de 3 opérations DISTINCTES dont le résultat reste ≤ 100
+                const OPS = [
+                    { id:'x2',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'2'}],  fn: v => v * 2,  txt: v => `${v} × 2` },
+                    { id:'x3',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'3'}],  fn: v => v * 3,  txt: v => `${v} × 3` },
+                    { id:'x4',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'4'}],  fn: v => v * 4,  txt: v => `${v} × 4` },
+                    { id:'x5',  desc: () => [{kind:'op',val:'*'},{kind:'num',val:'5'}],  fn: v => v * 5,  txt: v => `${v} × 5` },
+                    { id:'+10', desc: () => [{kind:'op',val:'+'},{kind:'num',val:'10'}], fn: v => v + 10, txt: v => `${v} + 10` },
+                    { id:'+5',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'5'}],  fn: v => v + 5,  txt: v => `${v} + 5`  },
+                    { id:'+8',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'8'}],  fn: v => v + 8,  txt: v => `${v} + 8`  },
+                    { id:'+3',  desc: () => [{kind:'op',val:'+'},{kind:'num',val:'3'}],  fn: v => v + 3,  txt: v => `${v} + 3`  },
+                    { id:'-1',  desc: () => [{kind:'op',val:'-'},{kind:'num',val:'1'}],  fn: v => v - 1,  txt: v => `${v} - 1`  },
+                    { id:'-2',  desc: () => [{kind:'op',val:'-'},{kind:'num',val:'2'}],  fn: v => v - 2,  txt: v => `${v} - 2`  },
+                    { id:'/2',  desc: () => [{kind:'op',val:'/'},{kind:'num',val:'2'}],  fn: v => v / 2,  txt: v => `${v} ÷ 2`, ok: v => v % 2 === 0 && v >= 4 },
+                ];
+
+                // Tire 3 opérations DISTINCTES compatibles avec startVal sans dépasser 100
+                let val = startVal;
+                const chosen = [];
+                const shuffled = OPS.slice().sort(() => Math.random() - 0.5);
+                for (const op of shuffled) {
+                    if (chosen.length >= 3) break;
+                    if (op.ok && !op.ok(val)) continue;
+                    const next = op.fn(val);
+                    if (next > 100 || next < 0 || !Number.isInteger(next)) continue;
+                    chosen.push({ op, fromVal: val });
+                    val = next;
+                }
+                // Fallback si pas assez d'opérations valides (3 opérations sûres)
+                if (chosen.length < 3) {
+                    val = startVal;
+                    chosen.length = 0;
+                    const safe = [OPS.find(o=>o.id==='+5'), OPS.find(o=>o.id==='x2'), OPS.find(o=>o.id==='+3')];
+                    for (const op of safe) {
+                        chosen.push({ op, fromVal: val }); val = op.fn(val);
+                    }
+                }
+
+                const finalVal = val;
+
+                // Construction des blocs :
+                // Chapeau → Demander → mettre résultat à réponse → mettre résultat à résultat OP n → … → Dire
+                const blocks = [
+                    { type: 'hat' },
+                    { type: 'ask', msg: 'Choisir un nombre' },
+                    { type: 'setvar', label: 'résultat', expr: [{kind:'reply', val:'réponse'}] },
+                ];
+                for (const c of chosen) {
+                    const opToks = c.op.desc();
+                    // expr = [ puce variable "résultat" ] [ opérateur ] [ nombre ]
+                    const expr = [{kind:'var', val:'résultat'}, ...opToks];
+                    blocks.push({ type: 'setvar', label: 'résultat', expr });
+                }
+                blocks.push({ type: 'say', msg: 'J\'obtiens :', varName: 'résultat' });
+
+                const svg = buildScratchSVG(blocks, 80);
+
+                // Hint : déroulé du calcul étape par étape
+                let hintSteps = `résultat ← ${startVal}`;
+                let v2 = startVal;
+                for (const c of chosen) {
+                    const next = c.op.fn(v2);
+                    hintSteps += ` ➤ résultat ← ${c.op.txt(v2)} = ${next}`;
+                    v2 = next;
+                }
+
+                return { label: 'Script Scratch – Appliquer un programme à un nombre',
+                    q: `On choisit <b>${startVal}</b> comme nombre de départ. Quel nombre le lutin va-t-il dire ?<br>${svg}`,
+                    a: String(finalVal),
+                    h: hintSteps,
+                    t: 'scratch'
+                };
+            }
+        ]
+    };
+
+    // ── Constructeur de blocs Scratch SVG ──────────────────────────────────────
+    function buildScratchSVG(blocks, offset) {
+        const W      = 210 + offset;
+        const hatH   = 40;
+        const blockH = 34;
+        const repH   = 38;
+        const endH   = 14;
+        const barW   = 14;
+        const innerX = 4 + barW + 4;
+        const innerW = W - 8 - barW - 4;
+        const gap    = 3;
+
+        const C = {
+            hat:        '#FFAB18',
+            repeat:     '#FF8C1A',
+            repeatDark: '#DB6E00',
+            move:       '#4C97FF',
+            moveDark:   '#3373CC',
+            pen:        '#59C059',
+            penDark:    '#389438',
+            variable:   '#FF8C1A', // Variables : orange
+            variableDark:'#DB6E00',
+            varChip:    '#FF6680', // puce nom de variable : rose-rouge
+            varChipDk:  '#CC0033',
+            operator:   '#59C059', // Opérateurs : vert
+            operatorDk: '#389438',
+            say:        '#9966FF', // Looks/Dire : violet
+            sayDark:    '#7744CC',
+            text:       '#ffffff',
+        };
+		
+
+        // ── Badge ovale générique ────────────────────────────────────────────
+        function oval(x, y, w, h, fill, stroke, dasharray, label, labelFill, fontSize) {
+            let o = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h/2}" fill="${fill}"`;
+            if (stroke) o += ` stroke="${stroke}" stroke-width="2"`;
+            if (dasharray) o += ` stroke-dasharray="${dasharray}"`;
+            o += `/>`;
+            o += `<text x="${x + w/2}" y="${y + h/2 + 4}" text-anchor="middle" font-size="${fontSize||12}" font-weight="bold" fill="${labelFill}" font-family="sans-serif">${label}</text>`;
+            return o;
+        }
+
+        // ── Bloc simple avec badges auto sur les nombres ─────────────────────
+        function simpleBlock(bx, by, bw, bh, col, colDark, label, hasBlank) {
+            let out = `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${col}"/>`;
+            out += `<rect x="${bx}" y="${by + bh - 4}" width="${bw}" height="4" rx="3" fill="${colDark}" opacity="0.45"/>`;
+            const tmid = by + bh / 2 + 5;
+            const tx   = bx + 12;
+            const parts = label.split(/(\d+)/);
+            let cx = tx;
+            parts.forEach(p => {
+                if (/^\d+$/.test(p)) {
+                    if (hasBlank) {
+                        out += oval(cx - 2, by + 7, 34, 20, 'white', colDark, '4,2', '?', colDark, 14);
+                    } else {
+                        out += oval(cx - 2, by + 7, 34, 20, 'rgba(255,255,255,0.28)', null, null, p, C.text, 13);
+                    }
+                    cx += 38;
+                } else if (p) {
+                    out += `<text x="${cx}" y="${tmid}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">${p}</text>`;
+                    cx += p.length * 7.2;
+                }
+            });
+            return out;
+        }
+		
+		
+        // ── Passe 1 : calcul des y ───────────────────────────────────────────
+        let y = 4;
+        let repeatStartY = null, endRepeatY = null;
+        const computed = [];
+        for (const b of blocks) {
+            computed.push({ ...b, y });
+            if      (b.type === 'hat')       y += hatH;
+            else if (b.type === 'pen')       y += blockH;
+            else if (b.type === 'repeat')  { repeatStartY = y; y += repH; }
+            else if (b.type === 'move' || b.type === 'turn') y += blockH + gap;
+            else if (b.type === 'setvar')    y += blockH + gap;
+            else if (b.type === 'ask')       y += blockH + gap;
+            else if (b.type === 'say')       y += blockH + gap;
+            else if (b.type === 'endrepeat'){ endRepeatY = y; y += endH; }
+        }
+        const totalH = y + 8;
+
+        // ── Passe 2 : rendu ──────────────────────────────────────────────────
+        let svgParts = [];
+
+        // Barre orange verticale de boucle
+        if (repeatStartY !== null && endRepeatY !== null) {
+            svgParts.push(`<rect x="4" y="${repeatStartY + repH}" width="${barW}" height="${endRepeatY - (repeatStartY + repH) + endH}" fill="${C.repeat}"/>`);
+        }
+
+        for (const b of computed) {
+            const by = b.y;
+
+            // CHAPEAU
+            if (b.type === 'hat') {
+                svgParts.push(`
+                  <rect x="4" y="${by}" width="${W-8}" height="${hatH}" rx="14" fill="${C.hat}"/>
+                  <rect x="4" y="${by + hatH - 14}" width="${W-8}" height="14" fill="${C.hat}"/>
+                `);
+                svgParts.push(`<text x="${W/2}" y="${by + hatH/2 + 5}" text-anchor="middle" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">Quand 🏳️ est cliqué</text>`);
+
+            // STYLO
+            } else if (b.type === 'pen') {
+                svgParts.push(simpleBlock(4, by, W-8, blockH, C.pen, C.penDark, b.label, false));
+
+            // RÉPÉTER
+            } else if (b.type === 'repeat') {
+                svgParts.push(`<rect x="4" y="${by}" width="${W-8}" height="${repH}" rx="5" fill="${C.repeat}"/>`);
+                svgParts.push(`<rect x="4" y="${by+repH-4}" width="${W-8}" height="4" rx="3" fill="${C.repeatDark}" opacity="0.45"/>`);
+                svgParts.push(`<text x="16" y="${by+repH/2+5}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">Répéter</text>`);
+                const num = b.label.match(/\d+/)?.[0] || '';
+                if (b.blank) {
+                    svgParts.push(oval(82, by+9, 34, 20, 'white', C.repeatDark, '4,2', '?', C.repeatDark, 14));
+                } else {
+                    svgParts.push(oval(82, by+9, 34, 20, 'rgba(255,255,255,0.28)', null, null, num, C.text, 13));
+                }
+                svgParts.push(`<text x="122" y="${by+repH/2+5}" font-size="12" font-weight="bold" fill="${C.text}" font-family="sans-serif">fois</text>`);
+
+            // MOVE / TURN
+            } else if (b.type === 'move' || b.type === 'turn') {
+                svgParts.push(simpleBlock(innerX, by, innerW, blockH, C.move, C.moveDark, b.label, b.blank));
+
+            // FIN RÉPÉTER
+            } else if (b.type === 'endrepeat') {
+                svgParts.push(`<rect x="4" y="${by}" width="${W-8}" height="${endH}" rx="5" fill="${C.repeat}"/>`);
+
+            // ── METTRE [variable] À [expr] ─────────────────────────────────
+            // b.label = nom de la variable, b.expr = tableau de tokens
+            // token : { kind:'text'|'num'|'var'|'op'|'reply', val }
+            } else if (b.type === 'setvar') {
+                const bx = 4, bw = W - 8 ;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.variable}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.variableDark}" opacity="0.45"/>`);
+
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+
+                // "mettre"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">mettre</text>`);
+                cx += 48;
+
+                // puce nom variable (rose arrondie)
+                const vname = b.label;
+                const vnameW = Math.max(36, vname.length * 7 + 16);
+                svgParts.push(oval(cx, by+8, vnameW, 18, C.varChip, null, null, vname, C.text, 11));
+                cx += vnameW + 6;
+
+                // "à"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">à</text>`);
+                cx += 14;
+
+                // expression : tableau de tokens
+                for (const tok of b.expr) {
+                    if (tok.kind === 'num') {
+                        // badge blanc semi-transparent, largeur adaptée au contenu
+                        const nw = Math.max(24, String(tok.val).length * 8 + 14);
+                        svgParts.push(oval(cx, by+8, nw, 18, 'rgba(255,255,255,0.28)', null, null, tok.val, C.text, 11));
+                        cx += nw + 4;
+                    } else if (tok.kind === 'var') {
+                        const tw = Math.max(36, tok.val.length * 7 + 16);
+                        svgParts.push(oval(cx, by+8, tw, 18, C.varChip, null, null, tok.val, C.text, 11));
+                        cx += tw + 4;
+                    } else if (tok.kind === 'reply') {
+                        // puce "réponse" en bleu ciel (même couleur que le bloc demander)
+                        const rw = Math.max(42, tok.val.length * 7 + 16);
+                        svgParts.push(oval(cx, by+8, rw, 18, C.move, null, null, tok.val, C.text, 11));
+                        cx += rw + 4;
+                    } else if (tok.kind === 'op') {
+                        // opérateur dans ellipse verte, un peu plus large pour * et /
+                        const ow = Math.max(20, String(tok.val).length * 9 + 10);
+                        svgParts.push(oval(cx - 2, by+7, ow, 20, C.operator, null, null, tok.val, C.text, 13));
+                        cx += ow + 2;
+                    } else {
+                        svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">${tok.val}</text>`);
+                        cx += tok.val.length * 7;
+                    }
+                }
+
+            // ── DEMANDER … ET ATTENDRE ─────────────────────────────────────
+            } else if (b.type === 'ask') {
+                const bx = 4, bw = W - 8;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.move}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.moveDark}" opacity="0.45"/>`);
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">demander</text>`);
+                cx += 68;
+                const msgW = Math.max(60, b.msg.length * 6.5 + 14);
+                svgParts.push(oval(cx, by+8, msgW, 18, 'white', null, null, b.msg, '#333', 10));
+                cx += msgW + 6;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">et attendre</text>`);
+
+            // ── DIRE [texte] ET [variable] ─────────────────────────────────
+            } else if (b.type === 'say') {
+                const bx = 4, bw = W - 8;
+                svgParts.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${blockH}" rx="5" fill="${C.say}"/>`);
+                svgParts.push(`<rect x="${bx}" y="${by+blockH-4}" width="${bw}" height="4" rx="3" fill="${C.sayDark}" opacity="0.45"/>`);
+
+                let cx = bx + 10;
+                const mid = by + blockH/2 + 5;
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">dire</text>`);
+                cx += 30;
+
+                // bulle de texte blanc pour la chaîne
+                const msgW = b.msg.length * 6.5 + 14;
+                svgParts.push(oval(cx, by+8, msgW, 18, 'white', null, null, b.msg, '#333', 10));
+                cx += msgW + 6;
+
+                // "et"
+                svgParts.push(`<text x="${cx}" y="${mid}" font-size="11" font-weight="bold" fill="${C.text}" font-family="sans-serif">et</text>`);
+                cx += 18;
+
+                // puce variable résultat
+                const rv = b.varName || 'résultat';
+                const rvW = Math.max(30, rv.length * 7 + 14);
+                svgParts.push(oval(cx, by+8, rvW, 18, C.varChip, null, null, rv, C.text, 11));
+            }
+        }
+
+        return `<div style="display:flex;justify-content:center;margin:10px 0;">
+          <svg viewBox="0 0 ${W} ${totalH}" style="width:100%;max-width:${W}px;font-family:sans-serif;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15));">
+            ${svgParts.join('')}
+          </svg>
+        </div>`;
+    }
+
+    let session = [], currentIdx = 0, score = 0, isLocked = false;
+
+	 // ── Génération sans répétition ──────────────────────────────────────────
+    function buildSession(theme) {
+        // En mode "tout", on réserve exactement 1 place pour Scratch
+        const isTout = theme === 'tout';
+        const cats = isTout
+            ? Object.keys(GENERATORS).filter(k => k !== 'scratch')
+            : [theme];
+
+        // ── Génère N questions en limitant chaque générateur à maxPerGen appel(s) ──
+        function generateUnique(categories, count, maxPerGen) {
+            const pool = [];
+            // Compteur d'utilisation par générateur : clé = "cat|index"
+            const genUsage = {};
+
+            // Construit la liste de tous les générateurs disponibles (cat + index)
+            const allGens = [];
+            for (const cat of categories) {
+                GENERATORS[cat].forEach((gen, idx) => allGens.push({ cat, idx, gen }));
+            }
+
+            // Passe 1 : chaque générateur au plus maxPerGen fois, ordre aléatoire
+            const shuffled = allGens.slice().sort(() => Math.random() - 0.5);
+            for (let pass = 0; pass < maxPerGen && pool.length < count; pass++) {
+                for (const entry of shuffled) {
+                    if (pool.length >= count) break;
+                    const key = entry.cat + '|' + entry.idx;
+                    const uses = genUsage[key] || 0;
+                    if (uses >= maxPerGen) continue;
+                    genUsage[key] = uses + 1;
+                    pool.push(entry.gen());
+                }
+            }
+
+            // Passe 2 (fallback) : complète sans contrainte si le pool est encore insuffisant
+            while (pool.length < count) {
+                const entry = allGens[Math.floor(Math.random() * allGens.length)];
+                pool.push(entry.gen());
+            }
+
+            // Mélange final pour ne pas avoir toujours le même ordre de thèmes
+            return pool.sort(() => Math.random() - 0.5);
+        }
+
+        if (isTout) {
+            // 9 questions variées sans Scratch + 1 question Scratch
+            const mainQuestions = generateUnique(cats, 9, 1);
+            const scratchGen = GENERATORS['scratch'][Math.floor(Math.random() * GENERATORS['scratch'].length)];
+            const scratchQ = scratchGen();
+
+            // Insère la question Scratch à une position aléatoire parmi les 10
+            const scratchPos = Math.floor(Math.random() * 10);
+            mainQuestions.splice(scratchPos, 0, scratchQ);
+            return mainQuestions;
+        } else {
+            return generateUnique(cats, 10, 1);
+        }
+    }
+
+	
+    function startQuiz(theme) {
+        renderMathInElement(document.querySelector('.math-shortcuts'), {
+            delimiters: [{left: "$", right: "$", display: false}]
+        });
+        session = buildSession(theme);
+        currentIdx = 0; score = 0;
+        const labels = { calc: '🔢 Nombres et calculs', alg: '🧩 Calcul littéral et fonctions', geo: '📐 Espace, géométrie et grandeurs', proba: '📊 Probabilités et statistiques', scratch: '🐱 Algorithimique Scratch', tout: '🚀 Tous les thèmes' };
+        document.getElementById('label-theme').textContent = labels[theme] || 'Entraînement';
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        isLocked = false;
+        const q = session[currentIdx];
+        const el = document.getElementById('question-text');
+        el.innerHTML = q.q;
+        renderMathInElement(el, { delimiters: [{left: "$", right: "$", display: false}] });
+        const input = document.getElementById('answer-input');
+        input.value = ''; input.disabled = false; input.focus();
+        document.getElementById('feedback').classList.add('hidden');
+        document.getElementById('submit-btn').classList.remove('hidden');
+        document.getElementById('progress-bar').style.width = (currentIdx * 10) + '%';
+        document.getElementById('live-score').textContent = score;
+    }
+	
+	function normalizeAlgebra(str) {
+	    if (!str) return "";
+	    
+	    // 1. Nettoyage de base et harmonisation des carrés
+	    let s = str.toLowerCase()
+	               .replace(/\s+/g, '')       // Supprime les espaces
+	               .replace(/²/g, '^2')       // RECTIFICATION : transforme ² en ^2 systématiquement
+	               .replace(/-/g, '+-');      // Prépare le découpage des termes
+	    
+	    // 2. Découpage par les '+'
+	    let terms = s.split('+').filter(t => t !== "");
+	    
+	    // 3. Transformation des termes (ex: "t" -> "1t", "-x" -> "-1x")
+	    terms = terms.map(t => {
+	        // On cherche une lettre (x, t, a, b...) qui n'est pas précédée d'un chiffre
+	        // Cette regex gère n'importe quelle variable alphabétique
+	        if (/^[-+]?[a-z]/.test(t) && !/^[-+]?\d/.test(t)) {
+	            return t.replace(/([a-z])/, '1$1');
+	        }
+	        return t;
+	    });
+	
+	    // 4. Tri intelligent : Puissances décroissantes (t^2, puis t, puis constante)
+	    terms.sort((a, b) => {
+	        const getPower = (term) => {
+	            if (term.includes('^2')) return 2;
+	            // Si le terme contient une lettre mais pas de ^2, c'est puissance 1
+	            if (/[a-z]/.test(term)) return 1;
+	            return 0;
+	        };
+	        
+	        const pA = getPower(a);
+	        const pB = getPower(b);
+	        
+	        if (pA !== pB) return pB - pA;
+	        return a.localeCompare(b); // Tri alphabétique si même puissance
+	    });
+	
+	    // 5. Nettoyage final pour l'affichage/comparaison
+	    return terms.join('+').replace(/\+\-/g, '-');
+	}
+
+	function insertSymbol(symbol) {
+	    const input = document.getElementById('answer-input');
+	    const start = input.selectionStart;
+	    const end = input.selectionEnd;
+	    const text = input.value;
+	
+	    // Insère le symbole à la position du curseur
+	    input.value = text.slice(0, start) + symbol + text.slice(end);
+	
+	    // Repositionne le curseur juste après le symbole inséré
+	    input.selectionStart = input.selectionEnd = start + symbol.length;
+	
+	    // Redonne le focus à l'input pour que l'élève continue de taper
+	    input.focus();
+	}
+	
+    function handleValidation() {
+    if(isLocked) return;
+    const inputEl = document.getElementById('answer-input');
+    const userRaw = inputEl.value.trim().toLowerCase().replace(',', '.');
+    const q = session[currentIdx];
+    const correctRaw = q.a.toLowerCase().replace(',', '.');
+    let isCorrect = false;
+	let partial = false;
+		
+    const clean = (s) => s.replace(/\s+/g, '');
+
+	// 0. FRACTION → DÉCIMAL
+    if (q._fracDecTag) {
+        // Accepte virgule ou point, et zéros superflus (0.50 = 0.5)
+        const norm = s => parseFloat(s.replace(',', '.'));
+        const uVal = norm(userRaw);
+        const cVal = norm(q._fracDecVal);
+        if (!isNaN(uVal) && Math.abs(uVal - cVal) < 0.0001) isCorrect = true;
+    }
+	// 0b. OUI / NON (divisibilité)
+    else if (correctRaw === 'oui' || correctRaw === 'non') {
+        const u = userRaw.trim();
+        if (u === correctRaw || u === 'o' && correctRaw === 'oui' || u === 'n' && correctRaw === 'non') isCorrect = true;
+    }
+    // 0b. LECTURE GRAPHIQUE antécédent : accepte tout antécédent valide de la parabole
+    else if (q.q.includes("antécédent") && q.q.includes("graphiquement")) {
+        const uVal = parseFloat(userRaw.replace(',', '.'));
+        if (!isNaN(uVal)) {
+            // Retrouve les coefficients b et c depuis q.a (pt.x connu) et vérifie f(uVal) == f(pt.x)
+            // On stocke la valeur cible yTarget dans q.yTarget (ajouté au moment de la génération)
+            const yTarget = q.yTarget;
+            // Recalcule f(uVal) en utilisant les coefficients stockés dans q
+            const fVal = q.fa * uVal * uVal + q.fb * uVal + q.fc;
+            if (Math.abs(fVal - yTarget) < 0.001) isCorrect = true;
+        }
+    }
+	// 0c. TRIGONOMÉTRIE (rapport de deux segments)
+    else if (q.q.includes("Quel rapport faut-il")) {
+        // Accepte AB/CD, BA/CD, AB/DC, BA/DC — on trie les lettres de chaque segment
+        const normSeg = (s) => clean(s).split('/').map(p => p.split('').sort().join('')).join('/');
+        if (normSeg(userRaw) === normSeg(correctRaw)) isCorrect = true;
+    }
+	// Gestion unités
+	else if (!q._volTag && !q._aireTag && q.q.includes("Calcule") && (q.a.includes("cm") || q.a.includes("m") || q.a.includes("mm"))) {
+	    // On nettoie tout : espaces, virgules, et les commandes KaTeX \text{ }
+	    const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
+	    const correctClean = q.a.toLowerCase()
+	        .replace(/\\text\{/g, '') // Retire \text{
+	        .replace(/\}/g, '')       // Retire }
+	        .replace(/\s/g, '')       // Retire les espaces
+	        .replace(',', '.');
+	    
+	    const userValue = userClean.replace(/[a-z]/g, '');
+	    const correctValue = correctClean.replace(/[a-z]/g, '');
+	
+	    if (userClean === correctClean) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        partial = true;
+	    }
+	}
+    // 0b. CONVERSIONS D'UNITÉS
+    else if (q._convTag) {
+        const stripUnit = (s) => s.toLowerCase()
+            .replace(/\s/g, '').replace(',', '.')
+            .replace(/dm[³3]?(\^3)?/g, '').replace(/cm[²2³3]?(\^[23])?/g, '')
+            .replace(/mm[²2]?(\^2)?/g, '').replace(/km[²2]?(\^2)?/g, '')
+            .replace(/m[²2³3]?(\^[23])?/g, '').replace(/litres?/g, '').replace(/l$/, '');
+        const userNum    = parseFloat(stripUnit(userRaw));
+        const correctNum = parseFloat(q._convVal.replace(',', '.'));
+        if (!isNaN(userNum) && Math.abs(userNum - correctNum) <= 0.0001 * Math.max(1, Math.abs(correctNum))) {
+            isCorrect = true;
+        }
+    }
+    // 0b-bis. PÉRIMÈTRE DISQUE (calcul littéral)
+    else if (q._perimCircleTag) {
+        // Normalise la saisie : espaces, ×→*, x→*, π→pi, ^→rien, ²→2
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._perimR;
+        const d = q._perimD;
+        // Toutes les formes acceptées (avec * optionnel entre facteurs)
+        const valids = [
+            // 2*pi*r et permutations
+            `2*pi*${r}`, `2*${r}*pi`, `pi*2*${r}`, `pi*${r}*2`, `${r}*2*pi`, `${r}*pi*2`,
+            // sans étoiles
+            `2pi${r}`, `2${r}pi`, `pi2${r}`, `pi${r}2`, `${r}2pi`, `${r}pi2`,
+            // pi*d et permutations
+            `pi*${d}`, `${d}*pi`, `pi${d}`, `${d}pi`
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
+    // 0b-ter. AIRE DISQUE (calcul littéral)
+    else if (q._aireCircleTag) {
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/\^/g, '')
+            .replace(/²/g, '2')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._aireCircleR;
+        const r2 = `${r}2`; // r² normalisé
+        // Toutes les formes acceptées pour pi*r²
+        const valids = [
+            `pi*${r2}`, `pi*${r}*${r}`, `${r2}*pi`, `${r}*${r}*pi`,
+            `pi${r2}`, `pi${r}${r}`, `${r2}pi`, `${r}${r}pi`,
+            `${r}*pi*${r}`, `${r}pi${r}`
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
+    // 0c. AIRE
+    else if (q._aireTag) {
+        // Normalise la saisie : on remplace toutes les formes de "au carré"
+        const raw = inputEl.value.trim().toLowerCase()
+            .replace(/\s/g, '')
+            .replace('²', '¤')
+            .replace('^2', '¤');
+        
+        const unit = q._unit; // 'cm' ou 'm'
+        const correctVal = parseFloat(q._aireVal.replace(',', '.'));
+        const userVal = parseFloat(raw);
+        const valOk = !isNaN(userVal) && Math.abs(userVal - correctVal) < 0.015;
+		
+		const raw2 = raw.replace('¤','2')
+        const hasUnit2   = raw2.includes(unit + '2');          // cm2, m2 (après normalisation de ² et ^2)
+        const hasUnitOnly = !hasUnit2 && raw2.includes(unit);  // cm ou m sans le carré
+        const hasNoUnit   = !hasUnit2 && !hasUnitOnly;        // aucune unité
+
+        if (valOk && hasUnit2) {
+            isCorrect = true;
+        } else if (valOk && (hasUnitOnly || hasNoUnit)) {
+            partial = true;
+        }
+    }
+    // 0c-bis. VOLUME CYLINDRE (calcul littéral)
+    else if (q._volCylTag) {
+        const norm = (s) => s.toLowerCase()
+            .replace(/\s/g, '')
+            .replace(/×/g, '*')
+            .replace(/π/g, 'pi')
+            .replace(/\^/g, '')
+            .replace(/²/g, '2')
+            .replace(/pi/g, '§')
+            .replace(/x/g, '*')
+            .replace(/§/g, 'pi');
+        const u = norm(userRaw);
+        const r = q._volCylR;
+        const h = q._volCylH;
+        const r2 = `${r}2`; // r² normalisé
+        // Toutes les permutations de pi * r² * h
+        const valids = [
+            // avec * entre chaque facteur
+            `pi*${r2}*${h}`, `pi*${r}*${r}*${h}`,
+            `pi*${h}*${r2}`, `pi*${h}*${r}*${r}`,
+            `${r2}*pi*${h}`, `${r}*${r}*pi*${h}`,
+            `${r2}*${h}*pi`, `${r}*${r}*${h}*pi`,
+            `${h}*pi*${r2}`, `${h}*pi*${r}*${r}`,
+            `${h}*${r2}*pi`, `${h}*${r}*${r}*pi`,
+            `${r}*pi*${r}*${h}`, `${r}*${h}*pi*${r}`,
+            `${r}*${h}*${r}*pi`, `${r}*pi*${h}*${r}`,
+            // sans * (collé)
+            `pi${r2}${h}`, `pi${r}${r}${h}`,
+            `pi${h}${r2}`, `pi${h}${r}${r}`,
+            `${r2}pi${h}`, `${r2}${h}pi`,
+            `${h}pi${r2}`, `${h}${r2}pi`,
+        ];
+        if (valids.includes(u)) isCorrect = true;
+    }
+    // 0c-ter. VOLUME (numérique)
+    else if (q._volTag) {
+        const raw = inputEl.value.trim().toLowerCase()
+            .replace(/\s/g, '')
+            .replace('³', '3')
+            .replace('^3', '3')
+            .replace(',', '.');
+        const correctVal = parseFloat(q._volVal.replace(',', '.'));
+        const userVal    = parseFloat(raw);
+        const valOk      = !isNaN(userVal) && Math.abs(userVal - correctVal) < 0.015;
+        const hasUnit3   = raw.includes('m3');
+        const hasUnitOnly = !hasUnit3 && raw.includes('m');
+        const hasNoUnit   = !hasUnit3 && !hasUnitOnly;
+
+        if (valOk && hasUnit3) {
+            isCorrect = true;
+        } else if (valOk && (hasUnitOnly || hasNoUnit)) {
+            partial = true;
+        }
+    }
+    // 0d. COORDONNÉES D'UN POINT
+    else if (q._coordTag) {
+        // On relit la saisie brute (avant le replace(',','.') global qui fausse tout)
+        const rawInput = inputEl.value.trim().toLowerCase();
+        const normalize = (s) => s.replace(/\s/g, '').replace('(','').replace(')','');
+        const uClean = normalize(rawInput);
+        const cClean = normalize(q.a.toLowerCase());
+        if (uClean === cClean) isCorrect = true;
+    }
+    // 1. THALÈS (Rapports)
+    else if (q.q.includes("rapports de Thalès")) {
+        const uR = clean(userRaw).split('=');
+        const cR = clean(correctRaw).split('=');
+        if (uR.length === 3) {
+            const norm = (r) => r.split('/').map(s => s.split('').sort().join('')).sort().join('/');
+            const uSet = uR.map(norm).sort().join('|');
+            const cSet = cR.map(norm).sort().join('|');
+            const cInv = cR.map(r => norm(r.split('/').reverse().join('/'))).sort().join('|');
+            if (uSet === cSet || uSet === cInv) isCorrect = true;
+        }
+    }
+    // 2. PYTHAGORE
+    else if (q.q.includes("égalité de Pythagore")) {
+	    const cleanUser = userRaw.replace(/\s+/g, '');
+	    if (!cleanUser.includes('=')) { 
+	        isCorrect = false; 
+	    } else {
+	        const [uL, uR] = cleanUser.split('=');
+	        const [cL, cR] = correctRaw.replace(/\s+/g, '').split('=');
+	
+	        const normMembre = (membre) => {
+	            return membre.split('+').map(seg => {
+	                // Regex : cherche exactement 2 lettres + un carré (², ^2 ou 2)
+	                const match = seg.match(/^([a-z]{2})(²|\^2|2)$/);
+	                if (!match) return "INVALID"; 
+	                return match[1].split('').sort().join('') + "2";
+	            }).sort().join('+');
+	        };
+	
+	        const uL_norm = normMembre(uL);
+	        const uR_norm = normMembre(uR);
+	        
+	        // Si l'utilisateur a tapé "1", uL_norm sera "INVALID"
+	        if (uL_norm.includes("INVALID") || uR_norm.includes("INVALID")) {
+	            isCorrect = false;
+	        } else {
+	            const cL_norm = normMembre(cL);
+	            const cR_norm = normMembre(cR);
+	            isCorrect = (uL_norm === cL_norm && uR_norm === cR_norm) || 
+	                        (uL_norm === cR_norm && uR_norm === cL_norm);
+	        }
+	    }
+	}
+		// Validation températures
+	else if (q.q.includes("température")) {
+		const userCleaned = userRaw.toLowerCase()
+		    .replace(/\s/g, '')
+		    .replace('°c', '')
+		    .replace('°', '')
+		    .replace('c', '')
+		    .replace('degres', '')
+		    .replace('degre', '');
+		if (userCleaned === q.a.toLowerCase().replace(/\s/g, '')) {
+   			 isCorrect = true;
+		}
+	}
+		// Validation Périmètres
+	else if (q.q.includes("périmètre")) {
+	    const userClean = userRaw.toLowerCase().replace(/\s/g, '').replace(',', '.');
+	    const perimCorrect = q.a.toLowerCase().replace(/\\text\{/g, '').replace(/\}/g, '').replace(/\s/g, '').replace(',', '.');
+	    
+	    const userNum = parseFloat(userClean);
+	    const correctNum = parseFloat(perimCorrect);
+	    const hasUnit = userClean.includes('cm') || userClean.includes('m');
+	
+	    if (!isNaN(userNum)) {
+	        // SI c'est un disque -> marge de 0.11 | SINON -> égalité stricte (marge 0.01)
+	        const margin = q.q.includes("disque") ? 0.11 : 0.01;
+	        const isValueCorrect = Math.abs(userNum - correctNum) < margin;
+	
+	        if (isValueCorrect && hasUnit) {
+	            isCorrect = true;
+	        } else if (isValueCorrect && !hasUnit) {
+	            partial = true;
+	        }
+	    }
+	}
+	// Validation Somme des angles avec gestion du score partiel
+// Angles à l'intersection de deux droites
+	else if (q._angleIntTag) {
+	    const userClean = userRaw.replace(/\s/g, '');
+	    const userValue = userClean.replace('°', '');
+	    const correctValue = String(q._angleIntVal);
+	    if (userValue + '°' === userClean && userValue === correctValue) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        partial = true; // bonne valeur mais ° oublié
+	    }
+	}
+	else if (q.q.includes("angle manquant")) {
+	    const userClean = userRaw.replace(/\s/g, '');
+	    const correctClean = q.a.replace(/\s/g, ''); // Contient le "°"
+	    
+	    const userValue = userClean.replace('°', '');
+	    const correctValue = correctClean.replace('°', '');
+	
+	    if (userClean === correctClean) {
+	        isCorrect = true;
+	    } else if (userValue === correctValue) {
+	        // L'élève a mis la bonne valeur numérique mais a oublié le "°"
+	        partial = true; 
+	    }
+	}
+	//Fraction uniquement irréductible dans simplifier
+	else if (q.q.includes("Simplifier au maximum")) {
+	    const uClean = userRaw.replace(/\s+/g, '');
+	    const cClean = correctRaw.replace(/\s+/g, '');
+	    
+	    // Cas 1 : Correspondance exacte (ex: 3/4)
+	    if (uClean === cClean) {
+	        isCorrect = true;
+	    } 
+	    // Cas 2 : Le résultat est un entier (ex: attendu "5/1", reçu "5")
+	    else if (cClean.endsWith('/1')) {
+	        const integerPart = cClean.split('/')[0];
+	        if (uClean === integerPart) {
+	            isCorrect = true;
+	        }
+	    }
+	}
+	// ecriture scientifique
+	else if (q.q.includes("scientifique")) {
+	    // 1. On nettoie la réponse utilisateur (espaces, virgules, croix et x -> étoile)
+	    let u = userRaw.replace(/\s/g, '').replace(',', '.').replace('×', '*').replace('x', '*');
+	    
+	    // 2. On nettoie la réponse attendue (LaTeX, accolades, espaces, virgules -> étoile)
+	    let c = q.a.replace(/\\times/g, '*')
+	               .replace(/[\{\}]/g, '')
+	               .replace(/\s/g, '')
+	               .replace(',', '.');
+	    
+	    // 3. Comparaison (on accepte avec ou sans le symbole ^ selon la saisie)
+	    if (u === c || u === c.replace('^', '')) {
+	        isCorrect = true;
+	    }
+	}
+	// Validation proportionnalité
+	else if (q._propTag) {
+	    const hasUnit = userRaw.includes(q._propVal.includes(',') ? '€' : '€') || /[€L]/.test(userRaw);
+	    const uClean = userRaw.replace(/\s/g, '').replace(/[€L]/g, '').replace(',', '.');
+	    const cClean = q._propVal.replace(',', '.');
+	    const uNum = parseFloat(uClean);
+	    const cNum = parseFloat(cClean);
+	    if (!isNaN(uNum) && Math.abs(uNum - cNum) < 0.01) {
+	        if (hasUnit) {
+	            isCorrect = true;
+	        } else {
+	            partial = true;
+	        }
+	    }
+	}
+	// Validation pourcentages (augmentation/diminution)
+	else if (q._pctTag) {
+	    const hasUnit = userRaw.includes('€');
+	    const uClean = userRaw.replace(/\s/g, '').replace('€', '').replace(',', '.');
+	    const cClean = q._pctVal.replace(',', '.');
+	    const uNum = parseFloat(uClean);
+	    const cNum = parseFloat(cClean);
+	    if (!isNaN(uNum) && Math.abs(uNum - cNum) < 0.01) {
+	        if (hasUnit) {
+	            isCorrect = true;
+	        } else {
+	            partial = true; // Bonne valeur mais unité € oubliée
+	        }
+	    }
+	}
+	// Validation des durées
+	else if (q.q.includes("minutes")) {
+	    let u = userRaw.toLowerCase().replace(/\s/g, '').replace('heures', 'h').replace('heure', 'h'); // Réponse élève nettoyée
+	    let c = q.a.toLowerCase()
+               .replace(/\\text\{/g, '')
+               .replace(/\}/g, '')
+               .replace(/\s/g, '');  // Réponse attendue nettoyée
+	
+	    // 1. CAS PARFAIT : l'élève a mis les bonnes unités (ex: 1h30min, 45min, 1h)
+	    // On accepte aussi "0h45min" si la réponse attendue est "45min"
+	    if (u === c || u === "0h" + c || u === c + "0min") {
+	        isCorrect = true;
+	    } 
+	    // 2. CAS PARTIEL (0,5 pt) : il manque "min" mais les nombres sont bons (ex: 1h30)
+	    else {
+	        // On crée une version de la réponse attendue sans le "min" pour comparer
+	        let cSansU = c.replace('min', '').replace('h', '');
+			let uSansU = u.replace('min', '').replace('h', '');
+	        if (uSansU === cSansU) {
+	            partial = true;
+	        }
+	    }
+	}
+
+		
+	//Accepter x= dans équation
+	else if (q.q.includes("Résoudre")) {
+        let userClean = clean(userRaw).replace('x=', '');
+        let correctClean = clean(correctRaw).replace('x=', '');
+
+        // Fonction pour convertir "7", "-7/-1" ou "1/2" en nombre décimal
+        const toNum = (s) => {
+            if (s.includes('/')) {
+                const p = s.split('/');
+                return parseFloat(p[0]) / parseFloat(p[1]);
+            }
+            return parseFloat(s);
+        };
+
+        const uVal = toNum(userClean);
+        const cVal = toNum(correctClean);
+
+        // Comparaison avec une petite marge d'erreur pour les arrondis
+        if (!isNaN(uVal) && Math.abs(uVal - cVal) < 0.0001) {
+            isCorrect = true;
+        }
+    }
+    // 3. FRACTIONS & NOMBRES
+    else if (correctRaw.includes('/')) {
+        let uN, uD;
+        if (userRaw.includes('/')) { const p = userRaw.split('/'); uN = Number(p[0]); uD = Number(p[1]); }
+        else if (!isNaN(userRaw) && userRaw !== "") { uN = Number(userRaw); uD = 1; }
+        if (uN !== undefined && !isNaN(uN) && !isNaN(uD) && uD !== 0) {
+            const [cN, cD] = correctRaw.split('/').map(Number);
+            if (uN * cD === cN * uD) isCorrect = true;
+        }
+	}
+    // 4. FACTORISATION
+    else if (q.q.includes("Factoriser")) {
+        // q.a est de la forme "k(pv + q)", ex: "9(2x+1)"
+        // On stocke A=k*p et B=k*q dans le générateur
+        const A = q._factA; // coeff de la variable dans l'énoncé
+        const B = q._factB; // constante dans l'énoncé
+        const varName = q._factVar; // variable utilisée (x, y, a, b, t)
+
+        // Fonction qui développe une expression de la forme "k(pv+q)" ou "k(pv-q)"
+        // et retourne {valid, outerFactor} ou null
+        const parseFactor = (raw) => {
+            // Nettoyer la saisie : espaces, × → *, accepter * optionnel avant la parenthèse
+            const s = raw.replace(/\s/g, '').replace(/×/g, '*');
+            // Regex : nombre optionnel * ( contenu )
+            // ex: 9(2x+1), 3*(6x+3), -2(x-4)
+            const m = s.match(/^(-?\d+)\*?\((.+)\)$/);
+            if (!m) return null;
+            const outerK = parseInt(m[1]);
+            const inner = m[2]; // "2x+1", "6x+3", "2x-1"
+            if (isNaN(outerK) || outerK === 0) return null;
+
+            // Parser l'intérieur : terme en variable + constante
+            // Formes attendues : "pv+q", "pv-q", "v+q", "v-q", "-pv+q", etc.
+            const v = varName;
+            // Regex : optional coefficient, variable, then sign and constant
+            const innerM = inner.match(
+                new RegExp(`^(-?\\d*)(${v})([+-]\\d+)$`)
+            );
+            if (!innerM) return null;
+            const innerP = innerM[1] === '' ? 1 : innerM[1] === '-' ? -1 : parseInt(innerM[1]);
+            const innerQ = parseInt(innerM[3]);
+            if (isNaN(innerP) || isNaN(innerQ)) return null;
+
+            const devA = outerK * innerP; // développé : coeff de v
+            const devB = outerK * innerQ; // développé : constante
+            return { valid: devA === A && devB === B, outerFactor: outerK };
+        };
+
+        const result = parseFactor(userRaw);
+        if (result && result.valid) {
+            // C'est algébriquement correct — est-ce bien le PGCD ?
+            const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+            const pgcd = getPGCD(Math.abs(A), Math.abs(B));
+            if (Math.abs(result.outerFactor) === pgcd) {
+                isCorrect = true; // factorisation maximale
+            } else {
+                partial = true;   // factorisé mais pas au maximum
+            }
+        }
+        // Si result est null ou result.valid === false → faux (isCorrect et partial restent false)
+    }
+    // 5. RESTE (Algèbre, développement, réduction, etc.)
+    else {
+	    const userNorm = normalizeAlgebra(userRaw);
+	    const correctNorm = normalizeAlgebra(correctRaw);
+	    
+	    if (userNorm === correctNorm) {
+	        isCorrect = true;
+	    }
+	}
+
+    // Affichage résultat
+    isLocked = true;
+    inputEl.disabled = true;
+    document.getElementById('submit-btn').classList.add('hidden');
+    const fb = document.getElementById('feedback');
+    fb.classList.remove('hidden', 'correct', 'wrong');
+
+	// On enregistre les données pour l'historique
+    session[currentIdx].userAns = userRaw;
+    session[currentIdx].status = isCorrect ? 'correct' : (partial ? 'partial' : 'wrong');
+		
+    if (isCorrect) {
+	    score += 1;
+	    fb.innerHTML = "✓ Parfait !";
+	    fb.className = "feedback correct";
+	} else if (partial) { // <--- Changé en 'partial' pour correspondre à votre variable
+	    score += 0.5;
+	    const partialMsg = q.q.includes("Factoriser")
+	        ? `⚠ Factorisé, mais pas au maximum !<br>Réponse attendue : $${q.a}$`
+	        : `⚠ Valeur juste, mais attention à l'unité !<br>Réponse : $${q.a}$`;
+	    fb.innerHTML = partialMsg;
+	    fb.className = "feedback partial";
+	} else {
+	    fb.innerHTML = `✗ Réponse : $${q.a}$<br><small>${q.h}</small>`;
+	    fb.className = "feedback wrong";
+	}
+
+    // CRUCIAL : Déclencher le rendu KaTeX sur le bloc feedback
+    renderMathInElement(fb, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ],
+        throwOnError: false
+    });
+
+    document.getElementById('live-score').textContent = score;
+    setTimeout(next, isCorrect ? 1000 : 3000);
+}
+
+	
+    function next() {
+        currentIdx++;
+        if(currentIdx < 10) {
+            showQuestion();
+        } else {
+            showFinalResults();
+        }
+    }
+
+    function showFinalResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        const resScreen = document.getElementById('result-screen');
+        resScreen.classList.remove('hidden');
+        document.getElementById('final-score-val').textContent = score;
+
+        let html = `
+        <div id="history-container" style="margin-top:20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px;">
+            <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                    <tr style="background-color: var(--purple-light); color: var(--purple-dark);">
+                        <th style="padding: 12px; text-align: left;">Question</th>
+                        <th style="padding: 12px; text-align: center;">Ta réponse</th>
+                        <th style="padding: 12px; text-align: center;">Correction</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        session.forEach(q => {
+		    let bgColor, textColor, icon;
+		    
+		    if (q.status === 'correct') {
+		        bgColor = 'rgba(234, 243, 222, 0.7)';
+		        textColor = 'var(--green-dark)';
+		        icon = '✓';
+		    } else if (q.status === 'partial') {
+		        bgColor = 'rgba(255, 244, 229, 0.8)';
+		        textColor = 'var(--orange-dark)';
+		        icon = '⚠';
+		    } else {
+		        bgColor = 'rgba(252, 235, 235, 0.8)';
+		        textColor = 'var(--red-dark)';
+		        icon = '✗';
+		    }
+		
+		    // Convertit "a/b" en "$\frac{a}{b}$", laisse le texte brut pour oui/non
+		    const toLatex = (val) => {
+		        if (!val) return '-';
+		        if (val === 'oui' || val === 'non') return val; // texte brut, pas de LaTeX
+		        const m = val.match(/^(-?\d+)\/(-?\d+)$/);
+		        return m ? `$\\frac{${m[1]}}{${m[2]}}$` : val;
+		    };
+
+		    const userDisplay = toLatex(q.userAns);
+		    const corrDisplay = (() => {
+		        const t = toLatex(q.a);
+		        // Si toLatex n'a pas transformé (pas de fraction, pas oui/non) → on entoure de $
+		        if (t === q.a && q.a !== 'oui' && q.a !== 'non') return `$${q.a}$`;
+		        return t;
+		    })();
+
+		    html += `
+		    <tr style="background-color: ${bgColor}; border-bottom: 1px solid rgba(0,0,0,0.05);">
+		        <td style="padding: 10px 12px;" class="history-q-cell">
+		            <div class="mini-svg-container">${q.q}</div>
+		        </td>
+		        <td style="padding: 10px 12px; text-align: center; color: ${textColor}; font-weight: bold;">
+		            ${icon} ${userDisplay}
+		        </td>
+		        <td style="padding: 10px 12px; text-align: center;">${corrDisplay}</td>
+		    </tr>`;
+		});
+
+        html += `</tbody></table></div>`;
+        
+        // On insère le tableau juste avant le bouton "Retour au menu"
+        const resultDiv = document.getElementById('result-screen');
+        const existingTable = document.getElementById('history-container');
+        if(existingTable) existingTable.remove(); // Évite les doublons si on revient
+        
+        // On l'insère avant le bouton
+        resultDiv.querySelector('button').insertAdjacentHTML('beforebegin', html);
+        
+        // Rendu des maths
+        renderMathInElement(resultDiv, { delimiters: [{left: "$", right: "$", display: false}] });
+    }
+    document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') handleValidation(); });
+
+    // ── EXERCICES AU CHOIX ─────────────────────────────────────────────────────
+    // ── Méta-données des thèmes (pour l'écran de sélection) ─────────────────
+    const THEME_META = {
+        calc:   { label: '🔢 Nombres et calculs',             color: '#E3F2FD', textColor: '#0D47A1', border: '#BBDEFB' },
+        alg:    { label: '🧩 Calcul littéral et fonctions',   color: '#FFF0EE', textColor: '#B03A2E', border: '#F5B7B1' },
+        geo:    { label: '📐 Espace, géométrie et grandeurs', color: '#EAF3DE', textColor: '#27500A', border: '#B2D281' },
+        proba:  { label: '📊 Probabilités et statistiques',   color: '#F3E5F5', textColor: '#4A148C', border: '#E1BEE7' },
+        scratch:{ label: '🐱 Algorithmique Scratch',          color: '#FFF4E5', textColor: '#B05B00', border: '#FFD8A8' },
+    };
+
+    // Auto-généré depuis GENERATORS : chaque return doit avoir un champ `label`.
+    // On déduplique par label pour n'afficher qu'une case par type d'exercice.
+    function buildCustomExercises() {
+        return Object.entries(THEME_META).map(([themeKey, meta]) => {
+            const gens = GENERATORS[themeKey];
+            const seen = new Set();
+            const exercises = [];
+            gens.forEach((gen, idx) => {
+                const sample = gen();
+                const lbl = sample.label || ('Exercice ' + (idx + 1));
+                if (!seen.has(lbl)) {
+                    seen.add(lbl);
+                    exercises.push({ label: lbl, genIdx: idx });
+                }
+            });
+            return { theme: themeKey, ...meta, exercises };
+        });
+    }
+    const CUSTOM_EXERCISES = buildCustomExercises();
+
+    function openCustomSelect() {
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('select-screen').classList.remove('hidden');
+        buildAccordion();
+        updateSelectionCount();
+    }
+
+    function backToMenu() {
+        document.getElementById('select-screen').classList.add('hidden');
+        document.getElementById('menu-screen').classList.remove('hidden');
+    }
+
+    function buildAccordion() {
+        const container = document.getElementById('accordion-container');
+        if (container.children.length > 0) return; // already built
+
+        CUSTOM_EXERCISES.forEach((theme, tIdx) => {
+            const item = document.createElement('div');
+            item.className = 'accordion-item';
+
+            const header = document.createElement('div');
+            header.className = 'accordion-header';
+            header.style.background = theme.color;
+            header.style.color = theme.textColor;
+            header.innerHTML = `<span>${theme.label}</span><span class="accordion-arrow">▼</span>`;
+            header.onclick = () => {
+                item.classList.toggle('open');
+            };
+
+            const body = document.createElement('div');
+            body.className = 'accordion-body';
+
+            // Toggle all link
+            const toggleRow = document.createElement('div');
+            toggleRow.className = 'theme-toggle-row';
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'theme-toggle-btn';
+            toggleBtn.textContent = 'Tout cocher / décocher';
+            toggleBtn.onclick = () => {
+                const boxes = body.querySelectorAll('input[type=checkbox]');
+                const allChecked = [...boxes].every(b => b.checked);
+                boxes.forEach(b => { b.checked = !allChecked; });
+                updateSelectionCount();
+            };
+            toggleRow.appendChild(toggleBtn);
+            body.appendChild(toggleRow);
+
+            theme.exercises.forEach((ex, eIdx) => {
+                const row = document.createElement('label');
+                row.className = 'check-row';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.dataset.theme = tIdx;
+                cb.dataset.genIdx = ex.genIdx;
+                cb.onchange = updateSelectionCount;
+                row.appendChild(cb);
+                row.appendChild(document.createTextNode(ex.label));
+                body.appendChild(row);
+            });
+
+            item.appendChild(header);
+            item.appendChild(body);
+            container.appendChild(item);
+        });
+    }
+
+    function updateSelectionCount() {
+        const checked = document.querySelectorAll('#accordion-container input[type=checkbox]:checked');
+        const count = checked.length;
+        document.getElementById('selection-count').textContent = count === 0
+            ? 'Aucun exercice sélectionné'
+            : count + " type(s) d'exercice(s) sélectionné(s)";
+        document.getElementById('start-custom-btn').disabled = count === 0;
+    }
+
+    function startCustomQuiz() {
+        const checked = document.querySelectorAll('#accordion-container input[type=checkbox]:checked');
+        if (checked.length === 0) return;
+
+        // Build list of selected generators
+        const selectedGens = [];
+        checked.forEach(cb => {
+            const tIdx = parseInt(cb.dataset.theme);
+            const genIdx = parseInt(cb.dataset.genIdx);
+            const themeKey = CUSTOM_EXERCISES[tIdx].theme;
+            selectedGens.push(GENERATORS[themeKey][genIdx]);
+        });
+
+        // Generate 10 questions picked randomly from selected generators
+        const pool = [];
+        const shuffled = selectedGens.slice().sort(() => Math.random() - 0.5);
+        // First pass: one use per generator
+        for (let pass = 0; pool.length < 10; pass++) {
+            for (const gen of shuffled) {
+                if (pool.length >= 10) break;
+                pool.push(gen());
+            }
+        }
+        session = pool.sort(() => Math.random() - 0.5);
+        currentIdx = 0; score = 0;
+
+        renderMathInElement(document.querySelector('.math-shortcuts'), {
+            delimiters: [{left: "$", right: "$", display: false}]
+        });
+
+        document.getElementById('select-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        document.getElementById('label-theme').textContent = '🎯 Exercices au choix';
+        showQuestion();
+    }
+
+</script>
+</body>
+</html>
+
+    <title>Automatismes Maths — DNB 2026</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --purple-light: #EEEDFE; --purple-mid: #7F77DD; --purple-dark: #3C3489; --purple-deep: #26215C;
+            --green-light: #EAF3DE; --green-dark: #27500A; --red-light: #FCEBEB; --red-dark: #501313;
+            --bg: #F8F7FF; --surface: #ffffff; --text: #1a1a2e; --text2: #5a5a7a; --border: #E1E0EF; --orange-light: #FFF4E5;
+    		--orange-dark: #B05B00;
+        }
+        body { font-family: 'DM Sans', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .app-container { width: 100%; max-width: 500px; background: var(--surface); border-radius: 24px; padding: 32px; box-shadow: 0 12px 40px rgba(60, 52, 137, 0.08); border: 1px solid var(--border); }
+        .hidden { display: none !important; }
+        h1 { font-weight: 600; font-size: 1.5rem; margin-bottom: 8px; color: var(--purple-deep); text-align: center; }
+        .subtitle { color: var(--text2); margin-bottom: 24px; font-size: 0.95rem; text-align: center; }
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .theme-btn { background: var(--purple-light); border: 1px solid transparent; padding: 16px; border-radius: 16px; color: var(--purple-dark); font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .theme-btn:hover { background: #E5E3FF; border-color: var(--purple-mid); transform: translateY(-2px); }
+        .theme-btn.all { grid-column: span 2; background: var(--purple-dark); color: white; }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .score-badge { background: var(--purple-light); color: var(--purple-dark); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
+        .progress-container { height: 8px; background: var(--purple-light); border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--purple-mid); width: 0%; transition: width 0.4s ease; }
+        .question-text { font-size: 1.3rem; font-weight: 500; color: var(--purple-deep); margin-bottom: 20px; min-height: 80px; text-align: center; display: block; line-height: 2; padding-top: 10px; }
+		.question-text small { display: block; margin-top: 8px; font-size: 0.9rem; line-height: 1.2; color: var(--purple-mid); }
+		.katex-display { display: inline-block !important; margin: 0 !important; }
+		#answer-input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid var(--border); font-size: 1.2rem; font-family: 'DM Mono', monospace; text-align: center; outline: none; margin-top: 5px; }
+        .validate-btn { width: 100%; background: var(--purple-dark); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 12px; font-weight: 500; text-align: center; }
+        .feedback.correct { background: var(--green-light); color: var(--green-dark); }
+		.feedback.partial {
+			background: var(--orange-light);
+			color: var(--orange-dark);
+			border: 1px solid #FFD8A8;
+		}
+        .feedback.wrong { background: var(--red-light); color: var(--red-dark); }
+		.svg-text {
+			font-size: 14px;
+			fill: currentColor;
+			font-weight: 600;
+			paint-order: stroke;
+			stroke: var(--surface); /* La couleur du fond de ton appli */
+			stroke-width: 3px;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+		}
+		.math-shortcuts .katex-display, 
+		.math-shortcuts .katex {
+		    margin: 0 !important;
+		    padding: 0 !important;
+		    font-size: 1.2rem;
+		}
+		
+		.math-shortcuts {
+		    display: flex;       /* Aligne les boutons horizontalement */
+		    gap: 8px;          /* Espace entre les boutons */
+		    margin-top: 20px;
+		    margin-bottom: 10px;
+		    width: 100%;        /* Prend toute la largeur de l'app */
+		}
+		.short-btn:active {
+		    background: var(--purple-mid);
+		    transform: translateY(2px);
+		}
+		.short-btn {
+			flex: 1;            /* Donne la même largeur à chaque bouton */
+		    height: 50px;       /* Hauteur fixe pour éviter les déformations */
+		    background: var(--purple-light);
+		    border: 1px solid var(--border);
+		    border-radius: 12px;
+		    cursor: pointer;
+		    display: flex;      /* Centre le contenu KaTeX à l'intérieur */
+		    align-items: center;
+		    justify-content: center;
+		    transition: all 0.2s;
+		    min-height: 50px;
+			min-width: 0;
+		}
+		.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; border-bottom: 1px solid var(--border);}
+		.history-table th { color: var(--text2); font-weight: 500; padding: 8px; border-bottom: 2px solid var(--border); }
+		.history-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: center; }
+		.row-wrong { background-color: #fffafa; }
+		.text-wrong { color: var(--red-dark); font-weight: bold; }
+		.text-correct { color: var(--green-dark); font-weight: bold; }
+		.row-partial {
+		    background-color: var(--orange-light) !important;
+		}
+		.text-partial {
+		    color: var(--orange-dark);
+		    font-weight: bold;
+		}
+		/* Pour arrondir les coins du tableau */
+		#history-container {
+		    border-radius: 16px;
+		    border: 1px solid var(--border);
+		    overflow: hidden;
+		    margin-bottom: 25px;
+		}
+		/* On cible uniquement les SVG de figures, pas les symboles KaTeX */
+		.mini-svg-container > br + svg, 
+		.mini-svg-container > svg {
+		    max-width: 110px !important;
+		    height: auto !important;
+		    transition: all 0.3s ease;
+		    cursor: zoom-in;
+		    display: block;
+		    margin: 8px auto;
+		}
+		
+		/* L'effet de survol UNIQUEMENT sur la figure */
+		.mini-svg-container > br + svg:hover,
+		.mini-svg-container > svg:hover {
+		    transform: scale(2.2);
+		    position: relative;
+		    z-index: 100;
+		    background: white;
+		    border-radius: 4px;
+		    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+		    padding: 5px;
+		}
+		
+		/* On s'assure que les SVG de KaTeX (chapeaux d'angles, racines...) restent intacts */
+		.katex svg {
+		    display: inline !important;
+		    max-width: none !important;
+		    transform: none !important;
+		    box-shadow: none !important;
+		    transition: none !important;
+		    margin: 0 !important;
+		    cursor: default !important;
+		}
+		
+		/* Empêche les lignes du tableau de bouger pendant le zoom */
+		.history-q-cell {
+		    overflow: visible !important; /* Important pour que le zoom ne soit pas coupé */
+		}
+		.katex { 
+		    font-weight: normal !important; 
+		}
+		
+        /* ── ÉCRAN DE SÉLECTION ─────────────────────────────────── */
+        .accordion-item { border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+        .accordion-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 13px 16px; cursor: pointer; font-weight: 600; font-size: 0.95rem;
+            user-select: none; gap: 8px;
+        }
+        .accordion-header:hover { filter: brightness(0.96); }
+        .accordion-arrow { transition: transform 0.25s; font-size: 0.8rem; flex-shrink: 0; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+        .accordion-body { display: none; padding: 4px 14px 12px; border-top: 1px solid var(--border); }
+        .accordion-item.open .accordion-body { display: block; }
+        .check-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 7px 4px; border-radius: 8px; cursor: pointer;
+            font-size: 0.88rem; color: var(--text);
+        }
+        .check-row:hover { background: var(--purple-light); }
+        .check-row input[type=checkbox] { accent-color: var(--purple-dark); width: 16px; height: 16px; flex-shrink: 0; }
+        .theme-toggle-row { display: flex; justify-content: flex-end; padding: 2px 4px 6px; }
+        .theme-toggle-btn { font-size: 0.75rem; color: var(--purple-mid); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; }
+        .start-custom-btn { width: 100%; background: var(--purple-dark); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 18px; transition: background 0.2s; }
+        .start-custom-btn:hover { background: var(--purple-deep); }
+        .start-custom-btn:disabled { background: var(--border); color: var(--text2); cursor: not-allowed; }
+        .selection-count { text-align: center; font-size: 0.82rem; color: var(--text2); margin-top: 10px; }
+		.select-screen-title { font-size: 1.2rem; font-weight: bold }
+		.select-screen-sub { font-size: 1rem}
+		
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="menu-screen">
+        <h1>Automatismes DNB</h1>
+        <p class="subtitle">Exerciseur automatisé pour s'entrainer</p>
+		<p style="text-align: center; color: var(--text2); font-size: 0.85rem; margin-top: -15px; margin-bottom: 25px; font-style: italic;">
+        Calculatrice interdite, mais papier et crayon vivement conseillés !
+    </p>
+        <div class="theme-grid">
+		    <button class="theme-btn" onclick="startQuiz('calc')" 
+		        style="background:#E3F2FD; color:#0D47A1; border-color: #BBDEFB;">
+		        🔢 Nombres et calculs
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('alg')" 
+		        style="background:#FFF0EE; color:#B03A2E; border-color: #F5B7B1;">
+		        🧩 Calcul littéral et fonctions
+		    </button>
+				    
+		    <button class="theme-btn" onclick="startQuiz('geo')" 
+		        style="background:var(--green-light); color:var(--green-dark); border-color: #B2D281;">
+		        📐 Espace, géométrie et grandeurs 
+		    </button>
+		    
+		    <button class="theme-btn" onclick="startQuiz('proba')" 
+		        style="background:#F3E5F5; color:#4A148C; border-color: #E1BEE7;">
+		        📊 Probabilités et statistiques
+		    </button>
+				    
+		    <button class="theme-btn" onclick="startQuiz('scratch')" 
+		        style="background:var(--orange-light); color:var(--orange-dark); border-color: #FFD8A8;">
+		        🐱 Algorithmique Scratch
+		    </button>
+
+			<button class="theme-btn" onclick="openCustomSelect()" style="
+				background:linear-gradient(76deg, #E3F2FD, var(--green-light), var(--orange-light), #FFF0EE, #F3E5F5);
+				border-color:#D3D3D3; color:#4D4D4D ;margin-top: 2px;">
+		        🎯 Exercices au choix
+		    </button>
+			
+		    <button class="theme-btn all" onclick="startQuiz('tout')">
+		        🚀 Tous les thèmes
+		    </button>
+		</div>
+    </div>
+
+    <div id="select-screen" class="hidden">
+        <p class="select-screen-title">🎯 Exercices au choix</p>
+        <p class="select-screen-sub">Sélectionne les types d'exercices à inclure</p>
+		<br>
+        <div id="accordion-container"></div>
+        <p class="selection-count" id="selection-count">0 type(s) sélectionné(s)</p>
+        <button class="start-custom-btn" id="start-custom-btn" onclick="startCustomQuiz()" disabled>Démarrer (10 questions)</button>
+        <button class="validate-btn" onclick="backToMenu()" style="background:var(--purple-light); color:var(--purple-dark); margin-top:10px;">← Retour au menu</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div class="question-header">
+            <span id="label-theme" style="font-weight:600; color:var(--purple-mid);">Entraînement</span>
+            <span class="score-badge">Score : <span id="live-score">0</span>/10</span>
+        </div>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="question-text" class="question-text"></div>
+        <input type="text" id="answer-input" placeholder="Réponse..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+		<div class="math-shortcuts">
+		    <button type="button" class="short-btn" onclick="insertSymbol('*')">$\times$</button>
+		    <button type="button" class="short-btn" onclick="insertSymbol('/')">$\frac{a}{b}$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('²')">$x^2$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('^')">$x^n$</button>
+			<button type="button" class="short-btn" onclick="insertSymbol('π')">$\pi$</button>
+		</div>
+        <button id="submit-btn" class="validate-btn" onclick="handleValidation()">Valider</button>
+        <div id="feedback" class="feedback hidden"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+	    <h1>Résultats</h1>
+	    <div style="font-size: 3.5rem; font-weight: 600; color: var(--purple-mid); margin: 20px 0; text-align: center;">
+	        <span id="final-score-val">0</span>/10
+	    </div>
+	    <div id="history-container" style="margin-bottom: 20px;"></div> 
+	    
+	    <button class="validate-btn" onclick="location.reload()">Retour au menu</button>
+	</div>
+	<footer style="margin-top: 30px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 0.8rem;">
+	    <p style="font-style: italic;">Application développée à l'aide de l'IA</p>
+	    <p style="margin-top: 5px;">&copy; 2026 Clément CORBIÈRE</p>
+	</footer>
+</div>
+
+<script>
+    const SCI_DATABASE = [
+        // Grands nombres
+        { v: "1200", a: "1,2 \\times 10^3" }, { v: "45000", a: "4,5 \\times 10^4" }, { v: "850", a: "8,5 \\times 10^2" },
+        { v: "91000", a: "9,1 \\times 10^4" }, { v: "3000000", a: "3 \\times 10^6" }, { v: "7500", a: "7,5 \\times 10^3" },
+        { v: "125000", a: "1,25 \\times 10^5" }, { v: "800000", a: "8 \\times 10^5" }, { v: "64000", a: "6,4 \\times 10^4" },
+        { v: "10200", a: "1,02 \\times 10^4" }, { v: "55000000", a: "5,5 \\times 10^7" }, { v: "9900", a: "9,9 \\times 10^3" },
+        { v: "400", a: "4 \\times 10^2" }, { v: "27000", a: "2,7 \\times 10^4" }, { v: "130", a: "1,3 \\times 10^2" },
+        { v: "880000", a: "8,8 \\times 10^5" }, { v: "60000", a: "6 \\times 10^4" }, { v: "3140", a: "3,14 \\times 10^3" },
+        { v: "5000000", a: "5 \\times 10^6" }, { v: "22000", a: "2,2 \\times 10^4" }, { v: "7000", a: "7 \\times 10^3" },
+        { v: "410000", a: "4,1 \\times 10^5" }, { v: "1900000", a: "1,9 \\times 10^6" }, { v: "360", a: "3,6 \\times 10^2" },
+        { v: "52000", a: "5,2 \\times 10^4" },
+        // Petits nombres (inférieurs à 1)
+        { v: "0,02", a: "2 \\times 10^{-2}" }, { v: "0,0007", a: "7 \\times 10^{-4}" }, { v: "0,6", a: "6 \\times 10^{-1}" },
+        { v: "0,0044", a: "4,4 \\times 10^{-3}" }, { v: "0,00005", a: "5 \\times 10^{-5}" }, { v: "0,0081", a: "8,1 \\times 10^{-3}" },
+        { v: "0,0003", a: "3 \\times 10^{-4}" }, { v: "0,019", a: "1,9 \\times 10^{-2}" }, { v: "0,000004", a: "4 \\times 10^{-6}" },
+        { v: "0,052", a: "5,2 \\times 10^{-2}" }, { v: "0,00099", a: "9,9 \\times 10^{-4}" }, { v: "0,007", a: "7 \\times 10^{-3}" },
+        { v: "0,000012", a: "1,2 \\times 10^{-5}" }, { v: "0,85", a: "8,5 \\times 10^{-1}" }, { v: "0,00002", a: "2 \\times 10^{-5}" },
+        { v: "0,00041", a: "4,1 \\times 10^{-4}" }, { v: "0,066", a: "6,6 \\times 10^{-2}" }, { v: "0,0000033", a: "3,3 \\times 10^{-6}" },
+        { v: "0,0015", a: "1,5 \\times 10^{-3}" }, { v: "0,0000078", a: "7,8 \\times 10^{-6}" }, { v: "0,04", a: "4 \\times 10^{-2}" },
+        { v: "0,00022", a: "2,2 \\times 10^{-4}" }, { v: "0,000001", a: "1 \\times 10^{-6}" }, { v: "0,7", a: "7 \\times 10^{-1}" },
+        { v: "0,0035", a: "3,5 \\times 10^{-3}" }
+    ];
+
+	function generateTriangleSVG(angleA, angleB, type = "normal") {
+	    const isRight = type === "rectangle";
+	    let x1, y1, x2, y2, x3, y3;
+	    
+	    if (isRight) {
+	        x1 = 40;  y1 = 100; x2 = 150; y2 = 100; x3 = 40;  y3 = 30;
+	    } else {
+	        x1 = 30;  y1 = 100; x2 = 150; y2 = 100; x3 = 75;  y3 = 30;
+	    }
+	
+	    const drawArc = (x, y, startAngleRad, endAngleRad) => {
+	        const r = 18;
+	        const xS = x + r * Math.cos(startAngleRad);
+	        const yS = y + r * Math.sin(startAngleRad);
+	        const xE = x + r * Math.cos(endAngleRad);
+	        const yE = y + r * Math.sin(endAngleRad);
+	        return `<path d="M ${xS} ${yS} A ${r} ${r} 0 0 1 ${xE} ${yE}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+	    };
+	
+	    // Calcul de la position du ?
+	    // Rectangle : un peu plus à droite | Quelconque : centré sous le sommet
+	    const qMarkX = isRight ? x3 + 12 : x3 - 2;
+	    const qMarkY = isRight ? y3 + 30 : y3 + 32;
+	
+	    return `
+	    <svg viewBox="0 0 180 120" style="max-width:220px; margin: 5px auto; display:block; overflow:visible;">
+	        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="var(--purple-dark)" stroke-width="2" />
+	        
+	        ${isRight ? 
+	            `<path d="M ${x1} ${y1-15} L ${x1+15} ${y1-15} L ${x1+15} ${y1}" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>` : 
+	            drawArc(x1, y1, -1, 0) + `<text x="${x1+22}" y="${y1-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleA}°</text>`
+	        }
+	
+	        ${isRight ? drawArc(x2, y2, 3.14, 3.7) : drawArc(x2, y2, 3.14, 3.9)}
+	        <text x="${x2-45}" y="${y2-5}" font-size="11" fill="var(--purple-deep)" font-weight="bold">${angleB}°</text>
+	        
+	        ${isRight ? 
+	            drawArc(x3, y3, 0.55, 1.57) : 
+	            drawArc(x3, y3, 0.68, 2.05) // Arc réduit pour ne plus dépasser à droite
+	        }
+	        <text x="${qMarkX}" y="${qMarkY}" font-size="16" fill="var(--red-dark)" font-weight="bold">?</text>
+	    </svg>`;
+	}
+
+	function generatePerimeterSVG(type, data) {
+	    const color = "var(--purple-dark)";
+	    const accent = "var(--purple-mid)";
+	    const textColor = "var(--purple-deep)";
+	    
+	    let figure = "";
+	    if (type === "losange") {
+		    figure = `
+		        <path d="M 90 20 L 150 60 L 90 100 L 30 60 Z" fill="none" stroke="${color}" stroke-width="2" />
+		        
+		        <line x1="55" y1="35" x2="65" y2="45" stroke="${accent}" stroke-width="1.5" />
+		        
+		        <line x1="115" y1="45" x2="125" y2="35" stroke="${accent}" stroke-width="1.5" />
+		        
+		        <line x1="55" y1="85" x2="65" y2="75" stroke="${accent}" stroke-width="1.5" />
+		        
+		        <line x1="115" y1="75" x2="125" y2="85" stroke="${accent}" stroke-width="1.5" />
+		        
+		        <text x="135" y="40" font-size="12" fill="${textColor}" font-weight="bold">${data.cote} ${data.unit}</text>
+		    `;
+		} else if (type === "rectangle") {
+		    const w = 120; // Largeur visuelle
+		    const h = 60;  // Hauteur visuelle
+		    const x = 30;  // Position X
+		    const y = 30;  // Position Y
+		    const s = 12;  // Taille du carré d'angle droit
+		
+		    figure = `
+		        <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="2" />
+		        
+		        <path d="M ${x} ${y+s} L ${x+s} ${y+s} L ${x+s} ${y}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x} ${y+h-s} L ${x+s} ${y+h-s} L ${x+s} ${y+h}" fill="none" stroke="${accent}" stroke-width="1" /> <path d="M ${x+w-s} ${y+h} L ${x+w-s} ${y+h-s} L ${x+w} ${y+h-s}" fill="none" stroke="${accent}" stroke-width="1" /> <text x="${x + w/2}" y="${y - 8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${data.L} ${data.unit}</text>
+		        <text x="${x + w + 5}" y="${y + h/2 + 5}" font-size="12" fill="${textColor}" font-weight="bold">${data.l} ${data.unit}</text>
+		    `;
+		}  else if (type === "disque") {
+			const isRayon = data.mode === "rayon";
+			figure = `
+				<circle cx="90" cy="60" r="40" fill="none" stroke="${color}" stroke-width="2" />
+				<circle cx="90" cy="60" r="2" fill="${color}" />
+				${isRayon ? 
+					`<line x1="90" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
+					 <text x="110" y="55" text-anchor="middle" font-size="11" fill="${textColor}" font-weight="bold">r = ${data.val} ${data.unit}</text>` :
+					`<line x1="50" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
+					 <text x="90" y="55" text-anchor="middle" font-size="11" fill="${textColor}" font-weight="bold">d = ${data.val} ${data.unit}</text>`
+				}
+			`;
+		}
+			
+	    return `<svg viewBox="0 0 180 120" style="max-width:200px; margin: 5px auto; display:block; overflow:visible;">${figure}</svg>`;
+	}
+
+	
+    const GENERATORS = {
+        calc: [
+            () => {
+                const d1 = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                const k = [2, 3, 4][Math.floor(Math.random() * 3)];
+                const d2 = d1 * k;
+                const n1 = Math.floor(Math.random() * 5) + 1; 
+                const n2 = Math.floor(Math.random() * 5) + 1;
+                const reverse = Math.random() > 0.5;
+                const q = reverse ? `\\frac{${n2}}{${d2}} + \\frac{${n1}}{${d1}}` : `\\frac{${n1}}{${d1}} + \\frac{${n2}}{${d2}}`;
+                const numFinal = n1 * k + n2;
+                return { label: 'Addition de fractions', q: `Calculer : $${q}$`, a: `${numFinal}/${d2}`, h: `Mets tout sur $${d2}$.` };
+            },
+            () => {
+                const d1 = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                const k = [2, 3, 4][Math.floor(Math.random() * 3)];
+                const d2 = d1 * k;
+                const n1 = Math.floor(Math.random() * 5) + 1;
+                const n2 = Math.floor(Math.random() * 5) + 1;
+                const reverse = Math.random() > 0.5;
+                const q = reverse
+                    ? `\\frac{${n2}}{${d2}} - \\frac{${n1}}{${d1}}`
+                    : `\\frac{${n1}}{${d1}} - \\frac{${n2}}{${d2}}`;
+                const numFinal = reverse ? n2 - n1 * k : n1 * k - n2;
+                const reponse = numFinal === 0 ? '0' : `${numFinal}/${d2}`;
+                const hint = reverse
+                    ? `Mets tout sur $${d2}$ : $\\frac{${n2}}{${d2}} - \\frac{${n1 * k}}{${d2}}$.`
+                    : `Mets tout sur $${d2}$ : $\\frac{${n1 * k}}{${d2}} - \\frac{${n2}}{${d2}}$.`;
+                return { label: 'Soustraction de fractions', q: `Calculer : $${q}$`, a: reponse, h: hint };
+            },
+            () => {
+                const r = Math.random();
+                let type, div, n;
+                if (r < 0.33) {
+                    type = "tiers"; div = 3;
+                    const multiplesDeTrois = [12, 15, 18, 21, 24, 27, 30, 33, 36, 45, 60, 75, 90, 120, 180, 360, 600, 630, 915, 1200];
+                    n = multiplesDeTrois[Math.floor(Math.random() * multiplesDeTrois.length)];
+                } else if (r < 0.66) {
+                    type = "quart"; div = 4; n = (Math.floor(Math.random() * 30) + 1) * 4;
+                } else {
+                    type = "moitié"; div = 2; n = (Math.floor(Math.random() * 100) + 1) * 2;
+                }
+                return { label: 'Fraction d\'un nombre', q: `Quel est le ${type} de $${n}$ ?`, a: (n / div).toString(), h: `Divise par $${div}$.` };
+            },
+            () => {
+                const entry = SCI_DATABASE[Math.floor(Math.random()*SCI_DATABASE.length)];
+                return { label: 'Écriture scientifique', q: `Donner l'écriture scientifique de $${entry.v}$ <br><small>(Utilise * pour multiplier et ^ pour puissance)</small>`, a: entry.a, h: "Nombre entre 1 et 10 exclu × une puissance de 10" };
+            },
+            () => {
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+                let n, d, pgcd;
+                do { n = Math.floor(Math.random() * 40) + 2; d = Math.floor(Math.random() * 40) + 2; pgcd = getPGCD(n, d); } while (pgcd === 1 || n === d);
+                return { label: 'Simplification de fractions', q: `Simplifier au maximum : $\\frac{${n}}{${d}}$`, a: `${n/pgcd}/${d/pgcd}`, h: `Divise par $${pgcd}$ au numérateur et au dénominateur.` };
+            },
+            () => {
+                const p = [50, 25, 10][Math.floor(Math.random() * 3)];
+                let v = p === 25 ? (Math.floor(Math.random() * 10) + 1) * 4 : (Math.floor(Math.random() * 20) + 1) * 10;
+                return { label: 'Pourcentages d\'une quantité', q: `Calculer $${p}\\%$ de $${v}$`, a: ((v * p) / 100).toString().replace('.', ','), h: `Divise par ${100/p}.` };
+            },
+            () => {
+                const n = Math.floor(Math.random() * 12) + 1;
+                return { label: 'Carrés d\'entiers', q: `Calculer : $${n}^2$`, a: (n * n).toString(), h: `$${n} \\times ${n}$.` };
+            },
+			() => {
+			    const type = Math.random() > 0.5 ? 'DEC_TO_HM' : 'MIN_TO_HM';
+			    
+			    if (type === 'DEC_TO_HM') {
+			        // Liste des valeurs décimales demandées
+			        const decs = [0.25, 0.5, 0.75, 1.25, 1.5, 1.75, 2.25, 2.5, 3.5, 3.75];
+				    const hDec = decs[Math.floor(Math.random() * decs.length)];
+				    
+				    const hFull = Math.floor(hDec);
+				    const m = Math.round((hDec - hFull) * 60);
+
+					let hint 
+					if (hDec - hFull === 0.25) hint = `0.25 h = $\\frac14$ h = 15 min`;
+					else if (hDec - hFull === 0.5) hint = `0.5 h = $\\frac12$ h = 30 min`;
+					else if (hDec - hFull === 0.75) hint = `0.75 h = $\\frac34$ h = 45 min`;
+					
+				    // On définit la réponse "parfaite" pour la base de données
+				    let reponseParfaite = "";
+				    if (hFull > 0 && m > 0) reponseParfaite = `${hFull} \\text{ h } ${m} \\text{ min}`;
+				    else if (hFull > 0 && m === 0) reponseParfaite = `${hFull} \\text{ h}`;
+				    else reponseParfaite = `${m} \\text{ min}`;
+				
+				    return { label: 'Conversions de durées',
+				        q: `Convertir en heures et minutes : $${hDec.toString().replace('.', ',')}\\text{ h}$`,
+				        a: reponseParfaite,
+				        h: hint
+				    };
+			    } else {
+			        // Minutes vers Heures et Minutes (ex: 90 min -> 1h30)
+			        const totalMin = [75, 90, 95, 100, 105, 120, 135, 145, 150, 155, 175, 195, 180, 210, 240, 250][Math.floor(Math.random() * 8)];
+			        const h = Math.floor(totalMin / 60);
+			        const m = totalMin % 60;
+			        
+			        return { label: 'Conversions de durées',
+			            q: `Convertir en heures et minutes : $${totalMin}\\text{ min}$`,
+			            a: m === 0 ? `${h} \\text{ h}` : `${h} \\text{ h } ${m} \\text{ min}`,
+			            h: "60 min = 1 h"
+			        };
+			    }
+			},
+            // ── DROITE GRADUÉE ─────────────────────────────────────────────────
+            () => {
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+
+                // Nombre de subdivisions par unité (2, 3, 4 ou 5)
+                const subs = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+
+                // Position du point : entier k, jamais tombé sur une graduation entière
+                let k;
+                do { k = Math.floor(Math.random() * (2 * subs - 1)) + 1; } while (k % subs === 0);
+
+                // Fraction simplifiée
+                const pgcd = getPGCD(k, subs);
+                const num = k / pgcd;
+                const den = subs / pgcd;
+                const reponse = den === 1 ? num.toString() : `${num}/${den}`;
+
+                // ── SVG droite graduée ────────────────────────────────────────
+                const W = 340, H = 70;
+                // L'axe commence avant 0 et finit après 2, la flèche est encore plus loin
+                const x0 = 50;           // position du 0
+                const unitPx = 100;      // 1 unité = 100px
+                const xLineStart = x0 - 18;  // dépasse légèrement à gauche du 0
+                const xArrowTip = x0 + 2 * unitPx + 28;  // flèche bien après le 2
+                const y = 38;
+                const subPx = unitPx / subs;
+                const xPoint = x0 + k * subPx;
+
+                let s = '';
+
+                // Axe + flèche
+                s += `<line x1="${xLineStart}" y1="${y}" x2="${xArrowTip - 8}" y2="${y}" stroke="var(--purple-dark)" stroke-width="2"/>`;
+                s += `<polygon points="${xArrowTip},${y} ${xArrowTip-10},${y-5} ${xArrowTip-10},${y+5}" fill="var(--purple-dark)"/>`;
+
+                // Grandes graduations 0, 1, 2
+                [0, 1, 2].forEach(n => {
+                    const x = x0 + n * unitPx;
+                    s += `<line x1="${x}" y1="${y-9}" x2="${x}" y2="${y+9}" stroke="var(--purple-dark)" stroke-width="2"/>`;
+                    s += `<text x="${x}" y="${y+22}" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--purple-deep)" font-family="sans-serif">${n}</text>`;
+                });
+
+                // Petites graduations intermédiaires
+                for (let u = 0; u < 2; u++) {
+                    for (let t = 1; t < subs; t++) {
+                        const x = x0 + u * unitPx + t * subPx;
+                        s += `<line x1="${x}" y1="${y-5}" x2="${x}" y2="${y+5}" stroke="var(--purple-mid)" stroke-width="1.2"/>`;
+                    }
+                }
+
+                // Point A
+                s += `<circle cx="${xPoint}" cy="${y}" r="5" fill="var(--red-dark)"/>`;
+                s += `<text x="${xPoint}" y="${y-12}" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--red-dark)" font-family="sans-serif">A</text>`;
+
+                const svg = `<div style="display:flex;justify-content:center;margin:16px 0;"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;">${s}</svg></div>`;
+
+                return { label: 'Repérage sur une droite graduée',
+                    q: `Quelle est l'abscisse du point A ?${svg}<small>Donne une fraction si besoin (ex : 3/4)</small>`,
+                    a: reponse,
+                    h: `Compte : le point est à la graduation ${k} sur ${subs} (chaque unité est découpée en ${subs} parts égales).`
+                };
+            },
+            // ── CRITÈRES DE DIVISIBILITÉ ───────────────────────────────────────
+            () => {
+                const diviseur = [2, 3, 5, 9][Math.floor(Math.random() * 4)];
+
+                // Génère un nombre 3 ou 4 chiffres, aléatoirement divisible ou non par le diviseur
+                const nbChiffres = Math.random() > 0.5 ? 3 : 4;
+                const min = Math.pow(10, nbChiffres - 1);
+                const max = Math.pow(10, nbChiffres) - 1;
+
+                let n;
+                if (Math.random() > 0.5) {
+                    // Divisible : on tire un multiple aléatoire
+                    const minK = Math.ceil(min / diviseur);
+                    const maxK = Math.floor(max / diviseur);
+                    n = (minK + Math.floor(Math.random() * (maxK - minK + 1))) * diviseur;
+                } else {
+                    // Non divisible : on tire au hasard jusqu'à trouver
+                    do { n = min + Math.floor(Math.random() * (max - min + 1)); } while (n % diviseur === 0);
+                }
+
+                const isDivisible = n % diviseur === 0;
+
+                // Hint selon le critère
+                const hints = {
+                    2: `Un nombre est divisible par 2 si son chiffre des unités est pair (0, 2, 4, 6 ou 8). Ici le chiffre des unités est ${n % 10}.`,
+                    3: `Un nombre est divisible par 3 si la somme de ses chiffres est divisible par 3. Ici : ${n.toString().split('').join('+')} = ${n.toString().split('').reduce((a,c)=>a+parseInt(c),0)}.`,
+                    5: `Un nombre est divisible par 5 si son chiffre des unités est 0 ou 5. Ici le chiffre des unités est ${n % 10}.`,
+                    9: `Un nombre est divisible par 9 si la somme de ses chiffres est divisible par 9. Ici : ${n.toString().split('').join('+')} = ${n.toString().split('').reduce((a,c)=>a+parseInt(c),0)}.`
+                };
+
+                return { label: 'Critères de divisibilité',
+                    q: `$${n}$ est-il divisible par $${diviseur}$ ?<br><small>Réponds par <b>oui</b> ou <b>non</b></small>`,
+                    a: isDivisible ? 'oui' : 'non',
+                    h: hints[diviseur]
+                };
+            },
+
+            // ── ÉCRITURE DÉCIMALE DE FRACTIONS SIMPLES ───────────────────────
+            () => {
+           
+
+                // Catalogue de fractions avec leur écriture décimale exacte
+                // [numérateur, dénominateur, décimal (string), indice de difficulté]
+                const fractions = [
+                    // dénominateur 2
+                    [1,2,'0,5'], [3,2,'1,5'], [5,2,'2,5'], [7,2,'3,5'], [9,2,'4,5'],
+                    // dénominateur 4
+                    [1,4,'0,25'], [3,4,'0,75'],
+                    // dénominateur 10
+                    [1,10,'0,1'], [3,10,'0,3'], [7,10,'0,7'], [9,10,'0,9'],
+                    [11,10,'1,1'], [13,10,'1,3'], [17,10,'1,7'],[29,10,'2,9'],
+                    // dénominateur 100
+                    [1,100,'0,01'], [3,100,'0,03'], [7,100,'0,07'],[2,100,'0,02'],
+                    [25,100,'0,25'], [50,100,'0,5'], [75,100,'0,75'],[43,100,'0,43'],
+                    // fractions = entiers (n/1 ou n/n)
+                    [7,1,'7'], [13,1,'13'], [5,5,'1'], [12,12,'1'], [8,8,'1'],
+                    [3,1,'3'], [9,1,'9'], [4,4,'1'], [6,6,'1'],
+                ];
+
+                const [num, den, dec] = fractions[Math.floor(Math.random() * fractions.length)];
+                const fracTeX = `\\dfrac{${num}}{${den}}`;
+        
+				label: 'Entretenir l'écriture décimale de certaines fractions',
+				q: `Donner l'écriture décimale de $${fracTeX}$`,
+				a: dec,
+				h: `$${fracTeX} = ${num} \\div ${den} = ${dec}$`,
+				_fracDecTag: true,
+				_fracDecVal: dec
+                   
+            }
+            
+        ],
+        alg: [
+            () => {
+                const vars = ['x', 'y', 't', 'a', 'b'];
+                const v = vars[Math.floor(Math.random() * vars.length)];
+                const genCoef = () => { let c = 0; while(c === 0) c = Math.floor(Math.random() * 15) - 7; return c; };
+                const c1 = genCoef(), c2 = genCoef(), c3 = genCoef(), n1 = genCoef();
+
+                const fmt = (c, unit, first = false) => {
+                    if (c === 0) return "";
+                    let absC = Math.abs(c);
+                    let displayC = (absC === 1 && unit !== "") ? "" : absC;
+                    let sign = c < 0 ? "-" : (first ? "" : " + ");
+                    if (!first && c < 0) sign = " - "; 
+                    return sign + displayC + unit;
+                };
+
+                const enonce = fmt(c1, v + "^2", true) + fmt(c2, v) + fmt(n1, "") + fmt(c3, v);
+                const resV2 = c1, resV = c2 + c3, resN = n1;
+                let reponse = fmt(resV2, v + "^2", true) + fmt(resV, v) + fmt(resN, "");
+                return { label: 'Réduction d\'expression', q: `Réduire l'expression : <span style="white-space:nowrap">$${enonce}$</span>`, a: reponse.replace(/\s+/g, ''), h: "Regroupe les termes de même famille." };
+            },
+            () => {
+                const vars = ['x', 'y', 'a', 'b'];
+                const v = vars[Math.floor(Math.random() * vars.length)];
+                const genRelatif = () => { let n = 0; while(n === 0) n = Math.floor(Math.random() * 15) - 7; return n; };
+                const k = genRelatif(), a = Math.floor(Math.random() * 5) + 2, b = genRelatif();
+                const enonce = `${k}(${a}${v} ${b > 0 ? "+" : "-"} ${Math.abs(b)})`;
+                const reponse = `${k*a}${v}${ (k*b) > 0 ? "+" + (k*b) : (k*b) }`;
+                return { label: 'Développement d\'expression', q: `Développer l'expression : $${enonce}$`, a: reponse.replace(/\s+/g, ''), h: `Distribue ${k} au deux termes de la parenthèse (atention aux signes).` };
+            },
+            () => {
+                const isHard = Math.random() > 0.5;
+                const isFractional = Math.random() > 0.4;
+                if (!isHard) {
+                    let a = Math.floor(Math.random() * 7) + 2, b = Math.floor(Math.random() * 10) - 5, c = Math.floor(Math.random() * 15) - 5;
+                    if (isFractional) {
+                        return { label: 'Résolution d\'équation', q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: (c-b) + "/" + a, h: "Isole les inconnues à gauche et les constantes à droite." };
+                    } else {
+                        const sol = Math.floor(Math.random() * 15) - 7;
+                        c = a * sol + b;
+                        return { label: 'Résolution d\'équation', q: `Résoudre : $${a}x ${b >= 0 ? "+" : "-"} ${Math.abs(b)} = ${c}$`, a: sol.toString(), h: "Isole les inconnues à gauche et les constantes à droite." };
+                    }
+                } else {
+                    let a, c; do { a = Math.floor(Math.random()*9)-4; c = Math.floor(Math.random()*9)-4; } while (a === c || a === 0 || c === 0);
+                    const b = Math.floor(Math.random()*15)-7, d = Math.floor(Math.random()*15)-7;
+                    const num = d - b, den = a - c;
+                    const fmtE = (coeff, variable, first) => {
+                        let res = Math.abs(coeff) === 1 ? (coeff < 0 ? "-" : "") + variable : coeff + variable;
+                        if (!first && coeff > 0) res = "+" + res;
+                        return res;
+                    };
+                    const enonce = `${fmtE(a, 'x', true)}${b >= 0 ? "+" : ""}${b} = ${fmtE(c, 'x', true)}${d >= 0 ? "+" : ""}${d}`;
+                    return { label: 'Résolution d\'équation', q: `Résoudre : $${enonce.replace(/\+\-/g, "-")}$`, a: num + "/" + den, h: "Isole les inconnues à gauche et les constantes à droite." };
+                }
+            },
+            // ── ÉVALUATION D'UNE EXPRESSION DU SECOND DEGRÉ ───────────────────
+            () => {
+                const vars = ['x', 'y', 't', 'n'];
+                const v = vars[Math.floor(Math.random() * vars.length)];
+
+                // Coefficients : a ∈ {1,2}, b et c ∈ [-5..5] non nuls
+                const a = Math.random() > 0.5 ? 1 : 2;
+                const genBC = () => { let n; do { n = Math.floor(Math.random() * 11) - 5; } while (n === 0); return n; };
+                const b = genBC();
+                const c = genBC();
+
+                // Valeur de x ∈ {-3,-2,-1,1,2,3} (on exclut 0 pour que ce soit intéressant)
+                const xVals = [-3, -2, -1, 1, 2, 3];
+                const xVal = xVals[Math.floor(Math.random() * xVals.length)];
+
+                // Résultat
+                const result = a * xVal * xVal + b * xVal + c;
+
+                // Mise en forme de l'expression LaTeX
+                const fmtTerm = (coef, unit, first) => {
+                    if (coef === 0) return '';
+                    const absC = Math.abs(coef);
+                    const sign = coef < 0 ? (first ? '-' : ' - ') : (first ? '' : ' + ');
+                    const display = (absC === 1 && unit !== '') ? '' : absC;
+                    return `${sign}${display}${unit}`;
+                };
+                const expr = fmtTerm(a, `${v}^2`, true) + fmtTerm(b, v, false) + fmtTerm(c, '', false);
+
+                // Hint : détail du calcul
+                const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+                const step1 = `${a}\\times${xDisp}^2 = ${a}\\times${xVal*xVal} = ${a*xVal*xVal}`;
+                const step2 = `${b < 0 ? '' : ''}${b}\\times${xDisp} = ${b*xVal}`;
+                const hint = `Remplace $${v}$ par $${xVal}$ : $${step1}$, $${step2}$, puis ajoute $${c}$.`;
+
+                return { label: 'Évaluer une expression litérale',
+                    q: `Calculer la valeur de l'expression <span style="white-space:nowrap">$${expr}$</span> pour <span style="white-space:nowrap">$${v} = ${xVal}$.</span>`,
+                    a: result.toString(),
+                    h: hint
+                };
+            },
+            // ── FONCTIONS : IMAGE ET ANTÉCÉDENT ───────────────────────────────
+            () => {
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+                const fname = ['f', 'g', 'h'][Math.floor(Math.random() * 3)];
+                const isDeg2 = Math.random() > 0.5;
+
+                // Coefficients non nuls dans [-5, 5]
+                const genCoef = (excludeZero = true) => {
+                    let n;
+                    do { n = Math.floor(Math.random() * 11) - 5; } while (excludeZero && n === 0);
+                    return n;
+                };
+
+                // Petits entiers pour x, excluant 0
+                const xPool = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
+                const pickX = () => xPool[Math.floor(Math.random() * xPool.length)];
+
+                if (isDeg2) {
+                    // ── Degré 2 : x² + bx + c, toujours une image ─────────────
+                    const b = genCoef(), c = genCoef();
+
+                    // Mise en forme LaTeX de x² + bx + c
+                    const fmtD2 = (b, c) => {
+                        let s = 'x^2';
+                        if (b !== 0) s += (b === 1 ? ' + x' : b === -1 ? ' - x' : b > 0 ? ` + ${b}x` : ` - ${Math.abs(b)}x`);
+                        if (c !== 0) s += (c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`);
+                        return s;
+                    };
+                    const expr = fmtD2(b, c);
+
+                    const xVal = pickX();
+                    const result = xVal * xVal + b * xVal + c;
+                    const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+
+                    // Question : alternance notation fonction / langage naturel
+                    const useNotation = Math.random() > 0.5;
+                    const question = useNotation
+                        ? `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Calculer $${fname}(${xVal})$.`
+                        : `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Quelle est l'image de $${xVal}$ par $${fname}$ ?`;
+
+                    const hint = `Remplace $x$ par $${xDisp}$ : $${xDisp}^2 + ${b}\\times${xDisp} + ${c} = ${xVal*xVal} + (${b*xVal}) + ${c}$.`;
+
+                    return { label: 'Image et antécédent d\'une fonction', q: question, a: result.toString(), h: hint };
+
+                } else {
+                    // ── Degré 1 : ax + b ───────────────────────────────────────
+                    const a = genCoef(), b = genCoef();
+
+                    const fmtD1 = (a, b) => {
+                        let s = a === 1 ? 'x' : a === -1 ? '-x' : `${a}x`;
+                        if (b !== 0) s += (b > 0 ? ` + ${b}` : ` - ${Math.abs(b)}`);
+                        return s;
+                    };
+                    const expr = fmtD1(a, b);
+
+                    const isImage = Math.random() > 0.5;
+
+                    if (isImage) {
+                        // Image : f(xVal)
+                        const xVal = pickX();
+                        const result = a * xVal + b;
+                        const xDisp = xVal < 0 ? `(${xVal})` : `${xVal}`;
+                        const hint = `$${fname}(${xVal}) = ${a}\\times${xDisp} + ${b} = ${a*xVal} + ${b}$.`;
+                        return { label: 'Image et antécédent d\'une fonction',
+                            q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Calculer $${fname}(${xVal})$.`,
+                            a: result.toString(),
+                            h: hint
+                        };
+                    } else {
+                        // Antécédent : trouver x tel que ax + b = yVal
+                        // On choisit x entier dans xPool pour garantir un yVal entier,
+                        // puis on pose la question sur yVal. La réponse est x (entier ici).
+                        // Mais on accepte aussi les fractions : on tire yVal directement
+                        // et on calcule x = (yVal - b) / a, qui peut être une fraction.
+                        const yVal = genCoef(false); // yVal dans [-5,5], peut être 0
+                        const numX = yVal - b;       // x = (yVal - b) / a
+                        const pgcd = getPGCD(Math.abs(numX), Math.abs(a));
+                        const numS = numX / pgcd;
+                        const denS = Math.abs(a) / pgcd; // dénominateur toujours positif
+                        const signFix = (numX < 0 && a < 0) || (numX >= 0 && a > 0) ? 1 : -1;
+                        const reponse = denS === 1
+                            ? (signFix * Math.abs(numS)).toString()
+                            : `${signFix * Math.abs(numS)}/${denS}`;
+
+                        const hint = `On résout $${a}x + ${b} = ${yVal}$, soit $${a}x = ${yVal - b}$, donc $x = \\frac{${yVal-b}}{${a}}$.`;
+                        return { label: 'Image et antécédent d\'une fonction',
+                            q: `Soit $${fname}$ une fonction telle que <span style="white-space:nowrap">$${fname}(x) = ${expr}$.</span><br>Quel est l'antécédent de $${yVal}$ par $${fname}$ ?`,
+                            a: reponse,
+                            h: hint
+                        };
+                    }
+                }
+            },
+
+            // ── FACTORISATION ──────────────────────────────────────────────────
+            () => {
+                const vars = ['x', 'y', 'a', 'b', 't'];
+                const v = vars[Math.floor(Math.random() * vars.length)];
+                const getPGCD = (a, b) => b === 0 ? a : getPGCD(b, a % b);
+
+                // k = facteur commun, p et q = coefficients internes
+                // Expression : k*p·v + k*q  =  k(p·v + q)
+                // pgcd(p,q) = 1 pour que k soit bien le PGCD
+                let k, p, q;
+                do {
+                    k = Math.floor(Math.random() * 5) + 2;   // 2..6
+                    p = Math.floor(Math.random() * 5) + 1;    // 1..5
+                    q = Math.floor(Math.random() * 11) - 5;   // -5..5
+                    if (q === 0) q = 1;
+                } while (getPGCD(Math.abs(p), Math.abs(q)) !== 1);
+
+                const A = k * p;  // coeff de v dans l'énoncé
+                const B = k * q;  // terme constant dans l'énoncé
+
+                // Formatage énoncé : Av + B
+                const fmtA = A === 1 ? v : A === -1 ? `-${v}` : `${A}${v}`;
+                const enonce = B > 0 ? `${fmtA} + ${B}` : `${fmtA} - ${Math.abs(B)}`;
+
+                // Formatage réponse : k(pv + q)
+                const fmtP = p === 1 ? v : `${p}${v}`;
+                const inner = q > 0 ? `${fmtP} + ${q}` : `${fmtP} - ${Math.abs(q)}`;
+                const reponse = `${k}(${inner})`;
+
+                const hint = `Le plus grand facteur commun est $${k}$ car $${A} = ${k}\\times${p}$ et $${Math.abs(B)} = ${k}\\times${Math.abs(q)}$. On obtient $${reponse}$.`;
+
+                return {
+                    label: 'Factorisation d\'une expression',
+                    q: `Factoriser l'expression au maximum : <span style="white-space:nowrap">$${enonce}$</span>`,
+                    a: reponse,
+                    h: hint,
+                    _factA: A,
+                    _factB: B,
+                    _factVar: v
+                };
+            },
+            
+        ],
+        geo: [
+            () => {			
+                const typePyth = Math.floor(Math.random() * 3); 
+                if (typePyth === 0) {
+                    const noms = [["A","B","C"], ["R","S","T"], ["I","J","K"]][Math.floor(Math.random()*3)];
+                    const [p1, p2, p3] = noms; 
+                    const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100"><path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" /><text x="35" y="15" font-size="14" fill="currentColor">${p1}</text><text x="30" y="95" font-size="14" fill="currentColor">${p2}</text><text x="125" y="95" font-size="14" fill="currentColor">${p3}</text></svg>`;
+                    return { label: 'Utiliser le théorème de Pythagore', q: `Écrire l'égalité de Pythagore pour ce triangle rectangle en ${p2} :${svg}`, a: `${p2}${p1}^2+${p2}${p3}^2=${p1}${p3}^2`, h: "Hypoténuse² = Petit Côté² + Moyen Côté²" };
+                } 
+                else {
+                    const triplets = [[3,4,5], [6,8,10], [5,12,13]];
+				    const [a, b, c] = triplets[Math.floor(Math.random()*triplets.length)];
+				    const unit = Math.random() > 0.5 ? "cm" : "m"; // Choix de l'unité
+				    const chercherHypo = Math.random() > 0.5;
+				    
+				    const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
+				        <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+				        <rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor" />
+				        <text x="10" y="55" font-size="12" fill="currentColor">${a} ${unit}</text>
+				        <text x="70" y="95" font-size="12" fill="currentColor">${chercherHypo ? b + " " + unit : "?"}</text>
+				        <text x="80" y="45" font-size="12" fill="currentColor">${chercherHypo ? "?" : c + " " + unit}</text>
+				    </svg>`;
+					const cc = c*c
+					const bb = b*b
+					
+				    return { label: 'Utiliser le théorème de Pythagore', 
+				        q: `${chercherHypo ? "Calculer l'hypoténuse" : "Calculer le côté manquant"} (n'oublie pas l'unité) :${svg}`, 
+				        a: (chercherHypo ? c : b) + ` \\text{ ${unit}}`, // La réponse attendue inclut l'unité
+				        h: `${chercherHypo ? `$$${a}^2 + ${b}^2 = ${cc} \\text{ et on sait que } ${c}^2 = ${cc}$$` : `$$${c}^2 - ${a}^2 = ${bb} \\text{ et on sait que } ${b}^2 = ${bb}$$`} ` 
+				    };
+                }
+            },
+            
+			() => {
+			    const isPapillon = Math.random() > 0.5;
+			    const isCalcul = Math.random() > 0.5;
+			    const noms = [["K","A","B","C","D"], ["S","M","N","P","G"], ["O","I","J","R","T"]][Math.floor(Math.random()*3)];
+			    const [S, AL, AR, BL, BR] = noms; 
+			
+			    // --- Ajout des variables pour les unités ---
+			    const units = ["cm", "m", "mm"];
+			    const unit = units[Math.floor(Math.random() * units.length)];
+			
+			    let svg = "";
+			    if (isPapillon) {
+			        // CONFIG PAPILLON ASYMÉTRIQUE
+			        svg = `<br><svg width="200" height="160" viewBox="0 0 200 160">
+			            <line x1="65" y1="20" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <line x1="135" y1="20" x2="45" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <line x1="65" y1="20" x2="135" y2="20" stroke="currentColor" stroke-width="2"/>
+			            <line x1="45" y1="135" x2="155" y2="135" stroke="currentColor" stroke-width="2"/>
+			            <text x="112" y="65" class="svg-text">${S}</text>
+			            <text x="45" y="25" class="svg-text">${BL}</text><text x="140" y="25" class="svg-text">${BR}</text>
+			            <text x="25" y="145" class="svg-text">${AL}</text><text x="160" y="145" class="svg-text">${AR}</text>
+			        </svg>`;
+			    } else {
+			        // CONFIG EMBOÎTÉE (Classique)
+			        svg = `<br><svg width="200" height="150" viewBox="0 0 200 150">
+			            <path d="M 100,20 L 30,130 L 170,130 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+			            <line x1="58" y1="85" x2="142" y2="85" stroke="currentColor" stroke-width="2"/>
+			            <text x="95" y="15" class="svg-text">${S}</text>
+			            <text x="15" y="140" class="svg-text">${AL}</text><text x="175" y="140" class="svg-text">${AR}</text>
+			            <text x="40" y="90" class="svg-text">${BL}</text><text x="150" y="90" class="svg-text">${BR}</text>
+			        </svg>`;
+			    }
+			
+			    if (!isCalcul) {
+			        // Rapports alignés : S-Haut / S-Bas
+			        const d1 = isPapillon ? `${S}${BL}/${S}${AR}` : `${S}${BL}/${S}${AL}`;
+			        const d2 = isPapillon ? `${S}${BR}/${S}${AL}` : `${S}${BR}/${S}${AR}`;
+			        const b = `${BL}${BR}/${AL}${AR}`;
+			        return { label: 'Utiliser le théorème de Thalès', 
+			            q: `Écrire l'égalité des rapports de Thalès ((${BL}${BR}) // (${AL}${AR})) :${svg}`, 
+			            a: `${d1}=${d2}=${b}`, 
+			            h: "Repère les côtés homologues et écris les rapports." 
+			        };
+			    } else {
+			        const k = [2, 2.5, 3, 1.5][Math.floor(Math.random()*4)];
+			        const petit = Math.floor(Math.random()*3)+2; 
+			        const baseP = Math.floor(Math.random()*3)+3;
+			        const grandSide = isPapillon ? S+AR : S+AL;
+			        
+			        // On ajoute l'unité aux valeurs numériques de l'énoncé
+			        return { label: 'Utiliser le théorème de Thalès', 
+			            q: `Sachant que (${BL}${BR}) // (${AL}${AR}), ${S}${BL} = ${petit} ${unit}, ${grandSide} = ${(petit*k).toString().replace('.', ',')} ${unit} et ${BL}${BR} = ${baseP} ${unit}. <br>Calculer ${AL}${AR} (n'oublie pas l'unité) :${svg}`, 
+			            a: (baseP*k).toString().replace('.', ',') + ` \\text{ ${unit}}`, 
+			            h: `C'est un agrandissement de rapport $${k}$.` 
+			        };
+			    }
+			},
+
+            () => {
+                // Triangle rectangle : angle droit en p2 (bas-gauche), p1 (haut), p3 (bas-droite)
+                // Côtés nommés depuis l'angle choisi :
+                //   angle en p1 → opposé=p2p3 (bas), adjacent=p1p2 (gauche), hypo=p1p3 (hypo)
+                //   angle en p3 → opposé=p1p2 (gauche), adjacent=p2p3 (bas), hypo=p1p3 (hypo)
+                const noms = [["A","B","C"], ["R","S","T"], ["I","J","K"], ["U","V","W"], ["D","E","F"]][Math.floor(Math.random()*5)];
+                const [p1, p2, p3] = noms;
+                const angleEn = Math.random() > 0.5 ? p1 : p3; // angle choisi
+                const ratio  = ["sin","cos","tan"][Math.floor(Math.random()*3)];
+
+                // Segments nommés (paire de lettres dans l'ordre alphabétique du nom de côté)
+                const seg = (a, b) => a < b ? a+b : b+a; // ordre alphabétique non requis — on garde l'ordre naturel des points
+                const hypo = p1+p3, vert = p1+p2, horiz = p2+p3;
+
+                let opp, adj;
+                if (angleEn === p1) { opp = horiz; adj = vert; }
+                else                { opp = vert;  adj = horiz; }
+
+                // Réponse correcte : fraction de deux segments
+                let ansNum, ansDen;
+                if      (ratio === "sin") { ansNum = opp;  ansDen = hypo; }
+                else if (ratio === "cos") { ansNum = adj;  ansDen = hypo; }
+                else                     { ansNum = opp;  ansDen = adj;  }
+
+                // Arcs centrés sur chaque sommet :
+                // p1=(40,20) : côté vertical vers le bas → point à (40,32) ; hypo vers p3 → point à (50,27)
+                // p3=(120,80) : côté horizontal vers la gauche → point à (108,80) ; hypo vers p1 → point à (111,73)
+                const arcP1 = `<path d="M 40,32 A 12,12 0 0 0 50,27" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arcP3 = `<path d="M 108,80 A 12,12 0 0 1 111,73" fill="none" stroke="var(--purple-mid)" stroke-width="1.5"/>`;
+                const arc = angleEn === p1 ? arcP1 : arcP3;
+                const svg = `<br><svg width="160" height="100" viewBox="0 0 160 100">
+                    <path d="M 40,20 L 40,80 L 120,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <rect x="40" y="72" width="8" height="8" fill="none" stroke="currentColor"/>
+                    ${arc}
+                    <text x="35" y="15" font-size="14" fill="currentColor">${p1}</text>
+                    <text x="30" y="95" font-size="14" fill="currentColor">${p2}</text>
+                    <text x="125" y="95" font-size="14" fill="currentColor">${p3}</text>
+                </svg>`;
+
+                return { label: 'Rapports de trigonométrie',
+                    q: `Quel rapport faut-il calculer pour obtenir $\\${ratio}(\\widehat{${angleEn}})$ ?${svg}`,
+                    a: `${ansNum}/${ansDen}`,
+                    h: ratio === "sin" ? "sinus = opposé / hypoténuse"
+                     : ratio === "cos" ? "cosinus = adjacent / hypoténuse"
+                     :                  "tangente = opposé / adjacent"
+                };
+            },
+
+			() => {
+		        const isRight = Math.random() > 0.5;
+		        let a1, a2, qText;
+		
+		        if (isRight) {
+		            a1 = 90;
+		            a2 = Math.floor(Math.random() * 70) + 10;
+		            qText = "Dans ce triangle rectangle, calculer l'angle manquant :";
+		        } else {
+		            a1 = Math.floor(Math.random() * 60) + 30;
+		            a2 = Math.floor(Math.random() * (180 - a1 - 40)) + 20;
+		            qText = "Calculer la mesure de l'angle manquant :";
+		        }
+		
+		        const ans = 180 - a1 - a2;
+		        return { label: 'Calculer un angle dans un triangle',
+		            q: `${qText}<br>${generateTriangleSVG(a1, a2, isRight ? "rectangle" : "normal")}`,
+		            a: ans.toString() + "°",
+		            h: "La somme des angles d'un triangle est toujours égale à $180°$."
+		        };
+		    },
+
+			() => {
+		        const types = ["losange", "rectangle", "disque"];
+		        const type = types[Math.floor(Math.random() * types.length)];
+		        const unit = "cm";
+		        let qText, ans, svg;
+		
+		        if (type === "losange") {
+		            const cote = Math.floor(Math.random() * 8) + 3;
+		            qText = "Calculer le périmètre de ce losange :";
+		            ans = (cote * 4).toString().replace('.', ',') + " \\text{ " + unit + "}";
+		            svg = generatePerimeterSVG("losange", {cote, unit});
+		        } else if (type === "rectangle") {
+		            const L = Math.floor(Math.random() * 6) + 6;
+		            const l = Math.floor(Math.random() * 4) + 2;
+		            qText = "Calculer le périmètre de ce rectangle :";
+		            ans = ((L + l) * 2).toString().replace('.', ',') + " \\text{ " + unit + "}";
+		            svg = generatePerimeterSVG("rectangle", {L, l, unit});
+		        } else {
+				    const val = Math.floor(Math.random() * 9) + 2;
+				    const isRayon = Math.random() > 0.5;
+				    const r = isRayon ? val : val;   // val = rayon si isRayon, sinon val = diamètre
+				    const d = isRayon ? val * 2 : val;
+				    const reel = isRayon ? val : val / 2;
+
+				    qText = `Quel calcul faut-il effectuer pour obtenir le périmètre de ce disque ?`;
+				    // Réponse canonique stockée sous forme normalisée (sans espaces, pi minuscule)
+				    // On accepte 2*pi*r ou pi*d (les deux sont corrects)
+				    ans = isRayon ? `2\\times\\pi\\times${r}` : `\\pi\\times${d}`;
+
+				    svg = generatePerimeterSVG("disque", {val, unit, mode: isRayon ? "rayon" : "diametre"});
+
+				    return { label: 'Périmètres divers',
+				        q: `${qText}<br>${svg}`,
+				        a: ans,
+				        h: isRayon
+				            ? `Périmètre = $2 \\times \\pi \\times r = 2 \\times \\pi \\times ${r}$`
+				            : `Périmètre = $\\pi \\times d = \\pi \\times ${d}$`,
+				        _perimCircleTag: true,
+				        _perimR: reel,
+				        _perimD: d
+				    };
+				}
+		
+		        return { label: 'Périmètres divers',
+		            q: `${qText}<br>${svg}`,
+		            a: ans,
+		            h: "Le périmètre est la somme des longueurs des côtés."
+		        };
+		    },
+
+            // ── LIRE LES COORDONNÉES D'UN POINT DANS UN REPÈRE ─────────────────
+            () => {
+                let px, py;
+                do {
+                    px = Math.floor(Math.random() * 9) - 4;
+                    py = Math.floor(Math.random() * 9) - 4;
+                } while (px === 0 && py === 0);
+
+                const couleurs = [
+                    { fill: '#E53935' }, { fill: '#1E88E5' }, { fill: '#43A047' },
+                    { fill: '#FB8C00' }, { fill: '#8E24AA' },
+                ];
+                const couleur = couleurs[Math.floor(Math.random() * couleurs.length)];
+                const lettres = ['A', 'B', 'M', 'P', 'N', 'T'];
+                const lettre = lettres[Math.floor(Math.random() * lettres.length)];
+
+                const W = 220, H = 220;
+                const ox = W / 2, oy = H / 2;
+                const step = 22;
+
+                let grid = '';
+                for (let i = -4; i <= 4; i++) {
+                    grid += `<line x1="${ox + i*step}" y1="10" x2="${ox + i*step}" y2="${H-10}" stroke="#d0cce8" stroke-width="0.8"/>`;
+                    grid += `<line x1="10" y1="${oy + i*step}" x2="${W-10}" y2="${oy + i*step}" stroke="#d0cce8" stroke-width="0.8"/>`;
+                }
+
+                const axes = `
+                    <line x1="10" y1="${oy}" x2="${W-8}" y2="${oy}" stroke="var(--purple-dark)" stroke-width="1.8"/>
+                    <polygon points="${W-8},${oy} ${W-15},${oy-4} ${W-15},${oy+4}" fill="var(--purple-dark)"/>
+                    <line x1="${ox}" y1="${H-8}" x2="${ox}" y2="10" stroke="var(--purple-dark)" stroke-width="1.8"/>
+                    <polygon points="${ox},10 ${ox-4},17 ${ox+4},17" fill="var(--purple-dark)"/>
+                    <text x="${ox+4}" y="${oy+12}" font-size="9" fill="var(--text2)">O</text>
+                `;
+
+                let graduations = '';
+                for (let i = -4; i <= 4; i++) {
+                    if (i === 0) continue;
+                    const xPos = ox + i * step;
+                    const yPos = oy + i * step;
+                    graduations += `<line x1="${xPos}" y1="${oy-3}" x2="${xPos}" y2="${oy+3}" stroke="var(--purple-dark)" stroke-width="1.2"/>`;
+                    graduations += `<text x="${xPos}" y="${oy+14}" font-size="9" text-anchor="middle" fill="var(--text2)">${i}</text>`;
+                    graduations += `<line x1="${ox-3}" y1="${yPos}" x2="${ox+3}" y2="${yPos}" stroke="var(--purple-dark)" stroke-width="1.2"/>`;
+                    graduations += `<text x="${ox-6}" y="${yPos+4}" font-size="9" text-anchor="end" fill="var(--text2)">${-i}</text>`;
+                }
+
+                const ptX = ox + px * step;
+                const ptY = oy - py * step;
+                const lblOffX = px >= 0 ? 8 : -8;
+                const lblAnchor = px >= 0 ? 'start' : 'end';
+                const lblOffY = py > 0 ? -8 : 14;
+                const point = `
+                    <circle cx="${ptX}" cy="${ptY}" r="5" fill="${couleur.fill}" stroke="white" stroke-width="1.5"/>
+                    <text x="${ptX+lblOffX}" y="${ptY+lblOffY}" font-size="12" font-weight="bold" fill="${couleur.fill}" text-anchor="${lblAnchor}">${lettre}</text>
+                `;
+
+                const svg = `<div style="text-align:center;margin:10px 0;">
+                    <svg viewBox="0 0 ${W} ${H}" style="max-width:240px;border-radius:10px;background:white;border:1px solid var(--border);">
+                        ${grid}${axes}${graduations}${point}
+                    </svg></div>`;
+
+                return { label: 'Lecture de coordonnées',
+                    q: `Lire les coordonnées du point <b style="color:${couleur.fill}">${lettre}</b> dans ce repère :${svg}`,
+                    a: `(${px};${py})`,
+                    h: `Le point ${lettre} est en abscisse ${px} et en ordonnée ${py}.`,
+                    _coordTag: true
+                };
+            },
+
+            // ── CALCUL D'AIRE ───────────────────────────────────────────────────
+            () => {
+                const units = ['cm', 'm'];
+                const unit = units[Math.floor(Math.random() * units.length)];
+                const unit2 = unit + '^2'; // notation LaTeX propre
+                const color = "var(--purple-dark)";
+                const accent = "var(--purple-mid)";
+                const textColor = "var(--purple-deep)";
+
+                const types = ['rectangle', 'carre', 'disque', 'triangle'];
+                const type = types[Math.floor(Math.random() * types.length)];
+
+                let aire, svg, qText, hint;
+
+                if (type === 'rectangle') {
+                    const L = Math.floor(Math.random() * 9) + 2;
+                    let l;
+                    do { l = Math.floor(Math.random() * 9) + 2; } while (l === L);
+                    aire = L * l;
+                    const w = 120, h = 60, x = 30, y = 30, s = 12;
+                    svg = `<svg viewBox="0 0 180 120" style="max-width:200px;margin:5px auto;display:block;overflow:visible;">
+                        <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${color}" stroke-width="2"/>
+                        <path d="M ${x} ${y+s} L ${x+s} ${y+s} L ${x+s} ${y}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x} ${y+h-s} L ${x+s} ${y+h-s} L ${x+s} ${y+h}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x+w-s} ${y+h} L ${x+w-s} ${y+h-s} L ${x+w} ${y+h-s}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${L} ${unit}</text>
+                        <text x="${x+w+5}" y="${y+h/2+5}" font-size="12" fill="${textColor}" font-weight="bold">${l} ${unit}</text>
+                    </svg>`;
+                    qText = `Calculer l'aire de ce rectangle :`;
+                    hint = `Aire = longueur × largeur = ${L} × ${l} = ${aire} ${unit2}`;
+
+                } else if (type === 'carre') {
+                    const c = Math.floor(Math.random() * 9) + 2;
+                    aire = c * c;
+                    const x = 30, y = 20, w = 90, s = 12;
+                    svg = `<svg viewBox="0 0 180 120" style="max-width:200px;margin:5px auto;display:block;overflow:visible;">
+                        <rect x="${x}" y="${y}" width="${w}" height="${w}" fill="none" stroke="${color}" stroke-width="2"/>
+                        <path d="M ${x} ${y+s} L ${x+s} ${y+s} L ${x+s} ${y}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x+w-s} ${y} L ${x+w-s} ${y+s} L ${x+w} ${y+s}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x} ${y+w-s} L ${x+s} ${y+w-s} L ${x+s} ${y+w}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <path d="M ${x+w-s} ${y+w} L ${x+w-s} ${y+w-s} L ${x+w} ${y+w-s}" fill="none" stroke="${accent}" stroke-width="1"/>
+                        <line x1="${x+w/2}" y1="${y-4}" x2="${x+w/2}" y2="${y+8}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w/2}" y1="${y+w-8}" x2="${x+w/2}" y2="${y+w+4}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x-4}" y1="${y+w/2}" x2="${x+8}" y2="${y+w/2}" stroke="${accent}" stroke-width="2"/>
+                        <line x1="${x+w-8}" y1="${y+w/2}" x2="${x+w+4}" y2="${y+w/2}" stroke="${accent}" stroke-width="2"/>
+                        <text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${c} ${unit}</text>
+                    </svg>`;
+                    qText = `Calculer l'aire de ce carré :`;
+                    hint = `Aire = côté² = ${c}² = ${aire} ${unit2}`;
+
+                } else if (type === 'disque') {
+                    const r = Math.floor(Math.random() * 7) + 2;
+                    aire = null; // pas de valeur numérique attendue
+                    svg = `<svg viewBox="0 0 180 120" style="max-width:200px;margin:5px auto;display:block;overflow:visible;">
+                        <circle cx="90" cy="60" r="40" fill="none" stroke="${color}" stroke-width="2"/>
+                        <circle cx="90" cy="60" r="2" fill="${color}"/>
+                        <line x1="90" y1="60" x2="130" y2="60" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>
+                        <text x="110" y="55" text-anchor="middle" font-size="11" fill="${textColor}" font-weight="bold">r = ${r} ${unit}</text>
+                    </svg>`;
+                    qText = `Quel calcul faut-il effectuer pour obtenir l'aire de ce disque ?`;
+                    hint = `Aire = $\\pi \\times r^2 = \\pi \\times ${r}^2$`;
+
+                    return { label: 'Calcul d\'aires',
+                        q: `${qText}<br>${svg}`,
+                        a: `\\pi\\times${r}²`,
+                        h: hint,
+                        _aireCircleTag: true,
+                        _aireCircleR: r
+                    };
+
+                } else { // triangle rectangle
+                    const base = Math.floor(Math.random() * 8) + 2;
+                    const hauteur = Math.floor(Math.random() * 8) + 2;
+                    aire = (base * hauteur) / 2;
+                    const x1 = 30, y1 = 100, x2 = 150, y2 = 100, x3 = 30, y3 = 30;
+                    const s = 12;
+                    svg = `<svg viewBox="0 0 180 120" style="max-width:200px;margin:5px auto;display:block;overflow:visible;">
+                        <path d="M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z" fill="none" stroke="${color}" stroke-width="2"/>
+                        <path d="M ${x1} ${y1-s} L ${x1+s} ${y1-s} L ${x1+s} ${y1}" fill="none" stroke="${accent}" stroke-width="1.5"/>
+                        <text x="${(x1+x2)/2}" y="${y1+16}" text-anchor="middle" font-size="12" fill="${textColor}" font-weight="bold">${base} ${unit}</text>
+                        <text x="${x1-5}" y="${(y1+y3)/2+5}" text-anchor="end" font-size="12" fill="${textColor}" font-weight="bold">${hauteur} ${unit}</text>
+                    </svg>`;
+                    qText = `Calculer l'aire de ce triangle rectangle :`;
+                    hint = `Aire = (base × hauteur) ÷ 2 = (${base} × ${hauteur}) ÷ 2 = ${aire} ${unit2}`;
+                }
+
+                const aireStr = aire.toString().replace('.', ',');
+
+                return { label: 'Calcul d\'aires',
+                    q: `${qText}<br>${svg}`,
+                    a: `${aireStr} \\text{ ${unit}}^2`,
+                    h: hint,
+                    _aireTag: true,
+                    _aireVal: aireStr,
+                    _unit: unit
+                };
+            },
+
+            // ── CALCUL DE VOLUME (perspective cavalière) ────────────────────────
+            () => {
+                const color  = "var(--purple-dark)";
+                const accent = "var(--purple-mid)";
+                const fill   = "rgba(127,119,221,0.08)";
+                const fillD  = "rgba(127,119,221,0.14)";
+                const td     = "var(--purple-deep)";
+
+                // Perspective cavalière : décalage oblique 45°, coeff 0.5
+                const KX = 0.35, KY = -0.35; // vecteur de profondeur par unité de profondeur px
+
+                const types = ['cube', 'pave', 'prisme', 'cylindre'];
+                const type  = types[Math.floor(Math.random() * types.length)];
+
+                let vol, svg, qText, hint;
+
+                // ── Fonction utilitaire : parallélépipède en perspective ──────────
+                // w, h, d = largeur, hauteur, profondeur en pixels SVG
+                // ox, oy = coin avant-bas-gauche
+                function drawBox(ox, oy, w, h, d, labels) {
+                    // 8 sommets : face avant = rectangle, face arrière = décalée
+                    const dx = d * KX, dy = d * KY;
+                    // Face avant
+                    const A = [ox,      oy     ]; // bas-gauche avant
+                    const B = [ox+w,    oy     ]; // bas-droit avant
+                    const C = [ox+w,    oy-h   ]; // haut-droit avant
+                    const D = [ox,      oy-h   ]; // haut-gauche avant
+                    // Face arrière
+                    const E = [ox+dx,   oy+dy  ];
+                    const F = [ox+w+dx, oy+dy  ];
+                    const G = [ox+w+dx, oy-h+dy];
+                    const H = [ox+dx,   oy-h+dy];
+
+                    const pt = ([x,y]) => `${x},${y}`;
+                    const line = (p1,p2,dash='') =>
+                        `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${color}" stroke-width="1.8" ${dash}/>`;
+
+                    let s = '';
+                    // Faces (remplies légèrement)
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(C)} ${pt(D)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(D)} ${pt(C)} ${pt(G)} ${pt(H)}" fill="${fillD}" stroke="none"/>`;
+                    s += `<polygon points="${pt(B)} ${pt(C)} ${pt(G)} ${pt(F)}" fill="${fillD}" stroke="none"/>`;
+                    // Arêtes visibles
+                    s += line(A,B); s += line(B,C); s += line(C,D); s += line(D,A);
+                    s += line(C,G); s += line(B,F); s += line(D,H);
+                    s += line(F,G); s += line(G,H);
+                    // Arêtes cachées (pointillées)
+                    const dash = 'stroke-dasharray="3,3"';
+                    s += line(A,E,dash); s += line(E,F,dash); s += line(E,H,dash);
+
+                    // Labels
+                    if (labels.w) s += `<text x="${(A[0]+B[0])/2}" y="${A[1]+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${labels.w}</text>`;
+                    // Hauteur : milieu de l'arête B→C (côté droit avant), décalé à droite
+                    if (labels.h) s += `<text x="${B[0]+21}" y="${(C[1]+B[1])/2-11}" text-anchor="start" font-size="11" font-weight="bold" fill="${td}">${labels.h}</text>`;
+                    // Profondeur : milieu de l'arête B→F, angle réel calculé
+                    if (labels.d) {
+                        const mx = (B[0]+F[0])/2+8, my = (B[1]+F[1])/2;
+                        const angleDeg = Math.atan2(F[1]-B[1], F[0]-B[0]) * 180 / Math.PI;
+                        s += `<text x="${mx}" y="${my+7}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}" transform="rotate(${angleDeg.toFixed(1)},${mx},${my+7})">${labels.d}</text>`;
+                    }
+                    return s;
+                }
+
+                // ── CUBE ─────────────────────────────────────────────────────────
+                if (type === 'cube') {
+                    const c = Math.floor(Math.random() * 4) + 2;
+                    vol = c * c * c;
+                    const PX = 70;
+                    const inner = drawBox(30, 145, PX, PX, PX, { w: `${c} m` });
+                    svg = `<svg viewBox="0 0 200 175" style="max-width:220px;margin:8px auto;display:block;overflow:visible;">${inner}</svg>`;
+                    qText = `Calculer le volume de ce cube :`;
+                    hint  = `V = côté³ = ${c}³ = ${vol} m³`;
+
+                // ── PAVÉ DROIT ───────────────────────────────────────────────────
+                } else if (type === 'pave') {
+                    const L = Math.floor(Math.random() * 7) + 2;
+                    let l, h;
+                    do { l = Math.floor(Math.random() * 5) + 2; } while (l === L);
+                    do { h = Math.floor(Math.random() * 4) + 2; } while (h === L || h === l);
+                    vol = L * l * h;
+                    const WPX = 90, HPX = 55, DPX = 50;
+                    const inner = drawBox(20, 140, WPX, HPX, DPX, { w: `${L} m`, h: `${h} m`, d: `${l} m` });
+                    svg = `<svg viewBox="0 0 210 165" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${inner}</svg>`;
+                    qText = `Calculer le volume de ce pavé droit :`;
+                    hint  = `V = longueur × largeur × hauteur = ${L} × ${l} × ${h} = ${vol} m³`;
+
+                // ── PRISME DROIT (base triangulaire rectangle) ───────────────────
+                } else if (type === 'prisme') {
+                    const b = Math.floor(Math.random() * 5) + 2;
+                    let hT, prof;
+                    do { hT = Math.floor(Math.random() * 5) + 2; } while (hT === b);
+                    do { prof = Math.floor(Math.random() * 5) + 2; } while (prof === b || prof === hT);
+                    const aire_base = (b * hT) / 2;
+                    vol = aire_base * prof;
+
+                    // Prisme debout : triangle rectangle sur la face GAUCHE
+                    // Angle droit en bas-gauche (A), base vers la droite (B), hauteur vers le haut (C)
+                    // La profondeur part en perspective cavalière vers la droite
+                    const pt = ([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
+                    const line = (p1,p2,dash='') =>
+                        `<line x1="${p1[0].toFixed(1)}" y1="${p1[1].toFixed(1)}" x2="${p2[0].toFixed(1)}" y2="${p2[1].toFixed(1)}" stroke="${color}" stroke-width="1.8" ${dash}/>`;
+
+                    // Face gauche : triangle rectangle
+                    // A=bas-gauche (angle droit), B=bas-droite, C=haut-gauche
+                    const HPX = 90;  // hauteur en pixels
+                    const BPX = 75;  // base en pixels
+                    const PPX = 80;  // profondeur en pixels (vers la droite + légèrement haut)
+                    const pdx = PPX, pdy = -18; // vecteur de profondeur
+
+                    const A = [30,  160];
+                    const B = [30 + BPX, 160];
+                    const C = [30,  160 - HPX];
+
+                    // Face droite (triangle décalé par le vecteur de profondeur)
+                    const A2 = [A[0]+pdx, A[1]+pdy];
+                    const B2 = [B[0]+pdx, B[1]+pdy];
+                    const C2 = [C[0]+pdx, C[1]+pdy];
+
+                    const sq = 10;
+                    let s = '';
+                    // Faces remplies
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(C)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(A2)} ${pt(B2)} ${pt(C2)}" fill="${fill}" stroke="none"/>`;
+                    s += `<polygon points="${pt(A)} ${pt(A2)} ${pt(C2)} ${pt(C)}" fill="${fill}" stroke="none"/>`;   // face gauche verticale
+                    s += `<polygon points="${pt(A)} ${pt(B)} ${pt(B2)} ${pt(A2)}" fill="${fillD}" stroke="none"/>`;  // face du bas
+                    s += `<polygon points="${pt(B)} ${pt(C)} ${pt(C2)} ${pt(B2)}" fill="${fillD}" stroke="none"/>`;  // face hypoténuse
+
+                    // Arête cachée (AB du triangle arrière est visible, mais A-A2 du bas peut l'être)
+                    const dash = 'stroke-dasharray="4,3"';
+                    // Arêtes du triangle avant
+                    s += line(A,B); s += line(A,C); s += line(B,C);
+                    // Arêtes de profondeur
+                    s += line(A,A2); s += line(B,B2); s += line(C,C2);
+                    // Arêtes du triangle arrière
+                    s += line(A2,B2); s += line(A2,C2); s += line(B2,C2);
+
+                    // Angle droit sur le triangle avant
+                    s += `<path d="M ${A[0]+sq} ${A[1]} L ${A[0]+sq} ${A[1]-sq} L ${A[0]} ${A[1]-sq}" fill="none" stroke="${accent}" stroke-width="1.2"/>`;
+
+                    // Labels
+                    s += `<text x="${(A[0]+B[0])/2}" y="${A[1]+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${b} m</text>`;
+                    s += `<text x="${A[0]-6}" y="${(A[1]+C[1])/2+4}" text-anchor="end" font-size="11" font-weight="bold" fill="${td}">${hT} m</text>`;
+                    s += `<text x="${(B[0]+B2[0])/2}" y="${(B[1]+B2[1])/2+14}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">${prof} m</text>`;
+
+                    svg = `<svg viewBox="0 0 230 185" style="max-width:250px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
+                    qText = `Calculer le volume de ce prisme droit (base : triangle rectangle) :`;
+                    hint  = `V = aire de la base × hauteur = (${b} × ${hT} ÷ 2) × ${prof} = ${aire_base} × ${prof} = ${vol} m³`;
+
+                // ── CYLINDRE ─────────────────────────────────────────────────────
+                } else {
+                    const r = Math.floor(Math.random() * 5) + 2;
+                    const h = Math.floor(Math.random() * 7) + 3;
+
+                    const cx = 105, cy = 60, rx = 50, ry = 16, hpx = 85;
+                    let s = '';
+                    s += `<ellipse cx="${cx}" cy="${cy+hpx}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<polygon points="${cx-rx},${cy} ${cx+rx},${cy} ${cx+rx},${cy+hpx} ${cx-rx},${cy+hpx}" fill="${fill}" stroke="none"/>`;
+                    s += `<line x1="${cx-rx}" y1="${cy}" x2="${cx-rx}" y2="${cy+hpx}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<line x1="${cx+rx}" y1="${cy}" x2="${cx+rx}" y2="${cy+hpx}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${color}" stroke-width="1.8"/>`;
+                    s += `<line x1="${cx}" y1="${cy}" x2="${cx+rx}" y2="${cy}" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3"/>`;
+                    s += `<text x="${cx+rx/2-4}" y="${cy-3}" text-anchor="middle" font-size="11" font-weight="bold" fill="${td}">r = ${r} m</text>`;
+                    s += `<line x1="${cx+rx+8}" y1="${cy}" x2="${cx+rx+8}" y2="${cy+hpx}" stroke="${accent}" stroke-width="1.2" stroke-dasharray="3"/>`;
+                    s += `<text x="${cx+rx+22}" y="${cy+hpx/2+4}" text-anchor="start" font-size="11" font-weight="bold" fill="${td}">${h} m</text>`;
+
+                    svg = `<svg viewBox="0 0 210 175" style="max-width:230px;margin:8px auto;display:block;overflow:visible;">${s}</svg>`;
+
+                    return { label: 'Calcul de volumes',
+                        q: `Quel calcul faut-il effectuer pour obtenir le volume de ce cylindre ?<br>${svg}`,
+                        a: `\\pi\\times${r}²\\times${h}`,
+                        h: `V = $\\pi \\times r^2 \\times h = \\pi \\times ${r}^2 \\times ${h}$`,
+                        _volCylTag: true,
+                        _volCylR: r,
+                        _volCylH: h
+                    };
+                }
+
+                const volStr = vol.toString().replace('.', ',');
+                return { label: 'Calcul de volumes',
+                    q: `${qText}<br>${svg}`,
+                    a: `${volStr} \\text{ m}^3`,
+                    h: hint,
+                    _volTag: true,
+                    _volVal: volStr
+                };
+            },
+
+            // ── CONVERSIONS D'UNITÉS ──────────────────────────────────────────
+            () => {
+                // Toutes les paires sont (valeur_énoncé, valeur_résultat) choisies pour
+                // donner des nombres propres des deux côtés (pas de virgule flottante bizarre).
+                const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+                const fmt  = n => n.toString().replace('.', ',');
+
+                const variant = Math.floor(Math.random() * 5);
+
+                // ── Variante 0 : m → cm / mm / km ─────────────────────────────
+                if (variant === 0) {
+                    const configs = [
+                        // [valM, cible, résultat, unité]
+                        // m → cm (×100) : valeurs entières ou demi-entières propres
+                        [1.5,'m',150,'cm'], [2.5,'m',250,'cm'], [3,'m',300,'cm'],
+                        [0.5,'m',50,'cm'],  [4,'m',400,'cm'],   [7,'m',700,'cm'],
+                        [12,'m',1200,'cm'], [0.25,'m',25,'cm'], [6,'m',600,'cm'],
+                        // m → mm (×1000) : résultats entiers
+                        [1,'m',1000,'mm'],  [2,'m',2000,'mm'],  [3,'m',3000,'mm'],
+                        [0.5,'m',500,'mm'], [1.5,'m',1500,'mm'],[0.25,'m',250,'mm'],
+                        [4,'m',4000,'mm'],  [5,'m',5000,'mm'],
+                        // m → km (÷1000) : résultats avec au plus 3 décimales propres
+                        [500,'m',0.5,'km'], [1500,'m',1.5,'km'],[2000,'m',2,'km'],
+                        [250,'m',0.25,'km'],[750,'m',0.75,'km'],[3000,'m',3,'km'],
+                        [100,'m',0.1,'km'], [5000,'m',5,'km'],
+                    ];
+                    const [val, , res, unit] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorStr = unit === 'cm' ? '100' : unit === 'mm' ? '1\\,000' : '0{,}001';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en ${unit} : $${valStr}\\text{ m}$`,
+                        a: resStr,
+                        h: `$1\\text{ m} = ${factorStr}\\text{ ${unit}}$, donc $${valStr} \\times ${factorStr} = ${resStr}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 1 : cm / mm / km → m ─────────────────────────────
+                if (variant === 1) {
+                    const configs = [
+                        // cm → m (÷100)
+                        [150,'cm',1.5,'m'],  [250,'cm',2.5,'m'],  [300,'cm',3,'m'],
+                        [50,'cm',0.5,'m'],   [400,'cm',4,'m'],    [75,'cm',0.75,'m'],
+                        [125,'cm',1.25,'m'], [600,'cm',6,'m'],    [200,'cm',2,'m'],
+                        // mm → m (÷1000)
+                        [1000,'mm',1,'m'],   [2000,'mm',2,'m'],   [500,'mm',0.5,'m'],
+                        [1500,'mm',1.5,'m'], [250,'mm',0.25,'m'], [3000,'mm',3,'m'],
+                        [750,'mm',0.75,'m'], [4000,'mm',4,'m'],
+                        // km → m (×1000)
+                        [1.5,'km',1500,'m'], [2.5,'km',2500,'m'], [0.5,'km',500,'m'],
+                        [3,'km',3000,'m'],   [0.25,'km',250,'m'], [4,'km',4000,'m'],
+                        [0.75,'km',750,'m'], [2,'km',2000,'m'],
+                    ];
+                    const [val, srcUnit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorStr = srcUnit === 'cm' ? '0{,}01' : srcUnit === 'mm' ? '0{,}001' : '1\\,000';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en m : $${valStr}\\text{ ${srcUnit}}$`,
+                        a: resStr,
+                        h: `$1\\text{ ${srcUnit}} = ${factorStr}\\text{ m}$, donc $${valStr} \\times ${factorStr} = ${resStr}\\text{ m}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: 'm'
+                    };
+                }
+
+                // ── Variante 2 : m² → cm² / mm² / km² ────────────────────────
+                if (variant === 2) {
+                    const configs = [
+                        // m² → cm² (×10 000) : valeurs entières simples
+                        [1,'cm²',10000],[2,'cm²',20000],[3,'cm²',30000],
+                        [5,'cm²',50000],[0.5,'cm²',5000],[4,'cm²',40000],
+                        // m² → mm² (×1 000 000) : valeurs entières simples
+                        [1,'mm²',1000000],[2,'mm²',2000000],[3,'mm²',3000000],
+                        [0.5,'mm²',500000],[5,'mm²',5000000],
+                        // m² → km² (÷1 000 000) : résultats propres avec ≤2 décimales
+                        [1000000,'km²',1],[500000,'km²',0.5],[2000000,'km²',2],
+                        [250000,'km²',0.25],[1500000,'km²',1.5],[3000000,'km²',3],
+                    ];
+                    const [val, unit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorLabel = unit === 'cm²' ? '10\\,000' : unit === 'mm²' ? '1\\,000\\,000' : '\\frac{1}{1\\,000\\,000}';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en $\\text{${unit}}$ : $${valStr}\\text{ m}^2$`,
+                        a: resStr,
+                        h: `$1\\text{ m}^2 = ${factorLabel}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 3 : m³ → dm³ / cm³ ──────────────────────────────
+                if (variant === 3) {
+                    const configs = [
+                        // m³ → dm³ (×1000)
+                        [1,'dm³',1000],[2,'dm³',2000],[3,'dm³',3000],
+                        [0.5,'dm³',500],[4,'dm³',4000],[1.5,'dm³',1500],
+                        [5,'dm³',5000],[0.25,'dm³',250],
+                        // m³ → cm³ (×1 000 000)
+                        [1,'cm³',1000000],[2,'cm³',2000000],[0.5,'cm³',500000],
+                        [3,'cm³',3000000],[0.001,'cm³',1000],[0.002,'cm³',2000],
+                    ];
+                    const [val, unit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const factorLabel = unit === 'dm³' ? '1\\,000' : '1\\,000\\,000';
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en $\\text{${unit}}$ : $${valStr}\\text{ m}^3$`,
+                        a: resStr,
+                        h: `$1\\text{ m}^3 = ${factorLabel}\\text{ ${unit}}$`,
+                        _convTag: true, _convVal: resStr, _convUnit: unit
+                    };
+                }
+
+                // ── Variante 4 : dm³ ou m³ → L ────────────────────────────────
+                {
+                    const configs = [
+                        // dm³ → L (×1, résultat = même nombre)
+                        [1,'dm³',1,'L'],[2,'dm³',2,'L'],[5,'dm³',5,'L'],
+                        [0.5,'dm³',0.5,'L'],[3,'dm³',3,'L'],[10,'dm³',10,'L'],
+                        [1.5,'dm³',1.5,'L'],[4,'dm³',4,'L'],[0.25,'dm³',0.25,'L'],
+                        // m³ → L (×1000)
+                        [1,'m³',1000,'L'],[2,'m³',2000,'L'],[0.5,'m³',500,'L'],
+                        [3,'m³',3000,'L'],[0.25,'m³',250,'L'],[1.5,'m³',1500,'L'],
+                        [4,'m³',4000,'L'],[0.1,'m³',100,'L'],
+                    ];
+                    const [val, srcUnit, res] = pick(configs);
+                    const valStr = fmt(val), resStr = fmt(res);
+                    const hintFactor = srcUnit === 'dm³'
+                        ? `$1\\text{ dm}^3 = 1\\text{ L}$, donc $${valStr}\\text{ dm}^3 = ${resStr}\\text{ L}$`
+                        : `$1\\text{ m}^3 = 1\\,000\\text{ L}$, donc $${valStr} \\times 1\\,000 = ${resStr}\\text{ L}$`;
+                    return {
+                        label: 'Conversions d\'unités',
+                        q: `Convertir en litres : $${valStr}\\text{ ${srcUnit === 'dm³' ? 'dm' : 'm'}}^3$`,
+                        a: resStr,
+                        h: hintFactor,
+                        _convTag: true, _convVal: resStr, _convUnit: 'L'
+                    };
+                }
+            },
+            // ── ANGLES À L'INTERSECTION DE DEUX DROITES ───────────────────────
+            () => {
+                // lineAngleDeg EST la mesure de l'angle1 : l'écartement visuel correspond à l'angle affiché
+                const lineAngleDeg = 30 + Math.floor(Math.random() * 121);
+                const ldR = lineAngleDeg * Math.PI / 180;
+                const angle1 = lineAngleDeg;
+                const angle2 = 180 - lineAngleDeg;
+
+                // Les 4 secteurs (sens anti-horaire depuis +x) :
+                //   secteur 0 : angle1 (entre +x et droite inclinée)
+                //   secteur 1 : angle2 (entre droite inclinée et -x)
+                //   secteur 2 : angle1 (opposé à 0)
+                //   secteur 3 : angle2 (opposé à 1)
+                const sectorMeasure = s => (s === 0 || s === 2) ? angle1 : angle2;
+
+                const isOpposite = Math.random() < 0.5;
+                let sectorA, sectorB;
+                if (isOpposite) {
+                    [sectorA, sectorB] = Math.random() < 0.5 ? [0, 2] : [1, 3];
+                } else {
+                    const adj = [[0,1],[1,2],[2,3],[3,0]];
+                    [sectorA, sectorB] = adj[Math.floor(Math.random() * 4)];
+                }
+
+                const knownSector   = Math.random() < 0.5 ? sectorA : sectorB;
+                const unknownSector = knownSector === sectorA ? sectorB : sectorA;
+                const knownVal   = sectorMeasure(knownSector);
+                const unknownVal = sectorMeasure(unknownSector);
+
+                // Milieux angulaires des 4 secteurs (angles mathématiques, sens anti-horaire)
+                const midRad = [
+                    ldR / 2,
+                    ldR + (Math.PI - ldR) / 2,
+                    Math.PI + ldR / 2,
+                    Math.PI + ldR + (Math.PI - ldR) / 2,
+                ];
+
+                const W = 220, H = 180, cx = 110, cy = 90, L = 92;
+                const ARC_R = 22, LBL_R = 40;
+
+                const dx = Math.cos(ldR) * L, dy = Math.sin(ldR) * L;
+
+                const drawArc = (sector, color) => {
+                    const startR = [0, ldR, Math.PI, Math.PI + ldR][sector];
+                    const endR   = [ldR, Math.PI, Math.PI + ldR, 2 * Math.PI][sector];
+                    const x1 = (cx + ARC_R * Math.cos(startR)).toFixed(1);
+                    const y1 = (cy - ARC_R * Math.sin(startR)).toFixed(1);
+                    const x2 = (cx + ARC_R * Math.cos(endR)).toFixed(1);
+                    const y2 = (cy - ARC_R * Math.sin(endR)).toFixed(1);
+                    const large = (endR - startR) > Math.PI ? 1 : 0;
+                    return `<path d="M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 ${large} 0 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="2.2"/>`;
+                };
+
+                const drawLabel = (sector, text, color) => {
+                    const mx = (cx + LBL_R * Math.cos(midRad[sector])).toFixed(1);
+                    const my = (cy - LBL_R * Math.sin(midRad[sector])).toFixed(1);
+                    return `<text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="${color}" font-family="sans-serif">${text}</text>`;
+                };
+
+                let s = '';
+                // Droite horizontale
+                s += `<line x1="${cx-L}" y1="${cy}" x2="${cx+L}" y2="${cy}" stroke="var(--purple-deep)" stroke-width="2"/>`;
+                // Droite inclinée
+                s += `<line x1="${(cx-dx).toFixed(1)}" y1="${(cy+dy).toFixed(1)}" x2="${(cx+dx).toFixed(1)}" y2="${(cy-dy).toFixed(1)}" stroke="var(--purple-deep)" stroke-width="2"/>`;
+                // Point central
+                s += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--purple-deep)"/>`;
+                // Arc connu (violet) + label
+                s += drawArc(knownSector, 'var(--purple-mid)');
+                s += drawLabel(knownSector, `${knownVal}°`, 'var(--purple-mid)');
+                // Arc inconnu (rouge) + ?
+                s += drawArc(unknownSector, 'var(--red-dark)');
+                s += drawLabel(unknownSector, '?', 'var(--red-dark)');
+
+                const svg = `<div style="text-align:center;margin:12px 0;"><svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;">${s}</svg></div>`;
+
+                const hint = isOpposite
+                    ? `Ces deux angles sont <b>opposés par le sommet</b> : ils sont égaux. Réponse : ${unknownVal}°.`
+                    : `Ces deux angles sont <b>supplémentaires</b> : leur somme vaut 180°. Donc ${knownVal}° + ? = 180°, soit ? = ${unknownVal}°.`;
+
+                return {
+                    label: "Calcul d\'angle entre deux sécantes",
                     q: `Quelle est la mesure de l'angle inconnu ?${svg}`,
                     a: `${unknownVal}°`,
                     h: hint,
