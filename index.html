@@ -2879,7 +2879,7 @@
 	               .replace(',', '.');
 	    
 	    // 3. Comparaison (on accepte avec ou sans le symbole ^ selon la saisie)
-	    if (u === c || u === c.replace('^', '')) {
+	    if (u === c || u === c.replace('^', '') || u === c.replace('²', '^2')) {
 	        isCorrect = true;
 	    }
 	}
